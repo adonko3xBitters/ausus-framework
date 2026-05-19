@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useAusus } from "./context.js";

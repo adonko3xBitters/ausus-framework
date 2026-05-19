@@ -77,6 +77,7 @@ deterministic, content-addressable `MetadataGraph`.
 | [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md) | this release — packages, compatibility, publish order, rollback |
 | [`docs/PUBLICATION-READINESS.md`](docs/PUBLICATION-READINESS.md) | publication audit |
 | [`docs/L4-API-DESIGN.md`](docs/L4-API-DESIGN.md) | L4 HTTP API design + integration evidence |
+| [`docs/REAL-WORLD-INTEGRATION.md`](docs/REAL-WORLD-INTEGRATION.md) | 5-sandbox integration matrix (Plain/Slim/Laravel/Symfony/Next.js) |
 | [`docs/RFC-000-v0r2-remediation.md`](docs/RFC-000-v0r2-remediation.md) | Node-ESM + clean-room remediation pass |
 | [`docs/RENDERER-REACT-V0-REAL-PASS.md`](docs/RENDERER-REACT-V0-REAL-PASS.md) | React renderer V0 evidence |
 | [`docs/COMPILER-DESIGN.md`](docs/COMPILER-DESIGN.md), [`docs/PERSISTENCE-SQL-DESIGN.md`](docs/PERSISTENCE-SQL-DESIGN.md), [`docs/RUNTIME-DEFAULT-DESIGN.md`](docs/RUNTIME-DEFAULT-DESIGN.md), [`docs/RENDERER-REACT-DESIGN.md`](docs/RENDERER-REACT-DESIGN.md) | per-package design docs |
