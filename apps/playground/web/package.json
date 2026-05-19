@@ -1,0 +1,22 @@
+{
+  "name": "ausus-playground-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "trace":  "tsx render-trace.tsx",
+    "bundle": "esbuild src/App.tsx --bundle --minify --format=esm --jsx=automatic --loader:.tsx=tsx --outfile=dist/bundle.js --alias:@ausus/renderer-react=../../../renderer/react/src/index.ts"
+  },
+  "dependencies": {
+    "@ausus/renderer-react": "0.1.0",
+    "react":                 "^18.3.1",
+    "react-dom":             "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react":     "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "esbuild":          "^0.21.0",
+    "tsx":              "^4.7.0",
+    "typescript":       "^5.4.0"
+  }
+}
