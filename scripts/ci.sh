@@ -88,4 +88,11 @@ grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-trace.log \
 echo "[ci] step 9 — npm pack --dry-run"
 (cd renderer/react && npm pack --dry-run 2>&1 | grep -E "(version|package size|total files):" | sed 's/^/  /')
 
-echo "[ci] DONE — all 9 steps passed"
+# 10
+echo "[ci] step 10 — L4 HTTP integration (live php -S + renderer-react)"
+bash scripts/integration-http.sh > /tmp/ausus-ci-integration.log 2>&1
+grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-integration.log \
+    && echo "  ✓ integration-http 12/12" \
+    || { echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10; }
+
+echo "[ci] DONE — all 10 steps passed"
