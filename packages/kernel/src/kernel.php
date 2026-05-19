@@ -93,6 +93,10 @@ final class StubActor implements Actor {
     private function sortUnique(array $a): array { $a = array_values(array_unique($a)); sort($a, SORT_STRING); return $a; }
 }
 
+/**
+ * @internal — bound by the Invoker; consumers see this through
+ * EffectContext, never construct it directly. See docs/API-GOVERNANCE.md §6.
+ */
 final readonly class Context {
     public function __construct(
         public Tenant $tenant,
@@ -416,8 +420,11 @@ final class Ulid {
 class AususError extends \RuntimeException {}
 
 class UnknownAction extends AususError {}
+/** @internal — Invoker pre-condition; not in the consumer catchable taxonomy. */
 class PolicySubjectRequired extends AususError {}
+/** @internal — Invoker pre-condition. */
 class ActorRequired extends AususError {}
+/** @internal — Invoker pre-condition. */
 class TenantContextRequired extends AususError {}
 class TenantBoundaryViolation extends AususError {}
 class PolicyDenied extends AususError {}

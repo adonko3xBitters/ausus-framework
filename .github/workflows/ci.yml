@@ -88,6 +88,9 @@ jobs:
         if: matrix.php-version == '8.4' && matrix.node-version == '22'
         run: bash scripts/integration-http.sh
 
+      - name: Public API surface guardrail
+        run: php apps/playground/api-surface.php
+
   # ─────────────────────────────────────────────────────────────────────
   # React-version compatibility job — proves @ausus/renderer-react works
   # under each version it claims to support in peerDependencies (^18 || ^19).

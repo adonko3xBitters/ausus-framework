@@ -17,6 +17,11 @@ use Ausus\{
 // EFFECT CONTEXT IMPLEMENTATION
 // =============================================================================
 
+/**
+ * @internal — built by the Invoker; consumers receive this through the
+ * EffectContext interface and never instantiate the concrete class.
+ * See docs/API-GOVERNANCE.md §6.
+ */
 final class DefaultEffectContext implements EffectContext {
     public function __construct(
         private readonly PersistenceContext $persistence,
@@ -135,6 +140,12 @@ final class WorkflowRuntime {
 // EFFECT DISPATCHER + BUILT-IN EFFECTS
 // =============================================================================
 
+/**
+ * @internal — accessed via the `'kernel.builtin.create'` marker
+ * (ActionNode.effectClass). Never instantiate directly; the
+ * EffectDispatcher owns the construction.
+ * See docs/API-GOVERNANCE.md §6.
+ */
 final class CreateEffect implements Effect {
     /** @param array{entityFqn:string, workflowStateField?:?string, workflowInitial?:?string} $config */
     public function __construct(private readonly array $config) {}
@@ -149,6 +160,10 @@ final class CreateEffect implements Effect {
     }
 }
 
+/**
+ * @internal — accessed via the `'kernel.builtin.transition'` marker.
+ * Never instantiate directly. See docs/API-GOVERNANCE.md §6.
+ */
 final class TransitionEffect implements Effect {
     /** @param array{entityFqn:string, stateField:string, target:string, stamps?:array<string>} $config */
     public function __construct(private readonly array $config) {}

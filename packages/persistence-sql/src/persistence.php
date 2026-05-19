@@ -13,11 +13,20 @@ use Ausus\{
 // SQLite-backed PersistenceDriver  (V0 minimal)
 // =============================================================================
 
+/**
+ * @internal — yielded by SqlitePersistenceDriver::beginTransaction;
+ * consumers treat this as the opaque TransactionHandle interface.
+ * See docs/API-GOVERNANCE.md §6.
+ */
 final class SqliteTransactionHandle implements TransactionHandle {
     public function __construct(public readonly Tenant $tenantBound, public bool $closed = false) {}
     public function tenant(): Tenant { return $this->tenantBound; }
 }
 
+/**
+ * @internal — returned by SqlitePersistenceDriver::context;
+ * consumers see this through the PersistenceContext interface.
+ */
 final class SqliteContext implements PersistenceContext {
     public function __construct(
         private readonly \PDO $pdo,
@@ -35,6 +44,10 @@ final class SqliteContext implements PersistenceContext {
     }
 }
 
+/**
+ * @internal — returned by SqliteContext::repository; consumers see this
+ * through the Repository interface. Do not instantiate directly.
+ */
 final class SqliteRepository implements Repository {
     public function __construct(
         private readonly \PDO $pdo,

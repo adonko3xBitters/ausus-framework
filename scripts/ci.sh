@@ -95,4 +95,11 @@ grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-integration.log \
     && echo "  ✓ integration-http 12/12" \
     || { echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10; }
 
-echo "[ci] DONE — all 10 steps passed"
+# 11 — public API surface guardrail (catches accidental new exports)
+echo "[ci] step 11 — public API surface snapshot"
+php apps/playground/api-surface.php > /tmp/ausus-ci-surface.log 2>&1
+grep -q "public surface matches snapshot" /tmp/ausus-ci-surface.log \
+    && echo "  ✓ surface matches docs/API-GOVERNANCE.md" \
+    || { echo "surface drift — diff:"; cat /tmp/ausus-ci-surface.log; exit 11; }
+
+echo "[ci] DONE — all 11 steps passed"

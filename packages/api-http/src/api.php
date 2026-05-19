@@ -232,6 +232,11 @@ final class Router implements RequestHandlerInterface
 //   EffectFailure / unknown  → 500  Internal Server Error
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * @internal — invoked by the Router on any uncaught exception. Consumers
+ * never call this directly; the kind ↔ HTTP-status mapping is part of
+ * the contract (see SEMVER-CONTRACT.md §5.3).
+ */
 final class ErrorMapper
 {
     public static function toResponse(
