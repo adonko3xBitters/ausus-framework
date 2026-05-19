@@ -80,6 +80,16 @@ jobs:
         working-directory: renderer/react
         run: npm pack --dry-run
 
+      - name: PHP hardening probes (compiler / runtime / persistence / DSL)
+        run: |
+          php apps/playground/hardening.php | tee /tmp/harden.log
+          grep -q "Prevented: [0-9]\+   Wrong-exception: 0   Unhandled: 0" /tmp/harden.log
+
+      - name: Renderer hardening probes (malformed schemas + crash containment)
+        run: |
+          npm run harden | tee /tmp/harden-react.log
+          grep -q "Prevented: [0-9]\+   Unhandled: 0   Crashed: 0" /tmp/harden-react.log
+
       - name: Clean-room install (only on PHP 8.4 + Node 22)
         if: matrix.php-version == '8.4' && matrix.node-version == '22'
         run: bash scripts/clean-room.sh

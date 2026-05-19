@@ -88,4 +88,18 @@ grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-trace.log \
 echo "[ci] step 9 — npm pack --dry-run"
 (cd renderer/react && npm pack --dry-run 2>&1 | grep -E "(version|package size|total files):" | sed 's/^/  /')
 
-echo "[ci] DONE — all 9 steps passed"
+# 10 — hardening probes (PHP)
+echo "[ci] step 10 — PHP hardening probes"
+php apps/playground/hardening.php > /tmp/ausus-ci-hardening-php.log 2>&1
+grep -q "Prevented: [0-9]\+   Wrong-exception: 0   Unhandled: 0" /tmp/ausus-ci-hardening-php.log \
+    && echo "  ✓ PHP hardening: 0 unhandled, 0 wrong-exception" \
+    || { echo "PHP hardening failed"; tail -30 /tmp/ausus-ci-hardening-php.log; exit 10; }
+
+# 11 — hardening probes (renderer)
+echo "[ci] step 11 — renderer hardening probes"
+npm run harden > /tmp/ausus-ci-hardening-react.log 2>&1
+grep -q "Prevented: [0-9]\+   Unhandled: 0   Crashed: 0" /tmp/ausus-ci-hardening-react.log \
+    && echo "  ✓ renderer hardening: 0 crashed, 0 unhandled" \
+    || { echo "renderer hardening failed"; tail -30 /tmp/ausus-ci-hardening-react.log; exit 11; }
+
+echo "[ci] DONE — all 11 steps passed"

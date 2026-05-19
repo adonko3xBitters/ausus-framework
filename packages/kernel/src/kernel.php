@@ -308,22 +308,53 @@ final class Compiler {
         $entities = []; $actions = []; $policies = []; $workflows = []; $projections = [];
         foreach ($plugins as $plugin) {
             $desc = $plugin->describe();
+
+            // Validate non-empty FQN + detect duplicate registration across every
+            // node kind. Actions were already protected; this hardens entities,
+            // policies, workflows, and projections (see hardening-pass §CT-01/03/08/09).
             foreach ($desc['entities'] ?? [] as $e) {
+                if ($e->fqn === '') {
+                    throw new \RuntimeException("MalformedDescriptor: entity has empty fqn (plugin={$plugin->name()})");
+                }
+                if (isset($entities[$e->fqn])) {
+                    throw new \RuntimeException("DuplicateRegistration: entity {$e->fqn}");
+                }
                 $entities[$e->fqn] = $e;
             }
             foreach ($desc['actions'] ?? [] as $a) {
+                if ($a->fqn === '') {
+                    throw new \RuntimeException("MalformedDescriptor: action has empty fqn (plugin={$plugin->name()})");
+                }
                 if (isset($actions[$a->fqn])) {
                     throw new \RuntimeException("DuplicateRegistration: action {$a->fqn}");
                 }
                 $actions[$a->fqn] = $a;
             }
             foreach ($desc['policies'] ?? [] as $p) {
+                if ($p->fqn === '') {
+                    throw new \RuntimeException("MalformedDescriptor: policy has empty fqn (plugin={$plugin->name()})");
+                }
+                if (isset($policies[$p->fqn])) {
+                    throw new \RuntimeException("DuplicateRegistration: policy {$p->fqn}");
+                }
                 $policies[$p->fqn] = $p;
             }
             foreach ($desc['workflows'] ?? [] as $w) {
+                if ($w->fqn === '') {
+                    throw new \RuntimeException("MalformedDescriptor: workflow has empty fqn (plugin={$plugin->name()})");
+                }
+                if (isset($workflows[$w->fqn])) {
+                    throw new \RuntimeException("DuplicateRegistration: workflow {$w->fqn}");
+                }
                 $workflows[$w->fqn] = $w;
             }
             foreach ($desc['projections'] ?? [] as $pr) {
+                if ($pr->fqn === '') {
+                    throw new \RuntimeException("MalformedDescriptor: projection has empty fqn (plugin={$plugin->name()})");
+                }
+                if (isset($projections[$pr->fqn])) {
+                    throw new \RuntimeException("DuplicateRegistration: projection {$pr->fqn}");
+                }
                 $projections[$pr->fqn] = $pr;
             }
         }
@@ -353,6 +384,26 @@ final class Compiler {
                 }
                 if (!isset($actions[$t->viaActionFqn])) {
                     throw new \RuntimeException("DanglingReference: transition via '{$t->viaActionFqn}' not registered");
+                }
+            }
+        }
+        // Projection-level reference validation (hardening §CT-08/09): every
+        // field referenced must exist on the owner entity; every actionFqn must
+        // resolve to a registered Action. Caught here at compile-time so the
+        // L4 / renderer surface never sees a stale projection definition.
+        foreach ($projections as $pr) {
+            if (!isset($entities[$pr->ownerEntityFqn])) {
+                throw new \RuntimeException("DanglingReference: projection {$pr->fqn} → entity {$pr->ownerEntityFqn} (not registered)");
+            }
+            $entity = $entities[$pr->ownerEntityFqn];
+            foreach ($pr->fields as $fname) {
+                if ($entity->field($fname) === null) {
+                    throw new \RuntimeException("DanglingReference: projection {$pr->fqn} field '{$fname}' not on entity {$pr->ownerEntityFqn}");
+                }
+            }
+            foreach ($pr->actionFqns as $afqn) {
+                if (!isset($actions[$afqn])) {
+                    throw new \RuntimeException("DanglingReference: projection {$pr->fqn} → action {$afqn} (not registered)");
                 }
             }
         }

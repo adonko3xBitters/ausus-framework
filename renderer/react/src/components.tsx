@@ -183,22 +183,30 @@ export function ListView(props: {
   schema: ViewSchema;
   onRefetch: () => void;
 }) {
-  const data = props.schema.data as { items: Record<string, unknown>[] };
-  const items = data?.items ?? [];
+  // Defensive coercion (hardening §R-03/§R-14): a malformed server response
+  // — wrong shape on data.items or a missing metadata block — must not crash
+  // the host React tree. Fall back to empty + opaque labels.
+  const data = (props.schema.data ?? {}) as { items?: unknown };
+  const items: Record<string, unknown>[] = Array.isArray(data.items)
+    ? (data.items as Record<string, unknown>[])
+    : [];
+  const meta = props.schema.metadata ?? { projection: "", tenant: "", entity: "" };
+  const fields  = Array.isArray(props.schema.fields)  ? props.schema.fields  : [];
+  const actions = Array.isArray(props.schema.actions) ? props.schema.actions : [];
 
-  const listActions = props.schema.actions.filter(a => !a.subjectRequired);
-  const itemActions = props.schema.actions.filter(a =>  a.subjectRequired);
+  const listActions = actions.filter(a => !a.subjectRequired);
+  const itemActions = actions.filter(a =>  a.subjectRequired);
 
   return (
     <section className="ausus-list">
       <header className="ausus-list__header">
-        <h1 className="ausus-list__title">{props.schema.metadata.projection}</h1>
+        <h1 className="ausus-list__title">{meta.projection}</h1>
         <ActionBar actions={listActions} onSuccess={props.onRefetch} />
       </header>
       <table className="ausus-table">
         <thead>
           <tr>
-            {props.schema.fields.map(f => (
+            {fields.map(f => (
               <th key={f.name}>{f.label}</th>
             ))}
             {itemActions.length > 0 && <th className="ausus-table__actions-col">Actions</th>}
@@ -207,20 +215,20 @@ export function ListView(props: {
         <tbody>
           {items.length === 0 && (
             <tr>
-              <td colSpan={props.schema.fields.length + (itemActions.length > 0 ? 1 : 0)} className="ausus-empty">
+              <td colSpan={fields.length + (itemActions.length > 0 ? 1 : 0)} className="ausus-empty">
                 No items.
               </td>
             </tr>
           )}
           {items.map((row, i) => {
             const subject: Reference = {
-              tenantId: props.schema.metadata.tenant,
-              entityFqn: props.schema.metadata.entity,
+              tenantId:       meta.tenant,
+              entityFqn:      meta.entity,
               identityHandle: String(row["id"] ?? ""),
             };
             return (
               <tr key={subject.identityHandle || i}>
-                {props.schema.fields.map(f => (
+                {fields.map(f => (
                   <td key={f.name}><FieldDisplay field={f} value={row[f.name]} /></td>
                 ))}
                 {itemActions.length > 0 && (
@@ -247,23 +255,29 @@ export function ListView(props: {
 
 export function DetailView(props: {
   schema: ViewSchema;
-  subject: Reference;
+  subject?: Reference;
   onRefetch: () => void;
 }) {
-  const data = props.schema.data as { item: Record<string, unknown> | null };
-  const item = data?.item;
-
+  // Defensive coercion (hardening §R-10/R-11/R-14/R-15): malformed wire
+  // payloads must surface a contained fallback, never crash the host tree.
+  const data = (props.schema.data ?? {}) as { item?: unknown };
+  const item = (data.item && typeof data.item === "object")
+    ? (data.item as Record<string, unknown>)
+    : null;
   if (!item) {
     return <div className="ausus-empty">Item not found.</div>;
   }
+  const meta    = props.schema.metadata ?? { projection: "", tenant: "", entity: "" };
+  const fields  = Array.isArray(props.schema.fields)  ? props.schema.fields  : [];
+  const actions = Array.isArray(props.schema.actions) ? props.schema.actions : [];
 
   return (
     <section className="ausus-detail">
       <header className="ausus-detail__header">
-        <h1 className="ausus-detail__title">{props.schema.metadata.projection}</h1>
+        <h1 className="ausus-detail__title">{meta.projection}</h1>
       </header>
       <dl className="ausus-detail__list">
-        {props.schema.fields.map(f => (
+        {fields.map(f => (
           <div className="ausus-detail__row" key={f.name}>
             <dt>{f.label}</dt>
             <dd><FieldDisplay field={f} value={item[f.name]} /></dd>
@@ -272,7 +286,7 @@ export function DetailView(props: {
       </dl>
       <footer className="ausus-detail__footer">
         <ActionBar
-          actions={props.schema.actions}
+          actions={actions}
           subject={props.subject}
           onSuccess={props.onRefetch}
         />
