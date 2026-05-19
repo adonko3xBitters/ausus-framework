@@ -225,6 +225,34 @@ final class Invoker {
         private readonly Actor $actor,                  // V0 — single Actor
     ) {}
 
+    /**
+     * Sugar: build a fully-wired Invoker from the 5 inputs a consumer actually
+     * varies per request (graph, driver, sink, tenant, actor). Encapsulates the
+     * standard composition (PolicyEngine, WorkflowRuntime, TransitionSetIndex,
+     * EffectDispatcher, DefaultAuditor, SequenceCounter) — no magic, no
+     * behavior change vs the explicit 9-arg constructor.
+     *
+     * Consumers wanting to swap any engine (custom Policy backend, alternate
+     * Effect dispatcher, etc.) still use the explicit constructor.
+     */
+    public static function standard(
+        MetadataGraph $graph,
+        PersistenceDriver $driver,
+        AuditSink $sink,
+        Tenant $tenant,
+        Actor $actor,
+    ): self {
+        return new self(
+            $graph, $driver,
+            new PolicyEngine($graph),
+            new WorkflowRuntime(new TransitionSetIndex($graph)),
+            new EffectDispatcher(),
+            new DefaultAuditor($sink),
+            new SequenceCounter(),
+            $tenant, $actor,
+        );
+    }
+
     public function invoke(string $actionFqn, ?Reference $subject, array $inputs = []): array {
         // Pre-flight
         $action = $this->graph->actions[$actionFqn] ?? null;

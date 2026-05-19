@@ -95,4 +95,19 @@ grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-integration.log \
     && echo "  ✓ integration-http 12/12" \
     || { echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10; }
 
-echo "[ci] DONE — all 10 steps passed"
+# 11 — consumer DX pass (3 external apps, real end-to-end)
+echo "[ci] step 11 — consumer DX (3 external apps)"
+php apps/consumer-minimal-crud/run.php > /tmp/ausus-ci-c1.log 2>&1 \
+    && grep -q "consumer-minimal-crud — OK" /tmp/ausus-ci-c1.log \
+    && echo "  ✓ consumer-minimal-crud" \
+    || { echo "consumer-minimal-crud failed"; tail -20 /tmp/ausus-ci-c1.log; exit 11; }
+php apps/consumer-multi-tenant/run.php > /tmp/ausus-ci-c2.log 2>&1 \
+    && grep -q "consumer-multi-tenant — OK" /tmp/ausus-ci-c2.log \
+    && echo "  ✓ consumer-multi-tenant" \
+    || { echo "consumer-multi-tenant failed"; tail -20 /tmp/ausus-ci-c2.log; exit 11; }
+npx tsx apps/consumer-custom-renderer/run.tsx > /tmp/ausus-ci-c3.log 2>&1 \
+    && grep -q "RESULT: passed=9 failed=0" /tmp/ausus-ci-c3.log \
+    && echo "  ✓ consumer-custom-renderer (9/9)" \
+    || { echo "consumer-custom-renderer failed"; tail -20 /tmp/ausus-ci-c3.log; exit 11; }
+
+echo "[ci] DONE — all 11 steps passed"

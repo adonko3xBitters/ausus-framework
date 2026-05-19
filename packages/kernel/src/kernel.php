@@ -209,6 +209,31 @@ final readonly class FieldNode {
         /** @var array<string,mixed> */ public array $typeOptions,
         public mixed $default,
     ) {}
+
+    /**
+     * Sugar: build a system-tagged, non-nullable FieldNode in one call.
+     * Pure additive — equivalent to `new FieldNode($name, $type, true, false, [], $default)`.
+     * Consumer DX: cuts the canonical 5-line system-fields block to 5 single-line calls.
+     */
+    public static function system(string $name, string $type, mixed $default = null): self
+    {
+        return new self($name, $type, true, false, [], $default);
+    }
+
+    /**
+     * Sugar: return the canonical system-field set every tenant-scoped entity
+     * needs (RFC-002 §3). Consumers spread it via `...FieldNode::systemSet()`.
+     */
+    public static function systemSet(): array
+    {
+        return [
+            self::system('id',         'identity'),
+            self::system('tenant_id',  'system_string'),
+            self::system('_version',   'version'),
+            self::system('created_at', 'datetime'),
+            self::system('updated_at', 'datetime'),
+        ];
+    }
 }
 
 final readonly class TransitionNode {

@@ -88,6 +88,12 @@ jobs:
         if: matrix.php-version == '8.4' && matrix.node-version == '22'
         run: bash scripts/integration-http.sh
 
+      - name: Consumer DX (3 external apps)
+        run: |
+          php apps/consumer-minimal-crud/run.php
+          php apps/consumer-multi-tenant/run.php
+          npx tsx apps/consumer-custom-renderer/run.tsx
+
   # ─────────────────────────────────────────────────────────────────────
   # React-version compatibility job — proves @ausus/renderer-react works
   # under each version it claims to support in peerDependencies (^18 || ^19).

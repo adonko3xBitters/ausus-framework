@@ -26,7 +26,12 @@
         "nyholm/psr7-server":         "^1.1"
     },
     "autoload": {
-        "classmap": ["apps/playground"]
+        "classmap": [
+            "apps/playground",
+            "apps/consumer-minimal-crud/src",
+            "apps/consumer-multi-tenant/src",
+            "apps/consumer-custom-renderer/src"
+        ]
     },
     "config": {
         "preferred-install": "dist",
