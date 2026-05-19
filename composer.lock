@@ -1,0 +1,218 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "d864b5a2d2bfc226e2cbc5a5efca5749",
+    "packages": [
+        {
+            "name": "ausus/kernel",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/kernel",
+                "reference": "7a04e4064163a7325eb56a32150882fc44ba99f6"
+            },
+            "require": {
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L0",
+                    "role": "kernel"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Kernel\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS Kernel — contracts, value objects, DSL facade. RFC-001 + contract surfaces of RFC-005 §2, RFC-013 §2, RFC-014 §2.",
+            "homepage": "https://github.com/ausus-framework/ausus",
+            "keywords": [
+                "ausus",
+                "framework",
+                "kernel",
+                "metadata"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/persistence-sql",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/persistence-sql",
+                "reference": "14898d25b9ed77676079fbe4690b07a06c0c62ae"
+            },
+            "require": {
+                "ausus/kernel": "0.1.*",
+                "ext-pdo": "*",
+                "php": ">=8.3"
+            },
+            "suggest": {
+                "ext-pdo_mysql": "For MySQL deployments",
+                "ext-pdo_pgsql": "For PostgreSQL deployments",
+                "ext-pdo_sqlite": "Default driver for V0 smoke tests"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L3",
+                    "role": "driver"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Persistence\\Sql\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "L3 PersistenceDriver — SQL implementation of RFC-002 via PDO (SQLite/MySQL/Postgres). Includes SchemaDeriver + DatabaseAuditSink.",
+            "homepage": "https://github.com/ausus-framework/ausus",
+            "keywords": [
+                "ausus",
+                "framework",
+                "pdo",
+                "persistence",
+                "sql"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/runtime-default",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/runtime-default",
+                "reference": "46eab568eac3cb9a59721f2e0c645a36191310b4"
+            },
+            "require": {
+                "ausus/kernel": "0.1.*",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L2",
+                    "role": "runtime"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Runtime\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "L2 Runtime — Invoker, Policy Engine, Workflow runtime, Effect dispatch. Implements RFC-005 §3–§13, RFC-006, RFC-001 §A-1.4 §8.2.1, and the de facto ActionEffect dispatch of RFC-013.",
+            "homepage": "https://github.com/ausus-framework/ausus",
+            "keywords": [
+                "ausus",
+                "framework",
+                "invoker",
+                "runtime",
+                "workflow"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/starter",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/starter",
+                "reference": "cc6122142a250bda6acc6d71c7a22994a1bc169d"
+            },
+            "require": {
+                "ausus/kernel": "0.1.*",
+                "ausus/persistence-sql": "0.1.*",
+                "ausus/runtime-default": "0.1.*",
+                "ext-pdo": "*",
+                "ext-pdo_sqlite": "*",
+                "php": ">=8.3"
+            },
+            "bin": [
+                "bin/boot.php"
+            ],
+            "type": "project",
+            "extra": {
+                "ausus": {
+                    "layer": "L7",
+                    "role": "template"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "scripts": {
+                "post-create-project-cmd": [
+                    "@php bin/boot.php"
+                ],
+                "boot": [
+                    "@php bin/boot.php"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS V0 starter template — boots a working HelloInvoice demo on top of kernel + persistence-sql + runtime-default. Installs via `composer create-project ausus/starter myapp`.",
+            "homepage": "https://github.com/ausus-framework/ausus",
+            "keywords": [
+                "ausus",
+                "framework",
+                "scaffold",
+                "starter"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {},
+    "prefer-stable": true,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=8.3"
+    },
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
+}

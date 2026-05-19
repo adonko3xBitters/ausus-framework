@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel in-flight runs on the same ref
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: validate · install · smoke · build · trace · pack
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:  ['8.3', '8.4']
+        node-version: ['18', '20', '22']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: pdo, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Show toolchain
+        run: |
+          php --version | head -1
+          composer --version
+          node --version
+          npm --version
+
+      - name: Composer validate (all 10 manifests)
+        run: |
+          for f in composer.json packages/*/composer.json; do
+            composer validate --no-check-publish --no-check-lock --no-check-version "$f"
+          done
+
+      - name: Composer install
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: PHP playground smoke (36 assertions)
+        run: php apps/playground/run.php
+
+      - name: Starter boot
+        run: composer --working-dir=packages/starter boot
+
+      - name: npm install (workspace)
+        run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+      - name: npm build
+        run: npm run build
+
+      - name: npm trace (12 React assertions)
+        run: npm run trace
+
+      - name: npm pack --dry-run
+        working-directory: renderer/react
+        run: npm pack --dry-run
+
+      - name: Clean-room install (only on PHP 8.4 + Node 22)
+        if: matrix.php-version == '8.4' && matrix.node-version == '22'
+        run: bash scripts/clean-room.sh

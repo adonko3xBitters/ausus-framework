@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security disclosure
+    url: https://github.com/adonko3xBitters/ausus-framework/blob/main/SECURITY.md
+    about: Vulnerabilities — do not file public issues. Use the channel in SECURITY.md.
+  - name: Discussions
+    url: https://github.com/adonko3xBitters/ausus-framework/discussions
+    about: Questions, ideas, and open-ended design talk go here.

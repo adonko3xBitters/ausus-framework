@@ -1,0 +1,44 @@
+# ── Composer ─────────────────────────────────────────────────────────────
+/vendor/
+packages/*/vendor/
+apps/*/vendor/
+.composer-cache/
+.phpunit.result.cache
+.phpstan-cache/
+.php-cs-fixer.cache
+
+# ── npm / Node ───────────────────────────────────────────────────────────
+node_modules/
+renderer/react/node_modules/
+apps/playground/web/node_modules/
+
+# ── Build artifacts ──────────────────────────────────────────────────────
+renderer/react/dist/
+apps/playground/web/dist/
+*.tsbuildinfo
+
+# ── Runtime / playground state ───────────────────────────────────────────
+apps/playground/*.sqlite
+*.sqlite
+*.sqlite-journal
+*.log
+
+# ── Editor / OS ──────────────────────────────────────────────────────────
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# ── Local-only ───────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+/tmp/
+.composer/
+
+# ── Local assistant scaffolding (not source-of-truth) ────────────────────
+.claude/
+CLAUDE.md
+AGENTS.md
+*.pdf

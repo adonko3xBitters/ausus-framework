@@ -1,0 +1,34 @@
+{
+    "name": "ausus/monorepo",
+    "type": "project",
+    "description": "AUSUS monorepo — V0 publication-ready workspace. Resolves ausus/* packages from local path repositories; mirrors what Packagist will see post-publication.",
+    "license": "MIT",
+    "repositories": [
+        { "type": "path", "url": "packages/kernel",                "options": { "symlink": true } },
+        { "type": "path", "url": "packages/persistence-sql",       "options": { "symlink": true } },
+        { "type": "path", "url": "packages/runtime-default",       "options": { "symlink": true } },
+        { "type": "path", "url": "packages/tenancy-row",           "options": { "symlink": true } },
+        { "type": "path", "url": "packages/audit-database",        "options": { "symlink": true } },
+        { "type": "path", "url": "packages/auth-bridge",           "options": { "symlink": true } },
+        { "type": "path", "url": "packages/presentation-default",  "options": { "symlink": true } },
+        { "type": "path", "url": "packages/standard-stack",        "options": { "symlink": true } },
+        { "type": "path", "url": "packages/starter",               "options": { "symlink": true } }
+    ],
+    "require": {
+        "php": ">=8.3",
+        "ausus/kernel":               "0.1.*",
+        "ausus/persistence-sql":      "0.1.*",
+        "ausus/runtime-default":      "0.1.*",
+        "ausus/starter":              "0.1.*"
+    },
+    "autoload": {
+        "classmap": ["apps/playground"]
+    },
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {}
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

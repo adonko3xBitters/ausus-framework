@@ -1,0 +1,20 @@
+# AUSUS — code ownership
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default — anything not listed below
+*                              @adonko3xBitters
+
+# Per-layer ownership (matches RFC-001 layer numbering)
+/packages/kernel/              @adonko3xBitters
+/packages/runtime-default/     @adonko3xBitters
+/packages/persistence-sql/     @adonko3xBitters
+/packages/starter/             @adonko3xBitters
+/renderer/react/               @adonko3xBitters
+
+# Architectural sources of truth
+/rfcs/                         @adonko3xBitters
+/docs/                         @adonko3xBitters
+
+# CI + tooling
+/.github/                      @adonko3xBitters
+/scripts/                      @adonko3xBitters

@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a problem with AUSUS
+title: "[bug] <short summary>"
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report.
+
+        **Security vulnerabilities — do not file here.** Use SECURITY.md.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: A clear description of the bug.
+      placeholder: When I call X with Y, it crashes with Z.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimum reproduction
+      description: Smallest commands or code that triggers the bug.
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: input
+    id: ausus-version
+    attributes:
+      label: AUSUS version
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: PHP version
+      placeholder: "8.3.x"
+    validations:
+      required: false
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node version (if React renderer)
+      placeholder: "20.x"
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / stack trace
+      render: text
