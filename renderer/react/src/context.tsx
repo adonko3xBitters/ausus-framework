@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { createContext, useContext, ReactNode } from "react";
 import type { Fetcher } from "./types.js";

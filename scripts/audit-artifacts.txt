@@ -1,0 +1,121 @@
+AUSUS — package integrity audit
+captured: 2026-05-19T17:49:19Z
+PHP 8.4.18   composer 2.9.5
+node v22.22.0   npm 10.9.4
+═══════════════════════════════════════════════════════════════════════════════════════════════════
+
+── build artifacts ──
+  ✓ composer archive ausus/kernel
+  ✓ composer archive ausus/persistence-sql
+  ✓ composer archive ausus/runtime-default
+  ✓ composer archive ausus/api-http
+  ✓ composer archive ausus/tenancy-row
+  ✓ composer archive ausus/audit-database
+  ✓ composer archive ausus/auth-bridge
+  ✓ composer archive ausus/presentation-default
+  ✓ composer archive ausus/standard-stack
+  ✓ composer archive ausus/starter
+  ✓ npm pack @ausus/renderer-react
+
+── per-package inventory + leakage scan ──
+
+── ausus/kernel  (6 files, 46080 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ src/ present
+
+── ausus/persistence-sql  (5 files, 23040 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ src/ present
+
+── ausus/runtime-default  (5 files, 29184 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ src/ present
+
+── ausus/api-http  (5 files, 27648 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ src/ present
+
+── ausus/tenancy-row  (4 files, 8192 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ skeleton (no src/ expected)
+
+── ausus/audit-database  (4 files, 8704 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ skeleton (no src/ expected)
+
+── ausus/auth-bridge  (4 files, 8704 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ skeleton (no src/ expected)
+
+── ausus/presentation-default  (4 files, 9216 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ skeleton (no src/ expected)
+
+── ausus/standard-stack  (4 files, 9728 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ metapackage (no src/ expected)
+
+── ausus/starter  (8 files, 27648 B)
+  ✓ composer.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ src/ present
+
+── @ausus/renderer-react ──
+  tarball: ausus-renderer-react-0.1.0.tgz  (21010 B)
+  files: 34
+  ✓ package.json
+  ✓ LICENSE
+  ✓ README.md
+  ✓ CHANGELOG.md
+  ✓ dist/index.js
+  ✓ dist/index.d.ts
+  ✓ has exports field
+  ✓ main exports . path
+  ✓ main exports has types
+  ✓ main exports has import
+  ✓ subpath ./types declared
+  ✓ subpath ./package.json declared
+  ✓ type: module
+  ✓ peerDependencies declared
+  ✓ engines.node declared
+  ✓ sideEffects flag declared
+  source maps:        6
+  declaration maps:   6
+  src .ts/.tsx files: 6
+  dist .js files:     6
+  ✓ src↔dist parity
+  ✓ dist/context.js starts with "use client"
+  ✓ dist/hooks.js starts with "use client"
+  ✓ dist/components.js starts with "use client"
+  ✓ dist/ViewSchemaConsumer.js starts with "use client"
+
+═══════════════════════════════════════════════════════════════════════════════════════════════════
+RESULT: 0 issues

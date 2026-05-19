@@ -2,16 +2,24 @@
     "name": "ausus/runtime-default",
     "type": "library",
     "version": "0.1.0",
-    "description": "L2 Runtime — Invoker, Policy Engine, Workflow runtime, Effect dispatch. Implements RFC-005 §3–§13, RFC-006, RFC-001 §A-1.4 §8.2.1, and the de facto ActionEffect dispatch of RFC-013.",
+    "description": "L2 Runtime \u2014 Invoker, Policy Engine, Workflow runtime, Effect dispatch. Implements RFC-005 \u00a73\u2013\u00a713, RFC-006, RFC-001 \u00a7A-1.4 \u00a78.2.1, and the de facto ActionEffect dispatch of RFC-013.",
     "license": "MIT",
-    "keywords": ["ausus", "framework", "runtime", "invoker", "workflow"],
+    "keywords": [
+        "ausus",
+        "framework",
+        "runtime",
+        "invoker",
+        "workflow"
+    ],
     "homepage": "https://github.com/ausus-framework/ausus",
     "require": {
         "php": ">=8.3",
         "ausus/kernel": "0.1.*"
     },
     "autoload": {
-        "classmap": ["src/"]
+        "classmap": [
+            "src/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -23,6 +31,13 @@
             "layer": "L2",
             "role": "runtime"
         }
+    },
+    "archive": {
+        "exclude": [
+            "/tests",
+            "/.gitkeep",
+            "/.DS_Store"
+        ]
     },
     "minimum-stability": "stable",
     "prefer-stable": true

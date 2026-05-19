@@ -2,15 +2,22 @@
     "name": "ausus/kernel",
     "type": "library",
     "version": "0.1.0",
-    "description": "AUSUS Kernel — contracts, value objects, DSL facade. RFC-001 + contract surfaces of RFC-005 §2, RFC-013 §2, RFC-014 §2.",
+    "description": "AUSUS Kernel \u2014 contracts, value objects, DSL facade. RFC-001 + contract surfaces of RFC-005 \u00a72, RFC-013 \u00a72, RFC-014 \u00a72.",
     "license": "MIT",
-    "keywords": ["ausus", "framework", "metadata", "kernel"],
+    "keywords": [
+        "ausus",
+        "framework",
+        "metadata",
+        "kernel"
+    ],
     "homepage": "https://github.com/ausus-framework/ausus",
     "require": {
         "php": ">=8.3"
     },
     "autoload": {
-        "classmap": ["src/"]
+        "classmap": [
+            "src/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -22,6 +29,13 @@
             "layer": "L0",
             "role": "kernel"
         }
+    },
+    "archive": {
+        "exclude": [
+            "/tests",
+            "/.gitkeep",
+            "/.DS_Store"
+        ]
     },
     "minimum-stability": "stable",
     "prefer-stable": true

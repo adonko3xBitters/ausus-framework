@@ -95,4 +95,11 @@ grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-integration.log \
     && echo "  ✓ integration-http 12/12" \
     || { echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10; }
 
-echo "[ci] DONE — all 10 steps passed"
+# 11 — package integrity audit (every artifact as a consumer receives it)
+echo "[ci] step 11 — package integrity audit"
+bash scripts/audit-artifacts.sh > /tmp/ausus-ci-audit.log 2>&1
+grep -q "RESULT: 0 issues" /tmp/ausus-ci-audit.log \
+    && echo "  ✓ audit-artifacts: 0 issues" \
+    || { echo "audit-artifacts regressed"; tail -40 /tmp/ausus-ci-audit.log; exit 11; }
+
+echo "[ci] DONE — all 11 steps passed"

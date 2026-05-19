@@ -2,9 +2,16 @@
     "name": "ausus/api-http",
     "type": "library",
     "version": "0.1.0",
-    "description": "AUSUS L4 — PSR-7/15 HTTP API surface for the metadata graph. Serves RFC-004 ViewSchema fetches, Action invocation, and the kernel exception taxonomy.",
+    "description": "AUSUS L4 \u2014 PSR-7/15 HTTP API surface for the metadata graph. Serves RFC-004 ViewSchema fetches, Action invocation, and the kernel exception taxonomy.",
     "license": "MIT",
-    "keywords": ["ausus", "framework", "api", "http", "psr-7", "psr-15"],
+    "keywords": [
+        "ausus",
+        "framework",
+        "api",
+        "http",
+        "psr-7",
+        "psr-15"
+    ],
     "homepage": "https://github.com/adonko3xBitters/ausus-framework",
     "require": {
         "php": ">=8.3",
@@ -16,13 +23,22 @@
         "ausus/runtime-default": "0.1.*"
     },
     "autoload": {
-        "classmap": ["src/"]
+        "classmap": [
+            "src/"
+        ]
     },
     "extra": {
         "ausus": {
             "layer": "L4",
             "role": "api-surface"
         }
+    },
+    "archive": {
+        "exclude": [
+            "/tests",
+            "/.gitkeep",
+            "/.DS_Store"
+        ]
     },
     "minimum-stability": "stable",
     "prefer-stable": true

@@ -2,9 +2,14 @@
     "name": "ausus/auth-bridge",
     "type": "library",
     "version": "0.1.0",
-    "description": "AUSUS — Laravel-bridge Authorization plugin (RFC-014). Skeleton: name reserved; V0 uses ausus/kernel's StubActor directly.",
+    "description": "AUSUS \u2014 Laravel-bridge Authorization plugin (RFC-014). Skeleton: name reserved; V0 uses ausus/kernel's StubActor directly.",
     "license": "MIT",
-    "keywords": ["ausus", "framework", "authorization", "rbac"],
+    "keywords": [
+        "ausus",
+        "framework",
+        "authorization",
+        "rbac"
+    ],
     "homepage": "https://github.com/ausus-framework/ausus",
     "require": {
         "php": ">=8.3"
@@ -16,6 +21,13 @@
             "status": "skeleton",
             "implementation-rfc": "RFC-014"
         }
+    },
+    "archive": {
+        "exclude": [
+            "/tests",
+            "/.gitkeep",
+            "/.DS_Store"
+        ]
     },
     "minimum-stability": "stable",
     "prefer-stable": true

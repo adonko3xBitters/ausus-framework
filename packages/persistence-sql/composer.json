@@ -2,9 +2,15 @@
     "name": "ausus/persistence-sql",
     "type": "library",
     "version": "0.1.0",
-    "description": "L3 PersistenceDriver — SQL implementation of RFC-002 via PDO (SQLite/MySQL/Postgres). Includes SchemaDeriver + DatabaseAuditSink.",
+    "description": "L3 PersistenceDriver \u2014 SQL implementation of RFC-002 via PDO (SQLite/MySQL/Postgres). Includes SchemaDeriver + DatabaseAuditSink.",
     "license": "MIT",
-    "keywords": ["ausus", "framework", "persistence", "sql", "pdo"],
+    "keywords": [
+        "ausus",
+        "framework",
+        "persistence",
+        "sql",
+        "pdo"
+    ],
     "homepage": "https://github.com/ausus-framework/ausus",
     "require": {
         "php": ">=8.3",
@@ -13,11 +19,13 @@
     },
     "suggest": {
         "ext-pdo_sqlite": "Default driver for V0 smoke tests",
-        "ext-pdo_mysql":  "For MySQL deployments",
-        "ext-pdo_pgsql":  "For PostgreSQL deployments"
+        "ext-pdo_mysql": "For MySQL deployments",
+        "ext-pdo_pgsql": "For PostgreSQL deployments"
     },
     "autoload": {
-        "classmap": ["src/"]
+        "classmap": [
+            "src/"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -29,6 +37,13 @@
             "layer": "L3",
             "role": "driver"
         }
+    },
+    "archive": {
+        "exclude": [
+            "/tests",
+            "/.gitkeep",
+            "/.DS_Store"
+        ]
     },
     "minimum-stability": "stable",
     "prefer-stable": true

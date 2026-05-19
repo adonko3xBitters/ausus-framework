@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import { useViewSchema } from "./hooks.js";
 import { ListView, DetailView } from "./components.js";
