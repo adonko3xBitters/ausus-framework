@@ -95,4 +95,11 @@ grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-integration.log \
     && echo "  ✓ integration-http 12/12" \
     || { echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10; }
 
-echo "[ci] DONE — all 10 steps passed"
+# 11 — compatibility/upgrade simulations (7 sandboxes)
+echo "[ci] step 11 — upgrade-sim (7 sandbox scenarios)"
+bash scripts/upgrade-sim.sh > /tmp/ausus-ci-upgrade.log 2>&1
+grep -q "Total: 7   Fail: 0   Silent breakage: 0" /tmp/ausus-ci-upgrade.log \
+    && echo "  ✓ upgrade-sim 7/7 (4 PASS, 3 REJECT, 0 silent)" \
+    || { echo "upgrade-sim failed"; tail -40 /tmp/ausus-ci-upgrade.log; exit 11; }
+
+echo "[ci] DONE — all 11 steps passed"

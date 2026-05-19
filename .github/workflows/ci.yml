@@ -88,6 +88,10 @@ jobs:
         if: matrix.php-version == '8.4' && matrix.node-version == '22'
         run: bash scripts/integration-http.sh
 
+      - name: Compatibility & upgrade simulations (only on PHP 8.4 + Node 22)
+        if: matrix.php-version == '8.4' && matrix.node-version == '22'
+        run: bash scripts/upgrade-sim.sh
+
   # ─────────────────────────────────────────────────────────────────────
   # React-version compatibility job — proves @ausus/renderer-react works
   # under each version it claims to support in peerDependencies (^18 || ^19).
