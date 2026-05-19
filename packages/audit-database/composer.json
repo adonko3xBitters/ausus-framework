@@ -1,0 +1,22 @@
+{
+    "name": "ausus/audit-database",
+    "type": "library",
+    "version": "0.1.0",
+    "description": "AUSUS — Database TransactionalSink (RFC-007). Skeleton: name reserved; V0 ships an inline DatabaseAuditSink inside ausus/persistence-sql.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "audit", "transactional"],
+    "homepage": "https://github.com/ausus-framework/ausus",
+    "require": {
+        "php": ">=8.3"
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L3",
+            "role": "audit-sink",
+            "status": "skeleton",
+            "implementation-rfc": "RFC-007"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
