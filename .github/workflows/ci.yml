@@ -13,8 +13,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ─────────────────────────────────────────────────────────────────────
+  # Main matrix — exercises PHP 8.3/8.4 × Node 18/20/22 against the
+  # default React 18 peer. The clean-room step only fires on the tip
+  # slot (8.4 + 22) to keep total CI minutes reasonable.
+  # ─────────────────────────────────────────────────────────────────────
   ci:
-    name: validate · install · smoke · build · trace · pack
+    name: ${{ matrix.php-version }} · node${{ matrix.node-version }}
     runs-on: ubuntu-latest
 
     strategy:
@@ -78,3 +83,45 @@ jobs:
       - name: Clean-room install (only on PHP 8.4 + Node 22)
         if: matrix.php-version == '8.4' && matrix.node-version == '22'
         run: bash scripts/clean-room.sh
+
+  # ─────────────────────────────────────────────────────────────────────
+  # React-version compatibility job — proves @ausus/renderer-react works
+  # under each version it claims to support in peerDependencies (^18 || ^19).
+  # Reuses the renderer build + trace harness; overrides the React version
+  # in the playground workspace before running.
+  # ─────────────────────────────────────────────────────────────────────
+  react-compat:
+    name: react${{ matrix.react-major }}-compat
+    runs-on: ubuntu-latest
+    needs: ci
+
+    strategy:
+      fail-fast: false
+      matrix:
+        react-major: ['18', '19']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: npm install (workspace)
+        run: npm install --no-audit --no-fund
+
+      - name: Override React version to ${{ matrix.react-major }}
+        run: |
+          npm install \
+            "react@^${{ matrix.react-major }}" \
+            "react-dom@^${{ matrix.react-major }}" \
+            --no-audit --no-fund
+          node -e "console.log('react@'+require('react/package.json').version+' / react-dom@'+require('react-dom/package.json').version)"
+
+      - name: npm build (renderer)
+        run: npm run build
+
+      - name: npm trace (12 React assertions on React ${{ matrix.react-major }})
+        run: npm run trace
