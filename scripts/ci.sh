@@ -95,4 +95,11 @@ grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-integration.log \
     && echo "  ✓ integration-http 12/12" \
     || { echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10; }
 
-echo "[ci] DONE — all 10 steps passed"
+# 11 — failure-semantics adversarial probe (16 scenarios)
+echo "[ci] step 11 — failure-semantics probe"
+bash scripts/failure-semantics.sh > /tmp/ausus-ci-failure.log 2>&1
+grep -q "Stack-trace leaks: 0   InternalError fallthroughs: 0" /tmp/ausus-ci-failure.log \
+    && echo "  ✓ failure-semantics: 0 leaks, 0 fallthroughs" \
+    || { echo "failure-semantics regressed"; tail -40 /tmp/ausus-ci-failure.log; exit 11; }
+
+echo "[ci] DONE — all 11 steps passed"

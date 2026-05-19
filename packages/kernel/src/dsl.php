@@ -196,7 +196,7 @@ final class ActionBuilder
                     if ($ef->name === $inputName) { $found = $ef; break; }
                 }
                 if ($found === null) {
-                    throw new \RuntimeException("Action::create input '{$inputName}' not declared on {$entityFqn}");
+                    throw new MalformedDescriptor("Action::create input '{$inputName}' not declared on {$entityFqn}");
                 }
                 $inputs[] = $found;
             }
@@ -242,7 +242,7 @@ final class ActionBuilder
             ), [$policy]];
         }
 
-        throw new \RuntimeException("ActionBuilder: unsupported kind '{$this->kind}'");
+        throw new MalformedDescriptor("ActionBuilder: unsupported kind '{$this->kind}'");
     }
 }
 
@@ -337,10 +337,10 @@ final class EntityBuilder
                 if ($f->name === $this->workflowField) { $stateField = $f; break; }
             }
             if ($stateField === null) {
-                throw new \RuntimeException("workflow('{$this->workflowField}') refers to unknown field on {$this->fqn}");
+                throw new WorkflowCoherence("workflow('{$this->workflowField}') refers to unknown field on {$this->fqn}");
             }
             if ($stateField->type !== 'enum') {
-                throw new \RuntimeException("workflow('{$this->workflowField}') field must be enum, got '{$stateField->type}'");
+                throw new WorkflowCoherence("workflow('{$this->workflowField}') field must be enum, got '{$stateField->type}'");
             }
             $states  = $stateField->typeOptions['options'];
             $initial = $stateField->default ?? $states[0];
@@ -385,7 +385,7 @@ final class EntityBuilder
             }
             $projActionFqns = empty($cfg['actions'])
                 ? $actionFqns
-                : array_map(fn(string $local) => $localToFqn[$local] ?? throw new \RuntimeException("projection {$projFqn} references unknown action '{$local}'"), $cfg['actions']);
+                : array_map(fn(string $local) => $localToFqn[$local] ?? throw new DanglingReference("projection {$projFqn} references unknown action '{$local}'"), $cfg['actions']);
             $this->dsl->_registerProjection(new ProjectionNode(
                 fqn: $projFqn,
                 ownerEntityFqn: $this->fqn,

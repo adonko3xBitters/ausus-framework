@@ -58,7 +58,7 @@ final class PolicyEngine {
         return $decision === Decision::Abstain ? Decision::Deny : $decision;   // deny-by-default
     }
     public function resolvePolicy(string $fqn): Policy {
-        $node = $this->graph->policies[$fqn] ?? throw new \RuntimeException("Unknown policy: {$fqn}");
+        $node = $this->graph->policies[$fqn] ?? throw new \Ausus\UnknownPolicy("Unknown policy: {$fqn}");
         $class = $node->implementationClass;
         $args = $node->constructorArgs;
         return new $class(...$args);
@@ -94,7 +94,7 @@ final class WorkflowRuntime {
         $transitions = $this->index->forAction($action->fqn);
         if (empty($transitions)) return;
         if ($subject === null) {
-            throw new \RuntimeException("WorkflowSubjectRequired: action {$action->fqn} is Workflow-attached but subject is null");
+            throw new \Ausus\WorkflowSubjectRequired("WorkflowSubjectRequired: action {$action->fqn} is Workflow-attached but subject is null");
         }
         $repo = $persistence->repository($subject->entityFqn);
         $entity = $repo->find($subject);
@@ -116,7 +116,7 @@ final class WorkflowRuntime {
             foreach ($candidates as [, $t]) {
                 if ($t->source === '*' || $t->source === $current) {
                     if ($matched !== null) {
-                        throw new \RuntimeException("WorkflowAmbiguousTransition: workflow {$wfqn} has multiple transitions matching (current={$current}, via={$action->fqn})");
+                        throw new \Ausus\WorkflowAmbiguousTransition("WorkflowAmbiguousTransition: workflow {$wfqn} has multiple transitions matching (current={$current}, via={$action->fqn})");
                     }
                     $matched = $t;
                 }
@@ -153,10 +153,10 @@ final class TransitionEffect implements Effect {
     /** @param array{entityFqn:string, stateField:string, target:string, stamps?:array<string>} $config */
     public function __construct(private readonly array $config) {}
     public function execute(EffectContext $context, ?Reference $subject, array $inputs): array {
-        if ($subject === null) throw new \RuntimeException("TransitionEffect requires Subject");
+        if ($subject === null) throw new \Ausus\WorkflowSubjectRequired("TransitionEffect requires Subject");
         $repo = $context->repository($subject->entityFqn);
         $entity = $repo->find($subject);
-        if ($entity === null) throw new \RuntimeException("Subject vanished mid-transaction");
+        if ($entity === null) throw new \Ausus\WorkflowSubjectNotFound("Subject vanished mid-transaction");
         $patch = [$this->config['stateField'] => $this->config['target']];
         foreach ($this->config['stamps'] ?? [] as $f) {
             $patch[$f] = $context->clock()->toRfc3339();
@@ -318,14 +318,14 @@ final class ProjectionRenderer {
     ) {}
 
     public function render(string $projectionFqn, ?Reference $subject = null): array {
-        $proj = $this->graph->projections[$projectionFqn] ?? throw new \RuntimeException("Unknown projection: {$projectionFqn}");
-        $entity = $this->graph->entities[$proj->ownerEntityFqn] ?? throw new \RuntimeException("Missing entity for projection");
+        $proj = $this->graph->projections[$projectionFqn] ?? throw new \Ausus\UnknownProjection("Unknown projection: {$projectionFqn}");
+        $entity = $this->graph->entities[$proj->ownerEntityFqn] ?? throw new \Ausus\MalformedDescriptor("Missing entity for projection {$projectionFqn}");
 
         // Build fields block
         $fields = [];
         foreach ($proj->fields as $fieldName) {
             $f = $entity->field($fieldName);
-            if ($f === null) throw new \RuntimeException("Projection {$projectionFqn} references unknown field {$fieldName}");
+            if ($f === null) throw new \Ausus\MalformedDescriptor("Projection {$projectionFqn} references unknown field {$fieldName}");
             $fields[] = [
                 'name' => $f->name,
                 'type' => $f->type,

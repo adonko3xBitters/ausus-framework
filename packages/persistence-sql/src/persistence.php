@@ -6,7 +6,8 @@ namespace Ausus\Persistence\Sql;
 use Ausus\{
     PersistenceDriver, PersistenceContext, Repository, TransactionHandle,
     Tenant, Reference, Version, Entity, MetadataGraph, EntityNode, FieldNode,
-    Ulid, NotFound, ConcurrencyConflict, TenantBoundaryViolation
+    Ulid, NotFound, ConcurrencyConflict, TenantBoundaryViolation,
+    UnknownEntity, UnknownField, FieldRequired
 };
 
 // =============================================================================
@@ -29,7 +30,7 @@ final class SqliteContext implements PersistenceContext {
     public function repository(string $entityFqn): Repository {
         $entity = $this->graph->entities[$entityFqn] ?? null;
         if ($entity === null) {
-            throw new \RuntimeException("UnknownEntity: {$entityFqn}");
+            throw new UnknownEntity("UnknownEntity: {$entityFqn}");
         }
         return new SqliteRepository($this->pdo, $this->tenant, $entity);
     }
@@ -78,7 +79,7 @@ final class SqliteRepository implements Repository {
             } elseif ($f->default !== null) {
                 $row[$f->name] = $this->serializeField($f, $f->default);
             } elseif (!$f->nullable) {
-                throw new \RuntimeException("FieldRequired: {$this->entity->fqn}.{$f->name} not in payload and no default");
+                throw new FieldRequired("FieldRequired: {$this->entity->fqn}.{$f->name} not in payload and no default");
             }
         }
 
@@ -109,7 +110,7 @@ final class SqliteRepository implements Repository {
         $params = ['_new_version' => $newVersion, '_now' => $now];
         foreach ($patch as $k => $v) {
             $field = $this->entity->field($k);
-            if ($field === null) throw new \RuntimeException("UnknownField: {$this->entity->fqn}.{$k}");
+            if ($field === null) throw new UnknownField("UnknownField: {$this->entity->fqn}.{$k}");
             $sets[] = "\"{$k}\" = :{$k}";
             $params[$k] = $this->serializeField($field, $v);
         }
@@ -137,7 +138,7 @@ final class SqliteRepository implements Repository {
 
         // Re-read for full row
         $reread = $this->find($ref);
-        if ($reread === null) throw new \RuntimeException("PostUpdateMissingRow: {$ref->identityHandle}");
+        if ($reread === null) throw new ConcurrencyConflict($ref, $expected->value, '<row-vanished-after-update>');
         return $reread;
     }
 

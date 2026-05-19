@@ -313,7 +313,7 @@ final class Compiler {
             }
             foreach ($desc['actions'] ?? [] as $a) {
                 if (isset($actions[$a->fqn])) {
-                    throw new \RuntimeException("DuplicateRegistration: action {$a->fqn}");
+                    throw new DuplicateRegistration("DuplicateRegistration: action {$a->fqn}");
                 }
                 $actions[$a->fqn] = $a;
             }
@@ -330,29 +330,29 @@ final class Compiler {
         // Validate references
         foreach ($actions as $a) {
             if (!isset($policies[$a->policyFqn])) {
-                throw new \RuntimeException("DanglingReference: action {$a->fqn} → policy {$a->policyFqn} (not registered)");
+                throw new DanglingReference("DanglingReference: action {$a->fqn} → policy {$a->policyFqn} (not registered)");
             }
             if (!isset($entities[$a->entityFqn])) {
-                throw new \RuntimeException("DanglingReference: action {$a->fqn} → entity {$a->entityFqn} (not registered)");
+                throw new DanglingReference("DanglingReference: action {$a->fqn} → entity {$a->entityFqn} (not registered)");
             }
         }
         foreach ($workflows as $w) {
             if (!isset($entities[$w->ownerEntityFqn])) {
-                throw new \RuntimeException("DanglingReference: workflow {$w->fqn} → entity {$w->ownerEntityFqn}");
+                throw new DanglingReference("DanglingReference: workflow {$w->fqn} → entity {$w->ownerEntityFqn}");
             }
             $entity = $entities[$w->ownerEntityFqn];
             if ($entity->field($w->stateField) === null) {
-                throw new \RuntimeException("WorkflowCoherence: workflow {$w->fqn} state field '{$w->stateField}' not on entity {$w->ownerEntityFqn}");
+                throw new WorkflowCoherence("WorkflowCoherence: workflow {$w->fqn} state field '{$w->stateField}' not on entity {$w->ownerEntityFqn}");
             }
             foreach ($w->transitions as $t) {
                 if ($t->source !== '*' && !in_array($t->source, $w->states, true)) {
-                    throw new \RuntimeException("WorkflowCoherence: transition source '{$t->source}' not in states");
+                    throw new WorkflowCoherence("WorkflowCoherence: transition source '{$t->source}' not in states");
                 }
                 if (!in_array($t->target, $w->states, true)) {
-                    throw new \RuntimeException("WorkflowCoherence: transition target '{$t->target}' not in states");
+                    throw new WorkflowCoherence("WorkflowCoherence: transition target '{$t->target}' not in states");
                 }
                 if (!isset($actions[$t->viaActionFqn])) {
-                    throw new \RuntimeException("DanglingReference: transition via '{$t->viaActionFqn}' not registered");
+                    throw new DanglingReference("DanglingReference: transition via '{$t->viaActionFqn}' not registered");
                 }
             }
         }
@@ -440,3 +440,31 @@ class NotFound extends AususError {
 }
 class AuditEmissionFailed extends AususError {}
 class WorkflowGuardDenied extends AususError {}
+
+// ─── Compiler-time validation errors (RFC-001 §6, RFC-006 §4) ────────────────
+/** Plugin descriptor violates the kernel's invariants (empty FQN, bad shape, etc.). */
+class MalformedDescriptor  extends AususError {}
+/** Same FQN registered twice across plugins (entity/action/policy/workflow/projection). */
+class DuplicateRegistration extends AususError {}
+/** A reference points to a node not present in the graph (e.g. action → unknown policy). */
+class DanglingReference    extends AususError {}
+/** Workflow declares a state field, transition source/target, or initial state that isn't coherent with the entity. */
+class WorkflowCoherence    extends AususError {}
+
+// ─── Runtime-time errors not previously typed ───────────────────────────────
+/** Same source state matches two transitions for the same Action — RFC-006 Amend-01. */
+class WorkflowAmbiguousTransition extends AususError {}
+/** Workflow-bound Action invoked without a subject Reference. */
+class WorkflowSubjectRequired     extends AususError {}
+/** Action FQN refers to a Policy that wasn't registered at compile time. */
+class UnknownPolicy               extends AususError {}
+/** Projection FQN not found in the compiled graph. */
+class UnknownProjection           extends AususError {}
+
+// ─── Persistence-time errors ────────────────────────────────────────────────
+/** Entity FQN not in the compiled graph; persistence cannot map it. */
+class UnknownEntity   extends AususError {}
+/** Update payload includes a field name that isn't declared on the entity. */
+class UnknownField    extends AususError {}
+/** Create payload is missing a required non-nullable field with no default. */
+class FieldRequired   extends AususError {}

@@ -136,8 +136,11 @@ final class Router implements RequestHandlerInterface
 
         $raw  = (string) $request->getBody();
         $body = $raw === '' ? [] : json_decode($raw, true);
-        if (!is_array($body)) {
-            throw new BadRequest('request body is not a valid JSON object');
+        // The action wire format (RFC L4 §2.2) requires a JSON OBJECT — never
+        // an array, never a primitive. PHP's json_decode collapses both `[...]`
+        // and `{...}` into a PHP array, so we explicitly reject list shapes.
+        if (!is_array($body) || (!empty($body) && array_is_list($body))) {
+            throw new BadRequest('request body must be a JSON object (got: ' . gettype($body) . ')');
         }
 
         $subject     = null;
@@ -256,15 +259,44 @@ final class ErrorMapper
     private static function classify(\Throwable $e): array
     {
         $short = (new \ReflectionClass($e))->getShortName();
+        // Per failure-semantics §3 + SEMVER-CONTRACT §5.3 — every kernel
+        // exception class has a stable HTTP status + error.kind string.
         return match ($short) {
-            'BadRequest'              => [400, 'BadRequest'],
-            'MalformedDescriptor'     => [400, 'MalformedDescriptor'],
-            'PolicyDeniedException'   => [403, 'PolicyDenied'],
-            'TenantBoundaryViolation' => [403, 'TenantBoundaryViolation'],
-            'WorkflowStateMismatch'   => [409, 'WorkflowStateMismatch'],
-            'ConcurrencyConflict'     => [409, 'ConcurrencyConflict'],
-            'EffectFailure'           => [500, 'EffectFailure'],
-            default                   => [500, 'InternalError'],
+            // 400 — caller's request was malformed before any business logic ran
+            'BadRequest'                 => [400, 'BadRequest'],
+            'MalformedDescriptor'        => [400, 'MalformedDescriptor'],
+            'PolicySubjectRequired'      => [400, 'PolicySubjectRequired'],
+
+            // 403 — policy/tenant boundary enforced
+            'PolicyDenied'               => [403, 'PolicyDenied'],
+            'TenantBoundaryViolation'    => [403, 'TenantBoundaryViolation'],
+
+            // 404 — graph lookup miss
+            'UnknownAction'              => [404, 'UnknownAction'],
+            'UnknownEntity'              => [404, 'UnknownEntity'],
+            'UnknownPolicy'              => [404, 'UnknownPolicy'],
+            'UnknownProjection'          => [404, 'UnknownProjection'],
+            'NotFound'                   => [404, 'NotFound'],
+            'WorkflowSubjectNotFound'    => [404, 'WorkflowSubjectNotFound'],
+
+            // 409 — concurrent / state mismatch (retryable after refetch)
+            'WorkflowStateMismatch'      => [409, 'WorkflowStateMismatch'],
+            'WorkflowAmbiguousTransition'=> [409, 'WorkflowAmbiguousTransition'],
+            'ConcurrencyConflict'        => [409, 'ConcurrencyConflict'],
+            'WorkflowSubjectRequired'    => [400, 'WorkflowSubjectRequired'],
+
+            // 422 — semantic invariant on the input payload
+            'UnknownField'               => [422, 'UnknownField'],
+            'FieldRequired'              => [422, 'FieldRequired'],
+
+            // 5xx — server-side
+            'EffectFailed'               => [500, 'EffectFailed'],
+            'AuditEmissionFailed'        => [500, 'AuditEmissionFailed'],
+            'DuplicateRegistration'      => [500, 'DuplicateRegistration'],
+            'DanglingReference'          => [500, 'DanglingReference'],
+            'WorkflowCoherence'          => [500, 'WorkflowCoherence'],
+
+            default                      => [500, 'InternalError'],
         };
     }
 }
