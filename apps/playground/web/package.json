@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "trace":  "tsx render-trace.tsx",
+    "perf":   "tsx perf-baseline.tsx",
     "bundle": "esbuild src/App.tsx --bundle --minify --format=esm --jsx=automatic --loader:.tsx=tsx --outfile=dist/bundle.js --alias:@ausus/renderer-react=../../../renderer/react/src/index.ts"
   },
   "dependencies": {

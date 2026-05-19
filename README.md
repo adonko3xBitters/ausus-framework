@@ -76,6 +76,7 @@ deterministic, content-addressable `MetadataGraph`.
 |---|---|
 | [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md) | this release — packages, compatibility, publish order, rollback |
 | [`docs/PUBLICATION-READINESS.md`](docs/PUBLICATION-READINESS.md) | publication audit |
+| [`docs/PERF-BASELINE-v0.1.md`](docs/PERF-BASELINE-v0.1.md) | official v0.1 perf baseline + O(n) catalogue |
 | [`docs/L4-API-DESIGN.md`](docs/L4-API-DESIGN.md) | L4 HTTP API design + integration evidence |
 | [`docs/RFC-000-v0r2-remediation.md`](docs/RFC-000-v0r2-remediation.md) | Node-ESM + clean-room remediation pass |
 | [`docs/RENDERER-REACT-V0-REAL-PASS.md`](docs/RENDERER-REACT-V0-REAL-PASS.md) | React renderer V0 evidence |
