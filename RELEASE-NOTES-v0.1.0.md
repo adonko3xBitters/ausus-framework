@@ -2,263 +2,131 @@
 
 **Release date:** 2026-05-19
 **Release type:** Release Candidate / initial public release
-**Status:** **GO for publication** (see §10 for the GO determination)
+**Status:** **PUBLICATION HOLD** — see §6.
+
+> **Code and artifacts are release-candidate ready.** Public publication
+> to Packagist and npm is **on HOLD** until every **P0 pre-flight control**
+> in [`docs/PUBLICATION-RUNBOOK.md`](docs/PUBLICATION-RUNBOOK.md) §2 passes.
+>
+> **Do not run ad-hoc publish commands from this document.** The full,
+> normative publication procedure lives in `docs/PUBLICATION-RUNBOOK.md` —
+> that runbook is authoritative.
 
 ---
 
 ## 1. Summary
 
-First public release of the AUSUS framework — a metadata-first, plugin-first
-Laravel-native enterprise application platform. This release ships:
+First public release of the AUSUS framework — a metadata-first,
+plugin-first, Laravel-native enterprise application platform. This
+release ships:
 
-- **3 implemented PHP libraries** (kernel, persistence-sql, runtime-default)
-- **1 PHP project template** (starter)
-- **1 PHP metapackage** (standard-stack) pinning the V0 set
-- **4 reserved PHP names** (tenancy-row, audit-database, auth-bridge, presentation-default) — name reservations only, no source code
-- **1 npm package** (`@ausus/renderer-react`) — React 18+ renderer for RFC-004 ViewSchema
+- **4 implemented PHP libraries** — `kernel`, `persistence-sql`, `runtime-default`, `api-http`
+- **1 PHP project template** — `starter`
+- **1 PHP metapackage** — `standard-stack` (pins the V0 set)
+- **4 reserved PHP names** — `tenancy-row`, `audit-database`, `auth-bridge`, `presentation-default` (name reservations only — no source code)
+- **1 npm package** — `@ausus/renderer-react` (React 18 / 19 renderer for the RFC-004 ViewSchema)
 
-All 10 publishable packages are at version **0.1.0**.
+All **11 publishable packages are at version 0.1.0** (10 Composer + 1 npm).
 
 ## 2. Packages in this release
 
-### Publishable to Packagist
+### Composer (10)
 
-| Order | Package | Type | Implementation | LOC |
+| # | Package | Type | Implementation | `ausus/*` deps |
 |---|---|---|---|---|
-| 1 | `ausus/kernel`              | library     | full | 442 |
-| 2 | `ausus/persistence-sql`     | library     | full | 315 |
-| 3 | `ausus/runtime-default`     | library     | full | 400 |
-| 4 | `ausus/tenancy-row`         | library     | name reservation | 0 |
-| 5 | `ausus/audit-database`      | library     | name reservation | 0 |
-| 6 | `ausus/auth-bridge`         | library     | name reservation | 0 |
-| 7 | `ausus/presentation-default`| library     | name reservation | 0 |
-| 8 | `ausus/standard-stack`      | metapackage | meta | 0 |
-| 9 | `ausus/starter`             | project     | full + boot script | 171 + 117 (bin/) |
+| 1  | `ausus/kernel`               | library     | full | — |
+| 2  | `ausus/persistence-sql`      | library     | full | kernel |
+| 3  | `ausus/runtime-default`      | library     | full | kernel |
+| 4  | `ausus/api-http`             | library     | full (L4 PSR-7/15) | kernel, runtime-default |
+| 5  | `ausus/tenancy-row`          | library     | name reservation | — |
+| 6  | `ausus/audit-database`       | library     | name reservation | — |
+| 7  | `ausus/auth-bridge`          | library     | name reservation | — |
+| 8  | `ausus/presentation-default` | library     | name reservation | — |
+| 9  | `ausus/standard-stack`       | metapackage | meta | kernel, persistence-sql, runtime-default, api-http |
+| 10 | `ausus/starter`              | project     | full + boot script | kernel, persistence-sql, runtime-default |
 
-### Publishable to npm
+### npm (1)
 
-| Order | Package | Type | LOC | Tarball |
-|---|---|---|---|---|
-| 1 | `@ausus/renderer-react` | React 18+ library | 549 src | **10.9 kB packed** (21 files, incl. LICENSE) |
+| Package | Type | Notes |
+|---|---|---|
+| `@ausus/renderer-react` | React 18 / 19 library | ESM-only; no bundled dependencies; React + react-dom are peer dependencies |
+
+The publication order, per-package commands, and dependency-safety
+analysis are in [`docs/PUBLICATION-RUNBOOK.md`](docs/PUBLICATION-RUNBOOK.md) §1 + §3.
 
 ## 3. Compatibility matrix
 
 | Layer | Tool | Minimum | Tested with | Notes |
 |---|---|---|---|---|
-| **Runtime: PHP** | `php`           | 8.3   | 8.4.18 | strict types, readonly classes, `final` by default |
-| **Runtime: PHP** | `ext-pdo`       | bundled | bundled | required by `ausus/persistence-sql` |
-| **Runtime: PHP** | `ext-pdo_sqlite` | bundled | bundled | required by `ausus/starter` (other PDO drivers work for the library) |
-| **Tooling: PHP** | `composer`      | 2.0   | 2.9.5 | path repositories, artifact repositories, `--no-install` |
-| **Runtime: JS**  | `node`          | 18    | 22.22.0 | strict ESM (`type: module`, NodeNext resolution) |
-| **Runtime: JS**  | `react`         | ^18 or ^19 | 18.3.1 | declared as `peerDependency` |
-| **Runtime: JS**  | `react-dom`     | ^18 or ^19 | 18.3.1 | declared as `peerDependency` |
-| **Tooling: JS**  | `npm`           | 8     | 10.9.4 | workspaces |
-| **Tooling: JS**  | `typescript` (dev) | 5.4 | 5.x | `moduleResolution: NodeNext` |
+| **Runtime: PHP** | `php`              | 8.3      | 8.4.18  | strict types, readonly classes, `final` by default |
+| **Runtime: PHP** | `ext-pdo`          | bundled  | bundled | required by `ausus/persistence-sql` |
+| **Runtime: PHP** | `ext-pdo_sqlite`   | bundled  | bundled | required by `ausus/starter` |
+| **Tooling: PHP** | `composer`         | 2.0      | 2.9.5   | path repositories, artifact repositories |
+| **Runtime: JS**  | `node`             | 18       | 22.22.0 | strict ESM (`type: module`, NodeNext resolution) |
+| **Runtime: JS**  | `react`            | ^18 or ^19 | 18.3.1 | declared as `peerDependency` |
+| **Runtime: JS**  | `react-dom`        | ^18 or ^19 | 18.3.1 | declared as `peerDependency` |
+| **Tooling: JS**  | `npm`              | 8        | 10.9.4  | workspaces |
+| **Tooling: JS**  | `typescript` (dev) | 5.4      | 5.x     | `moduleResolution: NodeNext` |
 
 **Explicit non-dependencies (none of these are required):**
-Laravel framework, Eloquent, Filament, Tailwind, any UI component library,
-Vite, Webpack, Babel, Jest, PHPUnit, Doctrine, Symfony components.
+Laravel framework, Eloquent, Filament, Tailwind, any UI component
+library, Vite, Webpack, Babel, Jest, PHPUnit, Doctrine, Symfony
+components.
 
-## 4. Publish order (dependency-graph topological)
+## 4. Known limitations (deferred to v0.2.0)
 
-### 4.1 Packagist (PHP)
+| Limitation |
+|---|
+| Skeleton packages (`tenancy-row`, `audit-database`, `auth-bridge`, `presentation-default`) ship no code — names reserved only. |
+| `composer create-project ausus/starter myapp` is a 2-command flow post-Packagist; a 3-command clean-room flow uses `--no-install`. |
+| Persistence verified on SQLite; MySQL / Postgres are designed-for but not validated under V0. |
+| The renderer has no built-in router, theme tokens, optimistic UI, or default CSS file. |
+| No PHPUnit test suite yet — the playground's 36 assertions cover the same surface. |
+| Supply-chain attestation (`npm --provenance`, GPG-signed tags, SBOM) is deferred to v0.2.0 — see `docs/PUBLICATION-RUNBOOK.md` §7. |
 
-PHP packages MUST publish in this order — each depends only on packages
-already published above it.
+## 5. Reproducibility summary
 
-```
-1. ausus/kernel                  (no ausus/* deps)
-2. ausus/persistence-sql         (deps: ausus/kernel)
-3. ausus/runtime-default         (deps: ausus/kernel)
-4. ausus/tenancy-row             (name reservation, no deps)
-5. ausus/audit-database          (name reservation, no deps)
-6. ausus/auth-bridge             (name reservation, no deps)
-7. ausus/presentation-default    (name reservation, no deps)
-8. ausus/standard-stack          (deps: kernel + persistence-sql + runtime-default)
-9. ausus/starter                 (deps: kernel + persistence-sql + runtime-default)
-```
+The release candidate was validated with the in-repo gates. Each is
+re-runnable from a clean checkout:
 
-Within the same dependency level, package order is alphabetical for
-reproducibility. Steps 4–7 can be parallelized.
-
-### 4.2 npm
-
-```
-1. @ausus/renderer-react   (peers: react, react-dom — both already on npm)
-```
-
-## 5. Exact publish commands
-
-### 5.1 Per-PHP-package — git subtree split + tag + Packagist submit
-
-Performed once per package, in the order from §4.1. Run from the monorepo
-root:
-
-```bash
-PKG=kernel    # repeat for each package in §4.1 order
-VERSION=v0.1.0
-ORG=ausus-framework   # GitHub organization (must exist)
-
-# 1. Subtree-split the package into its own branch
-git subtree split --prefix="packages/${PKG}" -b "split/${PKG}"
-
-# 2. Push to the per-package repo on GitHub
-git remote add "rel-${PKG}" "git@github.com:${ORG}/${PKG}.git" 2>/dev/null || true
-git push "rel-${PKG}" "split/${PKG}:main"
-
-# 3. Tag the release on the per-package repo
-git clone "git@github.com:${ORG}/${PKG}.git" "/tmp/release-${PKG}"
-cd "/tmp/release-${PKG}"
-git tag -a "${VERSION}" -m "Release ${VERSION}"
-git push origin "${VERSION}"
-
-# 4. Submit to Packagist (one-time per package)
-echo "Open: https://packagist.org/packages/submit?repo_url=https://github.com/${ORG}/${PKG}"
-# After first submission, set the Packagist webhook on the GitHub repo:
-#   Settings → Webhooks → Add → https://packagist.org/api/github
-#   Future tags then auto-update Packagist.
-
-cd -
-```
-
-Total time per package: ~30 seconds (most of it git remote setup).
-Total for all 9 packages: ~5 minutes interactively.
-
-### 5.2 @ausus/renderer-react — npm publish
-
-```bash
-# 1. One-time: claim @ausus on npmjs.org
-#    https://www.npmjs.com/org/create  →  org name: ausus
-#    Add yourself as owner. Grant publish-permission.
-
-# 2. Build + verify from monorepo root
-cd "/path/to/ausus-monorepo"
-npm install
-npm run build
-cd renderer/react
-npm pack --dry-run    # expected: ausus-renderer-react-0.1.0.tgz, 21 files, 10.9 kB
-
-# 3. Publish (still inside renderer/react/)
-npm login             # interactive
-npm publish           # publishConfig.access=public is already set in package.json
-```
-
-Wall time: ~10 seconds for the actual publish call.
-
-## 6. Post-publish smoke (for the operator)
-
-Run from any clean directory (NOT inside the monorepo):
-
-```bash
-# PHP path — exercises Packagist resolution end-to-end
-composer create-project ausus/starter myapp
-cd myapp && composer boot
-# expected: "OK — ausus/starter boots cleanly."
-
-# npm path — exercises npm registry resolution end-to-end
-mkdir /tmp/consumer && cd /tmp/consumer
-npm init -y
-npm install @ausus/renderer-react react@18 react-dom@18
-node -e "console.log(Object.keys(require('@ausus/renderer-react')))"
-# expected: AususProvider, useAusus, useViewSchema, useAction, ViewSchemaConsumer,
-#           ListView, DetailView, ActionModal, WorkflowBadge, FieldDisplay
-```
-
-## 7. Rollback procedure
-
-### 7.1 PHP (Packagist)
-
-**Packagist does not support deleting published versions.** The accepted
-rollback patterns are:
-
-| Severity | Procedure |
+| Gate | Result |
 |---|---|
-| **Broken release** (security, crashes) | Publish `0.1.1` with the fix immediately. Add `<0.1.1` to security advisories. Optionally mark `0.1.0` deprecated via the Packagist UI ("Mark abandoned and recommend …"). |
-| **Critical security** | Email security@packagist.org with the CVE and request manual version-yank. They will mark it unavailable. Average response: 24 h. |
-| **Wrong content shipped** | Tag `0.1.1` from the correct content; `0.1.0` remains visible but `0.1.*` consumers float to `0.1.1`. |
+| `composer validate` — 10 package manifests + workspace root (11 total) | PASS |
+| `bash scripts/ci.sh`              | PASS — ends with `[ci] DONE — all 10 steps passed` |
+| `bash scripts/clean-room.sh`      | PASS — 8/8 isolated-`mktemp` steps |
+| `bash scripts/integration-http.sh`| PASS — 12/12 live-HTTP assertions |
+| `php apps/playground/run.php`     | PASS — 36/36 assertions |
+| `npm run build && npm run trace`  | PASS — 12/12 React render assertions |
 
-The 9 packages are **independent** on Packagist — rolling back one does
-not require rolling back the others.
+Background on the clean-room + Node-ESM remediation is in
+[`docs/RFC-000-v0r2-remediation.md`](docs/RFC-000-v0r2-remediation.md).
+The publication-readiness audit is in
+[`docs/PUBLICATION-READINESS.md`](docs/PUBLICATION-READINESS.md).
 
-### 7.2 npm
+## 6. Final status
 
-```bash
-# Within 72 hours of publish — unpublish is allowed
-npm unpublish @ausus/renderer-react@0.1.0
-# Caveat: name is locked for 24 h after unpublish; cannot republish same version
-```
+**PUBLICATION HOLD.**
 
-After 72 h:
+The code and the build artifacts are release-candidate ready. Public
+publication does **not** proceed from this document. It proceeds **only**
+through [`docs/PUBLICATION-RUNBOOK.md`](docs/PUBLICATION-RUNBOOK.md),
+and **only after every P0 pre-flight control in that runbook's §2
+passes**.
 
-```bash
-# Mark broken — consumers see warning on install but install still proceeds
-npm deprecate @ausus/renderer-react@0.1.0 "Broken on Node ESM; use 0.1.1+"
-# Then publish a fixed 0.1.1:
-cd renderer/react && npm version patch && npm publish
-```
+The P0 controls that gate the HOLD:
 
-### 7.3 Decision tree
+1. Clean working tree, on `main`, synced with `origin`.
+2. CI green on the **exact commit** being tagged.
+3. All 10 per-package GitHub release repos exist **and are empty**.
+4. No `v0.1.0` tag pre-exists on any release repo or the monorepo.
+5. Packagist propagation is polled before each dependent publish and
+   before the smoke test.
 
-```
-Issue detected within 72 h of publish?
-├── Yes, npm only       → npm unpublish (still must publish 0.1.1 afterward)
-├── Yes, Packagist only → publish 0.1.1; Packagist consumers pin floats forward
-└── Yes, both           → both of above, in sequence
-
-Issue detected after 72 h?
-├── Always → publish 0.1.1; deprecate 0.1.0 with reason text
-```
-
-## 8. Known limitations (deferred to v0.2.0)
-
-| Limitation | Tracked under |
-|---|---|
-| Skeleton packages (tenancy-row, audit-database, auth-bridge, presentation-default) ship no code — names reserved | per-package CHANGELOG |
-| `composer create-project ausus/starter myapp` uses 2 commands post-Packagist; 3 commands clean-room with `--no-install` flag | starter README |
-| Persistence verified on SQLite; MySQL/Postgres designed-for but not validated under V0 | persistence-sql CHANGELOG |
-| Renderer has no built-in router, theme tokens, optimistic UI, or default CSS file | renderer CHANGELOG |
-| No PHPUnit test suite yet (the playground's 36 assertions cover the same surface) | CI script step 3 |
-
-## 9. Reproducibility — final clean-room evidence
-
-This release was validated end-to-end against the V0R2 + remediation
-pass criteria. See `docs/RFC-000-v0r2-remediation.md` for the full
-report. Summary:
-
-| Suite | Result | Wall time |
-|---|---|---|
-| 9 composer manifests validated   | **PASS** (10/10 manifests including root) | < 1 s |
-| `scripts/clean-room.sh`          | **PASS** (8/8 steps; isolated `mktemp`)   | ~15 s |
-| `scripts/ci.sh`                  | **PASS** (9/9 steps; in-place)            | ~5 s  |
-| Vanilla `node consumer.mjs`      | **PASS** (12/12 ESM consumer assertions)  | 0.04 s |
-| `composer create-project` (clean-room) | **PASS** (3-command flow, 523 ms wall) | 0.49 s composer CPU |
-| `npm pack --dry-run`             | **PASS** (10.9 kB / 21 files, incl. LICENSE) | < 1 s |
-
-**Determination: GO for v0.1.0 publication. Publication blockers are zero.**
-
-## 10. Release checklist (operator-runnable)
-
-Tick each item before invoking the publish commands in §5.
-
-- [ ] `composer validate` clean for all 9 manifests
-- [ ] `composer install` clean from root (path-repo mode)
-- [ ] `php apps/playground/run.php` → 36/36 assertions
-- [ ] `npm install && npm run build` clean
-- [ ] `npm run trace` → 12/12 assertions
-- [ ] `bash scripts/ci.sh` → all 9 steps PASS
-- [ ] `bash scripts/clean-room.sh` → all 8 steps PASS
-- [ ] LICENSE file present in monorepo root + each publishable package
-- [ ] CHANGELOG.md present in each publishable package
-- [ ] `RELEASE-NOTES-v0.1.0.md` reviewed (this file)
-- [ ] GitHub organization `ausus-framework` exists; per-package repos exist; SSH keys configured
-- [ ] Packagist account exists with submission permission
-- [ ] npm organization `ausus` claimed; current `npm whoami` has publish rights
-- [ ] All edits committed to the source-of-truth monorepo branch
-- [ ] **§5 publish commands executed in order**
-- [ ] §6 post-publish smoke run in a fresh dir, **outside the monorepo**
-- [ ] Tag the monorepo: `git tag v0.1.0 && git push --tags`
-- [ ] Announce the release (channel of your choice)
+When all P0 controls pass and the runbook's phased procedure (§3)
+completes with every STOP-matrix gate (§4) green, the status changes to
+**published**. Until then it remains **PUBLICATION HOLD**.
 
 ---
 
-**Final determination: GO.**
+**Authoritative procedure:** [`docs/PUBLICATION-RUNBOOK.md`](docs/PUBLICATION-RUNBOOK.md)
+— if this document and the runbook ever disagree, the runbook wins.
