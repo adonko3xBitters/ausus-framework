@@ -13,6 +13,9 @@
     "trace":     "npm run --workspace ausus-playground-web trace",
     "bundle":    "npm run --workspace ausus-playground-web bundle",
     "clean":     "rm -rf node_modules renderer/react/node_modules renderer/react/dist apps/playground/web/node_modules apps/playground/web/dist",
-    "smoke":     "npm run build && npm run trace"
+    "smoke":     "npm run build && npm run trace",
+    "docs:dev":     "npm --prefix docs-site run start",
+    "docs:build":   "npm --prefix docs-site run build",
+    "docs:preview": "npm --prefix docs-site run serve"
   }
 }
