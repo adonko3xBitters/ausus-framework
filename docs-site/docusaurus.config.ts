@@ -16,7 +16,7 @@ const config: Config = {
   },
 
   // Production URL — placeholder until a docs host is chosen.
-  url: 'https://adonko3xbitters.github.io',
+  url: 'https://ausus-framework.pages.dev',
   baseUrl: '/',
 
   organizationName: 'adonko3xBitters',
