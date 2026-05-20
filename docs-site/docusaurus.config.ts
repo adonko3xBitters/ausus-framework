@@ -90,6 +90,10 @@ const config: Config = {
         {type: 'doc', docId: 'operations/publication-runbook', label: 'Operations', position: 'left'},
         {type: 'docSidebar', sidebarId: 'docs', label: 'All Docs', position: 'left'},
         {href: GITHUB_REPO, label: 'GitHub', position: 'right'},
+        {
+          type: 'localeDropdown',
+          position: 'right',
+        },
       ],
     },
     footer: {
