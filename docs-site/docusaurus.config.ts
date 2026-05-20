@@ -28,7 +28,7 @@ const config: Config = {
 
   i18n: {
     defaultLocale: 'en',
-    locales: ['en'],
+    locales: ['en', 'fr'],
   },
 
   // Parse `.md` files as CommonMark (not MDX). The documentation is prose +

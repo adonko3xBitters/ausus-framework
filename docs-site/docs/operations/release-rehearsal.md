@@ -19,7 +19,7 @@ The rehearsal results live in `docs/RELEASE-REHEARSAL-v0.1.0.md` in the
 repository. This page summarises that document.
 :::
 
-## What a rehearsal checks
+## What a rehearsal checks {#what-a-rehearsal-checks}
 
 A rehearsal walks the runbook's §2 pre-flight top to bottom:
 
@@ -36,7 +36,7 @@ A rehearsal walks the runbook's §2 pre-flight top to bottom:
 
 Every registry-mutating command is replaced with a read-only equivalent.
 
-## Determination
+## Determination {#determination}
 
 A rehearsal ends with one of two determinations:
 
@@ -50,20 +50,20 @@ merging, the GitHub CLI needed authenticating, the 10 release repos needed
 creating, the npm `@ausus` org needed creating). Once that infrastructure was
 in place, the rehearsal returned **READY TO PUBLISH** with all 14 gates green.
 
-## Why rehearse
+## Why rehearse {#why-rehearse}
 
 The rehearsal exists because the alternative — discovering a missing release
 repo or an unauthenticated CLI **mid-publication** — risks leaving the
 ecosystem in a half-published, partially-irreversible state. A rehearsal moves
 every discoverable failure to *before* the first irreversible operation.
 
-## Re-verification rule
+## Re-verification rule {#re-verification-rule}
 
 A rehearsal verifies the runbook against **one specific commit**. If any new
 commit lands on `main` afterwards, the pre-flight — especially P0-A and P0-B —
 must be re-run against the new `HEAD` before publishing.
 
-## Related
+## Related {#related}
 
 - [Publication Runbook](publication-runbook.md) — the procedure being rehearsed.
 - [Package Integrity](package-integrity.md) — artifact verification detail.

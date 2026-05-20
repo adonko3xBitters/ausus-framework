@@ -17,7 +17,7 @@ projections) as a **plugin**. A compiler turns that description into a
 deterministic, content-addressable `MetadataGraph`. A layered runtime executes
 actions against it; an HTTP API exposes it; a React renderer draws it.
 
-## Architecture first
+## Architecture first {#architecture-first}
 
 AUSUS is organised as a stack of layers with stable, one-directional
 contracts. A layer never depends on a layer above it.
@@ -37,7 +37,7 @@ This is the central idea: the **metadata graph is the application**. Backends,
 APIs, and UIs are renderings of the same graph rather than independently
 maintained code.
 
-## Install
+## Install {#install}
 
 Create a new project from the starter template:
 
@@ -56,7 +56,7 @@ npm install @ausus/renderer-react react@18 react-dom@18
 See [Installation](getting-started/installation.md) for the from-source path
 and version requirements.
 
-## A minimal domain
+## A minimal domain {#a-minimal-domain}
 
 This is a complete domain plugin — an `invoice` entity with three actions and
 a status workflow — written in the AUSUS DSL:
@@ -100,7 +100,7 @@ final class HelloInvoiceDsl extends DslPlugin
 
 Walk through this end-to-end in the [HelloInvoice tutorial](getting-started/hello-invoice.md).
 
-## Current status
+## Current status {#current-status}
 
 :::info v0.1.0 — initial public release
 
@@ -132,13 +132,13 @@ matrix and known limitations.
 
 :::
 
-## Ecosystem links
+## Ecosystem links {#ecosystem-links}
 
 - **GitHub** — [adonko3xBitters/ausus-framework](https://github.com/adonko3xBitters/ausus-framework)
 - **Packagist** — [`ausus/*` packages](https://packagist.org/search/?query=ausus)
 - **npm** — [`@ausus/renderer-react`](https://www.npmjs.com/package/@ausus/renderer-react)
 
-## Where to go next
+## Where to go next {#where-to-go-next}
 
 | If you want to… | Start here |
 |---|---|

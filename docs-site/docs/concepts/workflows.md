@@ -11,7 +11,7 @@ A **workflow** is a state machine attached to an entity. It declares the legal
 states of a record and which [transition actions](entities-fields-actions.md#transition-actions)
 move it between them.
 
-## How a workflow is declared
+## How a workflow is declared {#how-a-workflow-is-declared}
 
 A workflow is **inferred**, not written out by hand. You point the entity at an
 `enum` field, and that field's options become the workflow states:
@@ -39,7 +39,7 @@ From this the compiler builds a `WorkflowNode`:
 
 The workflow FQN is `{entity}.lifecycle`, e.g. `billing.invoice.lifecycle`.
 
-## How a transition is enforced
+## How a transition is enforced {#how-a-transition-is-enforced}
 
 When you invoke a transition action, the [runtime](../backend/runtime.md) runs a
 **workflow guard** before the effect:
@@ -54,7 +54,7 @@ When you invoke a transition action, the [runtime](../backend/runtime.md) runs a
 So `issue` works only on a `DRAFT` invoice; calling it on an `ISSUED` invoice
 is rejected. `cancel`, declared from both `DRAFT` and `ISSUED`, works on either.
 
-### Wildcard transitions
+### Wildcard transitions {#wildcard-transitions}
 
 A transition source may be `*`, meaning "from any state". The runtime treats
 a wildcard as matching the current state when no exact source matches.
@@ -66,13 +66,13 @@ a wildcard that overlap), the runtime throws an ambiguous-transition error.
 Declare transitions so that at most one applies per state.
 :::
 
-## Multiple workflows
+## Multiple workflows {#multiple-workflows}
 
 An action can drive transitions on more than one workflow. When that happens,
 each attached workflow must have exactly one matching transition for the
 current state. In the v0.1.0 sample domain each entity has a single workflow.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - Workflows are inferred from a single enum field — there is no standalone
   workflow declaration syntax.
@@ -82,7 +82,7 @@ current state. In the v0.1.0 sample domain each entity has a single workflow.
 - The initial state is the enum `default`, or the first option if no default
   is set.
 
-## Related
+## Related {#related}
 
 - [Entities, Fields & Actions](entities-fields-actions.md) — transition actions.
 - [The Runtime](../backend/runtime.md) — where the workflow guard runs.

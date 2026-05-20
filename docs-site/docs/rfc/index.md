@@ -19,7 +19,7 @@ This section is a map of them and a record of **which RFCs v0.1.0 actually
 implements** — in most cases as a deliberate subset.
 :::
 
-## How to read this section
+## How to read this section {#how-to-read-this-section}
 
 - **[Implemented in v0.1.0](implemented.md)** — RFCs the v0.1.0 code realises,
   with a note on the subset that shipped.
@@ -29,7 +29,7 @@ implements** — in most cases as a deliberate subset.
 A subsystem appearing in an RFC does **not** mean it exists in v0.1.0. Always
 check the implemented/planned split before relying on a capability.
 
-## RFC catalogue
+## RFC catalogue {#rfc-catalogue}
 
 | RFC | Topic | v0.1.0 |
 |---|---|---|
@@ -51,14 +51,14 @@ Several RFCs carry amendments and reviews (`RFC-001-amendment-01`,
 `RFC-006-amendment-01`, `RFC-007-amendment-01`, …); those refine the parent RFC
 and are read alongside it.
 
-## Why subsets
+## Why subsets {#why-subsets}
 
 v0.1.0 implements **subsets** of most RFCs on purpose. The RFCs describe the
 intended end state; v0.1.0 is a vertical slice that proves the architecture
 end-to-end with the smallest surface that works. The pages in this section make
 the gap between "designed" and "shipped" explicit.
 
-## Related
+## Related {#related}
 
 - [Implemented RFCs](implemented.md) · [Planned RFCs](planned.md)
 - [Core Concepts](../concepts/metadata-graph.md) — the implemented model.

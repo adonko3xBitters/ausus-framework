@@ -10,7 +10,7 @@ description: The Invoker chain that executes actions.
 The runtime (`ausus/runtime-default`, layer L2) executes actions against a
 [metadata graph](../concepts/metadata-graph.md). Its centre is the `Invoker`.
 
-## The Invoker chain
+## The Invoker chain {#the-invoker-chain}
 
 Every call to `Invoker::invoke()` runs the same ordered chain. The chain is the
 core guarantee of AUSUS: an action either completes all of these steps or
@@ -42,7 +42,7 @@ $outputs = $invoker->invoke('billing.invoice.create', null, [
 ]);
 ```
 
-## Constructing an Invoker
+## Constructing an Invoker {#constructing-an-invoker}
 
 ```php
 use Ausus\Runtime\{
@@ -70,21 +70,21 @@ deliberately single-process and single-tenant per invocation — there is no
 distributed runtime and no multi-tenant runtime.
 :::
 
-## The pieces
+## The pieces {#the-pieces}
 
-### `PolicyEngine`
+### `PolicyEngine` {#policyengine}
 
 Resolves and evaluates an action's [policy](../concepts/policies.md).
 Deny-by-default and fail-closed: `Abstain` and thrown exceptions both become
 `Deny`.
 
-### `WorkflowRuntime`
+### `WorkflowRuntime` {#workflowruntime}
 
 Runs the [workflow](../concepts/workflows.md) guard. It loads the subject,
 reads its current state, and confirms the invoked action declares a transition
 from that state. No match → `WorkflowStateMismatch`.
 
-### `EffectDispatcher` and built-in effects
+### `EffectDispatcher` and built-in effects {#effectdispatcher-and-built-in-effects}
 
 Maps an action's `effectClass` to an `Effect` instance:
 
@@ -96,14 +96,14 @@ Maps an action's `effectClass` to an `Effect` instance:
 The dispatcher can also instantiate a custom `Effect` class by FQN, though the
 v0.1.0 sample domain only uses the two built-ins.
 
-### `DefaultAuditor` and `SequenceCounter`
+### `DefaultAuditor` and `SequenceCounter` {#defaultauditor-and-sequencecounter}
 
 Every successful action writes an `AuditEntry` through the `Auditor` into the
 audit sink — **inside the action's transaction**. The `SequenceCounter` assigns
 a monotonic sequence number per correlation id. See
 [SQL Persistence](sql-persistence.md#the-audit-log) for the audit table.
 
-## Transaction semantics
+## Transaction semantics {#transaction-semantics}
 
 - The transaction opens **after** policy evaluation — a denied action never
   opens one.
@@ -111,13 +111,13 @@ a monotonic sequence number per correlation id. See
 - Commit happens only if all three succeed. Any failure rolls back everything.
 - If the effect throws a non-AUSUS exception, it is wrapped as `EffectFailed`.
 
-## `ProjectionRenderer`
+## `ProjectionRenderer` {#projectionrenderer}
 
 `runtime-default` also provides `ProjectionRenderer`, which renders a
 [projection](../concepts/projections.md) to a
 [ViewSchema](../frontend/viewschema.md). It opens its own read transaction.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - Single-process, single-tenant, single-actor per `Invoker` (see the note above).
 - The audit `SequenceCounter` is **per process** — sequence numbers are not
@@ -125,7 +125,7 @@ a monotonic sequence number per correlation id. See
 - Per-transition guard policies are not evaluated (see [Workflows](../concepts/workflows.md)).
 - There is no retry, queue, or async execution — `invoke()` is synchronous.
 
-## Related
+## Related {#related}
 
 - [Policies](../concepts/policies.md) · [Workflows](../concepts/workflows.md)
 - [SQL Persistence](sql-persistence.md) — the driver the runtime writes through.

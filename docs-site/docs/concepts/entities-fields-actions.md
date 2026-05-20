@@ -11,7 +11,7 @@ Entities, fields, and actions are the data-and-behaviour core of an AUSUS
 domain. This page describes them as graph concepts; the builder methods that
 declare them are in [The PHP DSL](../backend/php-dsl.md).
 
-## Entities
+## Entities {#entities}
 
 An **entity** is a domain record type — `invoice`, `customer`, `order`. In the
 graph it is an `EntityNode` with:
@@ -23,12 +23,12 @@ graph it is an `EntityNode` with:
 
 One entity maps to one SQL table; see [SQL Persistence](../backend/sql-persistence.md).
 
-## Fields
+## Fields {#fields}
 
 A **field** (`FieldNode`) has a `name`, a `type`, a `nullable` flag, optional
 `typeOptions`, and an optional `default`.
 
-### Field types
+### Field types {#field-types}
 
 v0.1.0 supports eight field types:
 
@@ -61,7 +61,7 @@ Every entity automatically gets five system fields, in this order:
 You declare only your **domain** fields. The `money` type stores the amount in
 the column and resolves currency from the field's `typeOptions`.
 
-## Actions
+## Actions {#actions}
 
 An **action** is the only way to change data. In the graph an `ActionNode` has
 an `fqn`, the `entityFqn` it belongs to, a `policyFqn`, an `effectClass`, an
@@ -69,7 +69,7 @@ input list, a `subjectRequired` flag, and a `kind`.
 
 v0.1.0 has two action kinds, both backed by **built-in effects**:
 
-### Create actions
+### Create actions {#create-actions}
 
 A create action inserts a new record. It declares which fields are inputs:
 
@@ -83,7 +83,7 @@ A create action inserts a new record. It declares which fields are inputs:
 - If the entity has an enum field with a default (a workflow state field), the
   create effect applies that default automatically.
 
-### Transition actions
+### Transition actions {#transition-actions}
 
 A transition action moves a record between workflow states:
 
@@ -102,7 +102,7 @@ A transition action moves a record between workflow states:
 
 Transition actions are what [workflows](workflows.md) are built from.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - The only action kinds are **create** and **transition**, both built-in.
   There is no built-in `update` or `delete` action, and custom
@@ -113,7 +113,7 @@ Transition actions are what [workflows](workflows.md) are built from.
   validation rules in v0.1.0.
 - All entities are tenant-scoped; there is no global (un-scoped) entity.
 
-## Related
+## Related {#related}
 
 - [Workflows](workflows.md) — what transition actions drive.
 - [Policies](policies.md) — the authorization on each action.

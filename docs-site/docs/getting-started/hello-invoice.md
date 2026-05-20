@@ -15,7 +15,7 @@ runtime guarantee against it.
 The runnable version lives at `apps/playground/run.php` in the monorepo and is
 covered by 36 assertions in the validation gate.
 
-## 1. Declare the domain
+## 1. Declare the domain {#1-declare-the-domain}
 
 A domain in AUSUS is a **plugin**. Here is the complete `HelloInvoice` plugin
 written with the [DSL](../backend/php-dsl.md):
@@ -74,7 +74,7 @@ What this declares:
   initial value from the field.
 - Two **projections** — read-shaped views named `summary` and `detail`.
 
-## 2. Compile and boot
+## 2. Compile and boot {#2-compile-and-boot}
 
 ```php
 use Ausus\Compiler;
@@ -94,7 +94,7 @@ foreach (SchemaDeriver::deriveAll($graph) as $stmt) {
 See [Your first app](first-app.md) for the full runtime wiring; the steps
 below assume an `$invoker` and `$renderer` are in scope.
 
-## 3. Create an invoice
+## 3. Create an invoice {#3-create-an-invoice}
 
 ```php
 $created = $invoker->invoke('billing.invoice.create', null, [
@@ -108,7 +108,7 @@ $created = $invoker->invoke('billing.invoice.create', null, [
 - `$created['status']` — `'DRAFT'`, applied automatically from the enum
   default. The `create` action did not pass `status`.
 
-## 4. Issue it (a workflow transition)
+## 4. Issue it (a workflow transition) {#4-issue-it-a-workflow-transition}
 
 ```php
 use Ausus\Reference;
@@ -122,7 +122,7 @@ $out = $invoker->invoke('billing.invoice.issue', $ref, []);
 The `issue` action is declared `transition('status', from: 'DRAFT', to: 'ISSUED')`.
 The workflow runtime checks the invoice is currently `DRAFT` before allowing it.
 
-## 5. Watch the guards work
+## 5. Watch the guards work {#5-watch-the-guards-work}
 
 These calls are *supposed* to fail — they demonstrate the runtime guarantees.
 
@@ -151,7 +151,7 @@ $out = $invoker->invoke('billing.invoice.cancel', $ref, []);
 // $out['status'] === 'CANCELLED'
 ```
 
-## 6. Optimistic concurrency
+## 6. Optimistic concurrency {#6-optimistic-concurrency}
 
 Every row carries a `_version` ULID. An `update` with a stale version is
 rejected:
@@ -166,7 +166,7 @@ $repo->update($ref, ['customer_name' => 'New Name'], $stale);   // ok — bumps 
 $repo->update($ref, ['customer_name' => 'Bad Name'], $stale);   // throws ConcurrencyConflict
 ```
 
-## 7. Render a projection
+## 7. Render a projection {#7-render-a-projection}
 
 ```php
 $summary = $renderer->render('billing.invoice.summary');
@@ -179,7 +179,7 @@ $summary = $renderer->render('billing.invoice.summary');
 This [ViewSchema](../frontend/viewschema.md) is exactly what the HTTP API
 returns and what the [React renderer](../frontend/react-renderer.md) draws.
 
-## What HelloInvoice proves
+## What HelloInvoice proves {#what-helloinvoice-proves}
 
 Running the full playground exercises, in order: persistence round-trip,
 enum-default application, workflow transitions, workflow rejection, tenant
@@ -187,7 +187,7 @@ isolation, optimistic locking, audit-trail emission, and projection rendering
 — plus that the **DSL plugin and an equivalent hand-written plugin compile to
 a byte-identical graph hash**.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - Projection **list** rendering reads rows for the current tenant with no
   filtering or real pagination — `pagination.nextCursor` is always `null`.
@@ -196,7 +196,7 @@ a byte-identical graph hash**.
 - `cancel` uses `andTransition()` to declare two explicit sources; wildcard
   (`from: '*'`) transitions are supported by the runtime but not used here.
 
-## Next
+## Next {#next}
 
 - [Core Concepts](../concepts/metadata-graph.md) — the model behind all of this.
 - [The PHP DSL](../backend/php-dsl.md) — every builder method.

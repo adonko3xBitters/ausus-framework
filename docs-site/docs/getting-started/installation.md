@@ -10,7 +10,7 @@ description: Requirements and install paths for AUSUS v0.1.0.
 AUSUS v0.1.0 has two halves you can install independently: the **PHP backend**
 packages and the **React renderer** npm package.
 
-## Requirements
+## Requirements {#requirements}
 
 | Layer | Tool | Minimum | Tested with |
 |---|---|---|---|
@@ -25,7 +25,7 @@ AUSUS does **not** require the Laravel framework, Eloquent, Filament,
 Tailwind, a bundler, or any UI component library. Persistence in v0.1.0 uses
 the bundled SQLite PDO driver.
 
-## Option A — start from the project template
+## Option A — start from the project template {#option-a--start-from-the-project-template}
 
 The fastest path. `ausus/starter` is a ready-to-run project that already wires
 the kernel, persistence, runtime, and a sample domain together.
@@ -50,7 +50,7 @@ OK — ausus/starter boots cleanly.
 
 If you used `--no-install`, finish with `composer install && composer boot`.
 
-## Option B — add packages to an existing project
+## Option B — add packages to an existing project {#option-b--add-packages-to-an-existing-project}
 
 Install only the packages you need. The dependency order is bottom-up:
 
@@ -67,7 +67,7 @@ Or pin the whole validated v0.1.0 set with the metapackage:
 composer require ausus/standard-stack
 ```
 
-## Option C — build from source (monorepo)
+## Option C — build from source (monorepo) {#option-c--build-from-source-monorepo}
 
 Use this to read the code, run the validation gates, or contribute.
 
@@ -85,7 +85,7 @@ bash scripts/ci.sh    # full validation gate
 [ci] DONE — all 10 steps passed
 ```
 
-## The React renderer
+## The React renderer {#the-react-renderer}
 
 The renderer is a separate npm package. `react` and `react-dom` are **peer
 dependencies** — you install them yourself.
@@ -100,7 +100,7 @@ The package is **ESM-only** (`"type": "module"`, NodeNext resolution). It ships
 no bundled dependencies and no CSS file — see
 [The React renderer](../frontend/react-renderer.md).
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - **Persistence is validated on SQLite only.** MySQL/PostgreSQL drivers are a
   design goal, not a tested v0.1.0 capability.
@@ -111,7 +111,7 @@ no bundled dependencies and no CSS file — see
   `presentation-default`) are **not installable as working code** — they are
   name reservations. See [Packages](../packages/index.md).
 
-## Next
+## Next {#next}
 
 - [Your first app](first-app.md) — wire the layers together by hand.
 - [HelloInvoice tutorial](hello-invoice.md) — a full domain, end to end.

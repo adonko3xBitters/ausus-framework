@@ -10,7 +10,7 @@ description: How the AUSUS monorepo and a generated app are laid out.
 There are two layouts worth knowing: the **monorepo** (where AUSUS itself is
 developed) and a **consuming application** (what you build).
 
-## The monorepo
+## The monorepo {#the-monorepo}
 
 The framework is developed as a single repository with one publishable package
 per directory.
@@ -42,7 +42,7 @@ Each package directory holds `composer.json`, `src/`, `README.md`,
 `CHANGELOG.md`, and `LICENSE`. The four reserved packages contain a
 `composer.json` and `README.md` but **no `src/` PHP code**.
 
-### Validation gates
+### Validation gates {#validation-gates}
 
 | Script | What it runs |
 |---|---|
@@ -51,7 +51,7 @@ Each package directory holds `composer.json`, `src/`, `README.md`,
 | `scripts/integration-http.sh` | 12 live-HTTP assertions against `php -S` + the renderer |
 | `apps/playground/run.php` | 36 end-to-end assertions |
 
-## A consuming application
+## A consuming application {#a-consuming-application}
 
 A project created from `ausus/starter` is a normal Composer project:
 
@@ -70,14 +70,14 @@ Your own application replaces the sample plugins with your domain plugins and
 replaces `bin/boot.php` with your real entry point (a CLI command, an HTTP
 front controller using [ausus/api-http](../backend/http-api.md), etc.).
 
-## Where domain code lives
+## Where domain code lives {#where-domain-code-lives}
 
 AUSUS does not impose a directory convention on your domain code. A plugin is
 an ordinary PHP class that extends `DslPlugin` (or implements `Plugin`). Put it
 wherever your autoloader can find it. The only hard rule is that a plugin
 declares a `phpNamespace()` and a `name()` — see [Plugins](../concepts/plugins.md).
 
-## Naming conventions
+## Naming conventions {#naming-conventions}
 
 - **Entity FQN** — `{plugin name}.{entity local name}`, e.g. `billing.invoice`.
 - **Action FQN** — `{entity FQN}.{action local name}`, e.g. `billing.invoice.issue`.
@@ -86,7 +86,7 @@ declares a `phpNamespace()` and a `name()` — see [Plugins](../concepts/plugins
 - **SQL table name** — the entity FQN with dots replaced by underscores, e.g.
   `billing_invoice`.
 
-## Next
+## Next {#next}
 
 - [Plugins](../concepts/plugins.md) — the unit of domain code.
 - [Packages](../packages/index.md) — what each package contains.

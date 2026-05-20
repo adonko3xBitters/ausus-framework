@@ -15,7 +15,7 @@ If you want the full annotated domain, jump to the
 [HelloInvoice tutorial](hello-invoice.md). This page focuses on **how the
 layers connect**.
 
-## The pieces
+## The pieces {#the-pieces}
 
 A running AUSUS application is assembled from five things:
 
@@ -25,7 +25,7 @@ A running AUSUS application is assembled from five things:
 4. The **runtime** — `Invoker`, `PolicyEngine`, `WorkflowRuntime`, etc.
 5. An **Actor** and a **Tenant** — who is acting, and in which tenant.
 
-## Step 1 — compile the graph
+## Step 1 — compile the graph {#step-1--compile-the-graph}
 
 ```php
 use Ausus\Compiler;
@@ -39,7 +39,7 @@ echo substr($graph->hash, 0, 12);   // content-addressable graph hash
 The `MetadataGraph` is immutable and deterministic: the same plugins always
 produce the same `hash`. See [The Metadata Graph](../concepts/metadata-graph.md).
 
-## Step 2 — apply the schema
+## Step 2 — apply the schema {#step-2--apply-the-schema}
 
 The SQL package derives `CREATE TABLE` statements directly from the graph.
 
@@ -56,7 +56,7 @@ foreach (SchemaDeriver::deriveAll($graph) as $stmt) {
 
 This creates one table per entity, plus the internal `kernel_audit_log` table.
 
-## Step 3 — wire the runtime
+## Step 3 — wire the runtime {#step-3--wire-the-runtime}
 
 ```php
 use Ausus\{Tenant, TenantId, ActorRef, StubActor};
@@ -92,7 +92,7 @@ In v0.1.0 an `Invoker` is constructed with **one** `Tenant` and **one**
 is a deliberate v0.1.0 simplification — see [The Runtime](../backend/runtime.md).
 :::
 
-## Step 4 — invoke an action
+## Step 4 — invoke an action {#step-4--invoke-an-action}
 
 ```php
 use Ausus\Reference;
@@ -114,7 +114,7 @@ Every `invoke()` call runs the full runtime chain — policy check, workflow
 guard, effect, audit — inside one database transaction. See
 [The Runtime](../backend/runtime.md).
 
-## Step 5 — render a projection
+## Step 5 — render a projection {#step-5--render-a-projection}
 
 ```php
 use Ausus\Runtime\ProjectionRenderer;
@@ -127,20 +127,20 @@ $schema   = $renderer->render('billing.invoice.summary');
 The result is a [ViewSchema](../frontend/viewschema.md) — the wire format the
 [React renderer](../frontend/react-renderer.md) consumes.
 
-## What you have built
+## What you have built {#what-you-have-built}
 
 You now have the full vertical slice: **graph → schema → runtime → projection**.
 The HTTP API ([ausus/api-http](../backend/http-api.md)) is simply this same
 wiring placed behind PSR-7/15 request handling.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - There is no service container or auto-wiring helper in v0.1.0 — you assemble
   the runtime explicitly, as above. `ausus/starter` gives you this wiring
   pre-written.
 - `StubActor` is a fixed in-memory actor. There is no authentication layer.
 
-## Next
+## Next {#next}
 
 - [HelloInvoice tutorial](hello-invoice.md) — the same flow with a real domain
   and assertions.

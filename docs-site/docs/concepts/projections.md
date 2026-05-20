@@ -11,7 +11,7 @@ A **projection** is a read-shaped view over an entity — the fields and actions
 that a particular screen needs. Projections are how AUSUS turns a domain into
 something a UI can render without the UI knowing the domain.
 
-## Declaring a projection
+## Declaring a projection {#declaring-a-projection}
 
 A projection is declared on the entity, naming the fields and actions it
 exposes:
@@ -34,7 +34,7 @@ Each projection becomes a `ProjectionNode` in the graph with an FQN of
 `{entity}.{projection name}`, e.g. `billing.invoice.summary`. The optional
 `role` attaches a read policy.
 
-## Rendering a projection
+## Rendering a projection {#rendering-a-projection}
 
 `ProjectionRenderer` turns a projection into a [ViewSchema](../frontend/viewschema.md)
 — a JSON-shaped description of fields, actions, and data:
@@ -61,7 +61,7 @@ The shape of `data` tells the consumer which view to draw:
 The [React renderer](../frontend/react-renderer.md)'s `ViewSchemaConsumer`
 dispatches on exactly this.
 
-## List vs detail
+## List vs detail {#list-vs-detail}
 
 | | List | Detail |
 |---|---|---|
@@ -73,7 +73,7 @@ The renderer separates **list actions** (no subject required) from **item
 actions** (subject required) automatically based on each action's
 `subjectRequired` flag.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - **List rendering returns all rows for the tenant.** There is no filtering,
   sorting, or real pagination — the ViewSchema `filters` array is empty and
@@ -84,7 +84,7 @@ actions** (subject required) automatically based on each action's
 - Field labels are derived mechanically from field names (`customer_name` →
   "Customer name"). There is no label localization or override in v0.1.0.
 
-## Related
+## Related {#related}
 
 - [ViewSchema](../frontend/viewschema.md) — the wire format a projection renders to.
 - [The React renderer](../frontend/react-renderer.md) — the client that consumes it.

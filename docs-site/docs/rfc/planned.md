@@ -16,7 +16,7 @@ The items below are documented design and architectural direction. They are
 architecture points", not "what will ship when".
 :::
 
-## RFC-003 — Tenancy
+## RFC-003 — Tenancy {#rfc-003--tenancy}
 
 Designs a dedicated **row-level tenancy** driver and tenant-resolution model.
 
@@ -27,14 +27,14 @@ the dedicated `ausus/tenancy-row` driver package; that name is reserved and
 ships no code. There is no multi-tenant *runtime* — an `Invoker` is bound to a
 single tenant.
 
-## RFC-007 (dedicated audit package) — Audit database
+## RFC-007 (dedicated audit package) — Audit database {#rfc-007-dedicated-audit-package--audit-database}
 
 RFC-007 itself is [implemented in subset](implemented.md#rfc-007--audit) — the
 audit trail works. What is deferred is the **dedicated `ausus/audit-database`
 package**: a standalone audit driver separate from `persistence-sql`. That name
 is reserved and ships no code in v0.1.0.
 
-## RFC-010 — Reporting & maintenance
+## RFC-010 — Reporting & maintenance {#rfc-010--reporting--maintenance}
 
 Designs a reporting/query subsystem and maintenance-class operations
 (`ReportingDriver`, maintenance-class invocations).
@@ -43,7 +43,7 @@ Designs a reporting/query subsystem and maintenance-class operations
 distinguishes a `Maintenance` invocation class in the audit record, but no
 reporting or maintenance subsystem ships.
 
-## RFC-014 — Authorization
+## RFC-014 — Authorization {#rfc-014--authorization}
 
 Designs the full authorization model — actor resolution, an authentication
 bridge, and richer policy composition.
@@ -55,7 +55,7 @@ v0.1.0: any authentication, actor resolution from credentials, or the
 must supply its own authentication — see
 [The HTTP API](../backend/http-api.md).
 
-## Reserved packages summary
+## Reserved packages summary {#reserved-packages-summary}
 
 Four package names are reserved in v0.1.0 and tied to the RFCs above:
 
@@ -68,7 +68,7 @@ Four package names are reserved in v0.1.0 and tied to the RFCs above:
 
 See [Packages](../packages/index.md) for the full catalogue.
 
-## Other deferred items
+## Other deferred items {#other-deferred-items}
 
 Not tied to a single RFC, but documented as deferred from v0.1.0:
 
@@ -79,7 +79,7 @@ Not tied to a single RFC, but documented as deferred from v0.1.0:
 - **DSL enrichments** — convention-resolved policy/effect classes, field-level
   visibility, DSL diagnostics (RFC-011 deferred surface).
 
-## Related
+## Related {#related}
 
 - [Implemented RFCs](implemented.md)
 - [Release Notes v0.1.0](../releases/v0.1.0.md) — known limitations.

@@ -1,0 +1,42 @@
+{
+  "version.label": {
+    "message": "Actuelle",
+    "description": "The label for version current"
+  },
+  "sidebar.docs.category.Getting Started": {
+    "message": "Démarrage",
+    "description": "The label for category 'Getting Started' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Core Concepts": {
+    "message": "Concepts fondamentaux",
+    "description": "The label for category 'Core Concepts' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Backend": {
+    "message": "Backend",
+    "description": "The label for category 'Backend' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Frontend": {
+    "message": "Frontend",
+    "description": "The label for category 'Frontend' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Packages": {
+    "message": "Paquets",
+    "description": "The label for category 'Packages' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Reference": {
+    "message": "Référence",
+    "description": "The label for category 'Reference' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Release Notes": {
+    "message": "Notes de version",
+    "description": "The label for category 'Release Notes' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Operations": {
+    "message": "Opérations",
+    "description": "The label for category 'Operations' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.RFCs": {
+    "message": "RFC",
+    "description": "The label for category 'RFCs' in sidebar 'docs'"
+  }
+}

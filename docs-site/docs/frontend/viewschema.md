@@ -14,7 +14,7 @@ the domain — the ViewSchema carries it.
 
 ViewSchema is defined by RFC-004. v0.1.0 implements a subset of it.
 
-## Shape
+## Shape {#shape}
 
 ```json
 {
@@ -44,7 +44,7 @@ ViewSchema is defined by RFC-004. v0.1.0 implements a subset of it.
 | `filters` | filter descriptors — always empty in v0.1.0 |
 | `data` | the rows themselves (see below) |
 
-## `data` — list vs detail
+## `data` — list vs detail {#data--list-vs-detail}
 
 The `data` member tells the consumer which view to draw:
 
@@ -61,7 +61,7 @@ The `data` member tells the consumer which view to draw:
 `data.items` → render a list. `data.item` → render a detail. The renderer's
 `ViewSchemaConsumer` dispatches on exactly this.
 
-## `FieldDescriptor`
+## `FieldDescriptor` {#fielddescriptor}
 
 ```ts
 interface FieldDescriptor {
@@ -76,7 +76,7 @@ interface FieldDescriptor {
 The `type` drives how a cell is rendered — `money` is formatted with its
 currency, `enum` named `status` becomes a workflow badge, and so on.
 
-## `ActionDescriptor`
+## `ActionDescriptor` {#actiondescriptor}
 
 ```ts
 interface ActionDescriptor {
@@ -92,13 +92,13 @@ interface ActionDescriptor {
 `subjectRequired` separates **list actions** (e.g. `create`) from **item
 actions** (e.g. `issue`, `cancel`).
 
-## Schema versioning
+## Schema versioning {#schema-versioning}
 
 The renderer checks `schemaVersion`: it accepts `1.0.x` and reports an error
 for anything else. `schemaVersion` is how a future ViewSchema revision stays
 backward-compatible.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - `filters` is always empty — there is no filtering in v0.1.0.
 - `pagination.nextCursor` is always `null` — list rendering returns all rows
@@ -107,7 +107,7 @@ backward-compatible.
 - `confirmation` is part of the `ActionDescriptor` type but is not populated by
   the v0.1.0 backend renderer.
 
-## Related
+## Related {#related}
 
 - [Projections](../concepts/projections.md) — what renders into a ViewSchema.
 - [The HTTP API](../backend/http-api.md) — serves ViewSchemas.

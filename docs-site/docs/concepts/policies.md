@@ -11,7 +11,7 @@ A **policy** decides whether an [actor](#actors) may invoke an action. Every
 action in the graph has exactly one policy. The [runtime](../backend/runtime.md)
 evaluates it before any data is touched.
 
-## The `Policy` contract
+## The `Policy` contract {#the-policy-contract}
 
 ```php
 interface Policy
@@ -33,7 +33,7 @@ A policy returns a `Decision` enum value:
 | `Deny` | the action is refused |
 | `Abstain` | the policy makes no decision |
 
-## Deny-by-default, fail-closed
+## Deny-by-default, fail-closed {#deny-by-default-fail-closed}
 
 The `PolicyEngine` applies two safety rules when it evaluates a policy:
 
@@ -45,7 +45,7 @@ The `PolicyEngine` applies two safety rules when it evaluates a policy:
 If the decision is anything other than `Permit`, the runtime throws
 `PolicyDenied` and the invocation stops before the transaction opens.
 
-## The built-in policy: `RoleRequired`
+## The built-in policy: `RoleRequired` {#the-built-in-policy-rolerequired}
 
 v0.1.0 ships one policy implementation: `RoleRequired`. It permits the action
 if the actor holds a named role.
@@ -80,7 +80,7 @@ $actor = new StubActor(
 The HTTP API builds a `StubActor` from request headers (`X-Actor-Id`,
 `X-Actor-Roles`) — see [The HTTP API](../backend/http-api.md).
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - `RoleRequired` is the **only** policy implementation. There is no
   attribute-based policy, no permission-based policy, and no policy combination
@@ -92,7 +92,7 @@ The HTTP API builds a `StubActor` from request headers (`X-Actor-Id`,
 - Field-level and projection-level visibility policies are designed but not
   enforced in v0.1.0.
 
-## Related
+## Related {#related}
 
 - [The Runtime](../backend/runtime.md) — where the policy check runs.
 - [Entities, Fields & Actions](entities-fields-actions.md) — actions carry policies.

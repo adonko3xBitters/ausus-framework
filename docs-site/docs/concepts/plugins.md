@@ -15,7 +15,7 @@ plugins into a `MetadataGraph`.
 AUSUS is "plugin-first": you do not write controllers and models, you write a
 plugin and let the framework derive the rest.
 
-## The `Plugin` contract
+## The `Plugin` contract {#the-plugin-contract}
 
 The low-level contract (`ausus/kernel`) is small:
 
@@ -34,7 +34,7 @@ interface Plugin
   under.
 - `describe()` returns descriptor arrays the compiler consumes.
 
-## Writing plugins with the DSL
+## Writing plugins with the DSL {#writing-plugins-with-the-dsl}
 
 You rarely implement `Plugin` directly. Instead, extend `DslPlugin` and
 implement `dsl()` — the DSL builds the descriptor arrays for you:
@@ -64,7 +64,7 @@ final class HelloInvoiceDsl extends DslPlugin
 against a fresh `Dsl` builder and emits the descriptor arrays. The full builder
 surface is documented in [The PHP DSL](../backend/php-dsl.md).
 
-## Composing multiple plugins
+## Composing multiple plugins {#composing-multiple-plugins}
 
 `Compiler::compile()` takes an array. Plugins compose by declaration — the
 compiler merges their nodes into one graph:
@@ -80,7 +80,7 @@ If two plugins declare the same action FQN, the compiler throws a
 **DuplicateRegistration** error. Entities and policies with the same FQN are
 merged (last-wins); actions are strict.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - **Cross-plugin references are not specially resolved.** A plugin's action
   may reference another plugin's entity only if both are compiled together and
@@ -91,7 +91,7 @@ merged (last-wins); actions are strict.
 - There is no plugin discovery or registry. You pass the plugin instances to
   `compile()` explicitly.
 
-## Related
+## Related {#related}
 
 - [The Metadata Graph](metadata-graph.md) — what plugins compile into.
 - [The PHP DSL](../backend/php-dsl.md) — the full builder reference.

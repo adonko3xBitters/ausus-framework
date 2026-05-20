@@ -14,7 +14,7 @@ renders it. It is the L6 layer of the stack.
 React is treated as a **rendering engine only** — the renderer holds no domain
 knowledge. Everything it draws comes from the ViewSchema.
 
-## Install
+## Install {#install}
 
 ```bash
 npm install @ausus/renderer-react react@18 react-dom@18
@@ -25,7 +25,7 @@ npm install @ausus/renderer-react react@18 react-dom@18
 `react` and `react-dom` are **peer dependencies** (`^18 || ^19`). The package
 is **ESM-only** and ships no bundled dependencies.
 
-## Public API
+## Public API {#public-api}
 
 ```ts
 import {
@@ -48,7 +48,7 @@ import {
 | `WorkflowBadge` | component | colored badge for a workflow state |
 | `FieldDisplay` | component | renders one field cell by type |
 
-## Usage
+## Usage {#usage}
 
 Wrap your app once in `AususProvider`, then render a projection:
 
@@ -71,7 +71,7 @@ function App() {
 - shows a loading state while fetching and an error state with a retry button
   on failure.
 
-### The provider
+### The provider {#the-provider}
 
 ```tsx
 <AususProvider
@@ -84,7 +84,7 @@ function App() {
 The optional `fetcher` lets you inject auth headers, retries, or a test double.
 It is the seam where you add the authentication the backend does not provide.
 
-### Hooks directly
+### Hooks directly {#hooks-directly}
 
 ```tsx
 const { schema, loading, error, refetch } = useViewSchema("billing.invoice.summary");
@@ -95,14 +95,14 @@ await invoke({ subject: ref, inputs: {} });
 
 `useAction` always awaits the server — there is no optimistic UI in v0.1.0.
 
-## Styling
+## Styling {#styling}
 
 The renderer emits semantic class names (`ausus-table`, `ausus-badge`,
 `ausus-modal`, `ausus-btn`, …) but **ships no CSS file**. You provide the
 stylesheet. The class names are stable and documented by their use in the
 components.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - **No bundled CSS** — you supply styling for the `ausus-*` class names.
 - **No router** — `ViewSchemaConsumer` renders one projection; wiring
@@ -115,7 +115,7 @@ components.
 - The workflow-state field is detected by a heuristic (an `enum` field named
   `status`).
 
-## Related
+## Related {#related}
 
 - [ViewSchema](viewschema.md) — the format this renders.
 - [The HTTP API](../backend/http-api.md) — where ViewSchemas come from.

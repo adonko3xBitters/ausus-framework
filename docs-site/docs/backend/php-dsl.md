@@ -16,7 +16,7 @@ This page is the builder reference. For the concepts behind it, see
 [Core Concepts](../concepts/metadata-graph.md). A condensed cheat sheet is in
 [Reference → DSL](../reference/dsl.md).
 
-## `DslPlugin`
+## `DslPlugin` {#dslplugin}
 
 Extend `DslPlugin` and implement three methods:
 
@@ -35,7 +35,7 @@ final class BillingPlugin extends DslPlugin
 }
 ```
 
-## `Dsl` — declaring an entity
+## `Dsl` — declaring an entity {#dsl--declaring-an-entity}
 
 The `Dsl` builder has one entry point, `entity()`:
 
@@ -45,7 +45,7 @@ $dsl->entity('invoice')   // -> EntityBuilder for 'billing.invoice'
 
 The local name is prefixed with the plugin name to form the entity FQN.
 
-## `EntityBuilder`
+## `EntityBuilder` {#entitybuilder}
 
 `EntityBuilder` is fluent — chain the calls:
 
@@ -64,7 +64,7 @@ $dsl->entity('invoice')
     ->projection('summary', fields: ['id', 'number', 'status'], role: 'invoice.viewer');
 ```
 
-## `Field` — field builders
+## `Field` — field builders {#field--field-builders}
 
 `Field` is a static facade returning a `FieldBuilder`:
 
@@ -76,7 +76,7 @@ $dsl->entity('invoice')
 | `Field::money()` | `money` |
 | `Field::enum('A', 'B', ...)` | `enum` with the given options |
 
-### `FieldBuilder` modifiers
+### `FieldBuilder` modifiers {#fieldbuilder-modifiers}
 
 | Method | Effect |
 |---|---|
@@ -98,7 +98,7 @@ You declare only domain fields. The five
 [system fields](../concepts/entities-fields-actions.md#system-fields) are
 injected by the kernel.
 
-## `Action` — action builders
+## `Action` — action builders {#action--action-builders}
 
 `Action` is a static facade returning an `ActionBuilder`:
 
@@ -107,7 +107,7 @@ injected by the kernel.
 | `Action::create('field', ...)` | a **create** action; arguments are input field names |
 | `Action::transition('field', from:, to:)` | a **transition** action |
 
-### `ActionBuilder` modifiers
+### `ActionBuilder` modifiers {#actionbuilder-modifiers}
 
 | Method | Effect |
 |---|---|
@@ -134,7 +134,7 @@ static constructor on the same class — PHP does not allow a static and an
 instance method to share a name.
 :::
 
-## Projections
+## Projections {#projections}
 
 ```php
 ->projection(
@@ -147,7 +147,7 @@ instance method to share a name.
 
 If `actions` is omitted the projection exposes all of the entity's actions.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 The DSL is the minimal RFC-011 subset. **Deferred** to later versions:
 
@@ -159,7 +159,7 @@ The DSL is the minimal RFC-011 subset. **Deferred** to later versions:
 - `->unique()` and `->max()` are stored in the graph but **not enforced** as
   runtime validation in v0.1.0.
 
-## Related
+## Related {#related}
 
 - [Reference → DSL](../reference/dsl.md) — the condensed cheat sheet.
 - [Plugins](../concepts/plugins.md) — what a DSL plugin is.

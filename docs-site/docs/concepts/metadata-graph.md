@@ -14,7 +14,7 @@ workflow, and projection, validated and frozen into one value.
 Everything downstream — persistence schema, the runtime, the HTTP API, the
 rendered UI — is derived from this single graph.
 
-## What is in the graph
+## What is in the graph {#what-is-in-the-graph}
 
 A `MetadataGraph` (in `ausus/kernel`) holds:
 
@@ -31,7 +31,7 @@ A `MetadataGraph` (in `ausus/kernel`) holds:
 Each node is a `final readonly` value object. The graph has no methods that
 mutate it — once compiled, it does not change.
 
-## Compilation
+## Compilation {#compilation}
 
 The `Compiler` takes a list of [plugins](plugins.md) and produces the graph:
 
@@ -49,7 +49,7 @@ Compilation does three things:
 3. **Canonicalize and hash** — node maps are key-sorted, serialized to a
    canonical JSON form, and hashed with SHA-256.
 
-## Validation
+## Validation {#validation}
 
 The compiler rejects an incoherent graph at compile time, not at runtime:
 
@@ -63,7 +63,7 @@ The compiler rejects an incoherent graph at compile time, not at runtime:
 
 If validation fails, `compile()` throws — you cannot build an invalid graph.
 
-## Content-addressable hashing
+## Content-addressable hashing {#content-addressable-hashing}
 
 The graph `hash` is deterministic: the **same plugins always compile to the
 same hash**. This is used as an identity and integrity check.
@@ -80,7 +80,7 @@ identity for graph *shape*. A future revision may extend the canonical form to
 cover full node contents.
 :::
 
-## Why a graph
+## Why a graph {#why-a-graph}
 
 Because the application is a single declarative value, the same domain
 description drives every layer without re-statement:
@@ -91,7 +91,7 @@ description drives every layer without re-statement:
 
 No layer re-describes the domain. They all read the same graph.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - The graph is compiled **in-process at boot**. There is no on-disk compiled
   artifact or graph cache in v0.1.0.
@@ -99,7 +99,7 @@ No layer re-describes the domain. They all read the same graph.
   not full node bodies.
 - There is no graph diffing or migration tooling.
 
-## Related
+## Related {#related}
 
 - [Plugins](plugins.md) — the input to the compiler.
 - [Entities, Fields & Actions](entities-fields-actions.md) — the node types.

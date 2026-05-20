@@ -18,7 +18,7 @@ The checks here are drawn from the in-repo validation scripts
 the [Release Rehearsal](release-rehearsal.md) results.
 :::
 
-## Composer manifest validation
+## Composer manifest validation {#composer-manifest-validation}
 
 Every package manifest is validated:
 
@@ -30,7 +30,7 @@ composer validate packages/<pkg>/composer.json
 The release gate validates all **11 manifests** — the workspace root plus the
 10 packages — and requires zero failures.
 
-## Composer artifact build
+## Composer artifact build {#composer-artifact-build}
 
 Each Composer package is built into an archive and its contents inspected:
 
@@ -42,7 +42,7 @@ tar -tf /tmp/registry/ausus-<pkg>-0.1.0.tar
 This confirms each package produces a clean, self-contained archive at version
 `0.1.0`. The rehearsal runs this for all 10 Composer packages.
 
-## npm tarball inspection
+## npm tarball inspection {#npm-tarball-inspection}
 
 The renderer's npm tarball is inspected with a dry-run pack — **never** a real
 publish during verification:
@@ -58,7 +58,7 @@ runbook records these figures during pre-flight; the real `npm publish` later
 must produce the **same** figures. A divergence means a source/dist desync and
 is a STOP condition.
 
-## End-to-end gates
+## End-to-end gates {#end-to-end-gates}
 
 Artifact validity is necessary but not sufficient — the stack must also *work*.
 Three gates exercise it:
@@ -73,7 +73,7 @@ The clean-room rebuild is the strongest integrity signal: it copies the
 sources into a fresh location and proves the packages install and run with
 nothing left over from the development environment.
 
-## Irreversibility — why verification is strict
+## Irreversibility — why verification is strict {#irreversibility--why-verification-is-strict}
 
 Verification is strict because publication is **partly irreversible**:
 
@@ -83,7 +83,7 @@ Verification is strict because publication is **partly irreversible**:
 There is no "undo" to fall back on, so every discoverable defect must be caught
 *before* the first publish. See the [Publication Runbook](publication-runbook.md).
 
-## Deferred — supply-chain attestation
+## Deferred — supply-chain attestation {#deferred--supply-chain-attestation}
 
 The following supply-chain controls are **not** in v0.1.0 and are accepted as
 deferred risk for v0.2.0:
@@ -96,7 +96,7 @@ deferred risk for v0.2.0:
 Until those land, artifact trust rests on the validation gates above and on
 GitHub/registry transport security.
 
-## Related
+## Related {#related}
 
 - [Publication Runbook](publication-runbook.md) · [Release Rehearsal](release-rehearsal.md)
 - [Packages](../packages/index.md) — the catalog being verified.

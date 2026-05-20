@@ -11,7 +11,7 @@ description: The SQLite-backed persistence driver and schema derivation.
 SQLite-backed, derives its schema from the [metadata graph](../concepts/metadata-graph.md),
 and enforces tenant isolation and optimistic concurrency.
 
-## Deriving the schema
+## Deriving the schema {#deriving-the-schema}
 
 `SchemaDeriver` turns a compiled graph into `CREATE TABLE` statements — one
 table per entity, plus the audit log table:
@@ -32,7 +32,7 @@ foreach (SchemaDeriver::deriveAll($graph) as $stmt) {
 - `id` is the primary key. Non-nullable fields get `NOT NULL`; field defaults
   become column `DEFAULT`s.
 
-## The driver
+## The driver {#the-driver}
 
 `SqlitePersistenceDriver` implements the kernel `PersistenceDriver` contract:
 
@@ -52,7 +52,7 @@ A `PersistenceContext` is always bound to a `Tenant`; asking for a context with
 a tenant that does not match the transaction handle throws
 `TenantBoundaryViolation`.
 
-## The repository
+## The repository {#the-repository}
 
 `SqliteRepository` is the per-entity data API. v0.1.0 has three operations:
 
@@ -68,14 +68,14 @@ $entity = $repo->create(['number' => 'INV-1', /* ... */]);
 $entity = $repo->update($ref, ['customer_name' => 'New'], $entity->version);
 ```
 
-## Tenant isolation
+## Tenant isolation {#tenant-isolation}
 
 Every table has a `tenant_id` column. Every query is filtered by it, and a
 `Reference` whose `tenantId` does not match the active tenant is rejected with
 `TenantBoundaryViolation` **before** any SQL runs. Tenant scoping is enforced
 in the driver, not left to the caller.
 
-## Optimistic concurrency
+## Optimistic concurrency {#optimistic-concurrency}
 
 Every row carries a `_version` column — a ULID regenerated on every write.
 `update()` includes `_version = :expected` in its `WHERE` clause:
@@ -95,7 +95,7 @@ correlation id, and sequence number. The write happens **inside the action's
 transaction**, so the audit entry and the data change commit or roll back
 together. See [The Runtime](runtime.md).
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - **SQLite only.** The driver targets SQLite via PDO. MySQL and PostgreSQL are
   a design goal but are not implemented or validated in v0.1.0.
@@ -106,7 +106,7 @@ together. See [The Runtime](runtime.md).
   Changing an entity's fields does not alter an existing table.
 - `_version` is regenerated as a ULID; it is a change token, not a counter.
 
-## Related
+## Related {#related}
 
 - [The Runtime](runtime.md) — writes through this driver.
 - [The Metadata Graph](../concepts/metadata-graph.md) — the schema source.

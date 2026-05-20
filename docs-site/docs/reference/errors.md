@@ -10,7 +10,7 @@ description: The AUSUS kernel exception taxonomy and HTTP mapping.
 AUSUS uses a small, explicit exception taxonomy. Every kernel error extends one
 base class, so you can catch broadly or narrowly.
 
-## The base class
+## The base class {#the-base-class}
 
 ```php
 class AususError extends \RuntimeException {}
@@ -20,7 +20,7 @@ Every error below extends `Ausus\AususError`. Catching `AususError` catches all
 of them; the runtime distinguishes an AUSUS error from an unexpected one (an
 unexpected error thrown inside an effect is wrapped as `EffectFailed`).
 
-## Kernel exceptions
+## Kernel exceptions {#kernel-exceptions}
 
 | Exception | Raised when |
 |---|---|
@@ -41,7 +41,7 @@ unexpected error thrown inside an effect is wrapped as `EffectFailed`).
 `ConcurrencyConflict` and `NotFound` carry the offending `Reference`;
 `ConcurrencyConflict` also carries the `expected` and `actual` versions.
 
-## HTTP mapping
+## HTTP mapping {#http-mapping}
 
 `ausus/api-http` adds one transport-level exception, `BadRequest`, and maps the
 taxonomy to HTTP status codes via `ErrorMapper`:
@@ -63,7 +63,7 @@ The HTTP error envelope:
 { "ok": false, "error": { "kind": "WorkflowStateMismatch", "message": "..." } }
 ```
 
-## Catching errors
+## Catching errors {#catching-errors}
 
 ```php
 use Ausus\{PolicyDenied, WorkflowStateMismatch, ConcurrencyConflict, AususError};
@@ -81,7 +81,7 @@ try {
 }
 ```
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - The taxonomy is intentionally minimal. It is described in the source as a
   "V0 minimal closed-ish taxonomy" — later versions may add finer-grained
@@ -89,7 +89,7 @@ try {
 - Errors carry a message and (for some) a `Reference`; there is no structured
   error-code catalogue or i18n of error messages in v0.1.0.
 
-## Related
+## Related {#related}
 
 - [The Runtime](../backend/runtime.md) — where most errors originate.
 - [The HTTP API](../backend/http-api.md) — the HTTP status mapping.

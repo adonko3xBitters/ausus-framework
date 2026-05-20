@@ -11,7 +11,7 @@ description: The PSR-7/15 HTTP surface for projections and actions.
 PSR-15 request handler — `Router` — that serves [projections](../concepts/projections.md)
 and dispatches [actions](../concepts/entities-fields-actions.md#actions).
 
-## Routes
+## Routes {#routes}
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -22,7 +22,7 @@ and dispatches [actions](../concepts/entities-fields-actions.md#actions).
 
 Paths are served under a configurable prefix (default `/api`).
 
-### `GET /projections/{fqn}`
+### `GET /projections/{fqn}` {#get-projectionsfqn}
 
 Query parameters:
 
@@ -37,7 +37,7 @@ curl -H 'X-Tenant-ID: acme' \
   'http://localhost:8080/api/projections/billing.invoice.summary'
 ```
 
-### `POST /actions/{fqn}`
+### `POST /actions/{fqn}` {#post-actionsfqn}
 
 Body — a JSON object:
 
@@ -57,7 +57,7 @@ curl -X POST -H 'X-Tenant-ID: acme' -H 'Content-Type: application/json' \
   http://localhost:8080/api/actions/billing.invoice.create
 ```
 
-## Request headers
+## Request headers {#request-headers}
 
 | Header | Required | Meaning |
 |---|---|---|
@@ -75,7 +75,7 @@ authorization layer in front of this handler before exposing it. Treat
 `ausus/api-http` as an internal surface until you have done so.
 :::
 
-## Error responses
+## Error responses {#error-responses}
 
 `ErrorMapper` maps the kernel exception taxonomy to HTTP status codes:
 
@@ -90,7 +90,7 @@ authorization layer in front of this handler before exposing it. Treat
 
 The error envelope is `{ "ok": false, "error": { "kind": "...", "message": "..." } }`.
 
-## PSR interop
+## PSR interop {#psr-interop}
 
 `Router` implements `Psr\Http\Server\RequestHandlerInterface` and takes
 PSR-17 `ResponseFactoryInterface` / `StreamFactoryInterface` in its constructor.
@@ -98,7 +98,7 @@ It works with any PSR-7 implementation. A minimal `Emitter` is included for the
 demo front controller; production deployments can swap in a fuller PSR-7
 emitter.
 
-## Current v0.1.0 limitations
+## Current v0.1.0 limitations {#current-v010-limitations}
 
 - **No authentication** (see the warning above) and CORS is wide open
   (`Access-Control-Allow-Origin: *`).
@@ -107,7 +107,7 @@ emitter.
 - The `StubActor` role default, when `X-Actor-Roles` is omitted, is the
   HelloInvoice role set — convenient for the demo, not a production default.
 
-## Related
+## Related {#related}
 
 - [ViewSchema](../frontend/viewschema.md) — what `/projections/*` returns.
 - [The React renderer](../frontend/react-renderer.md) — the client for this API.

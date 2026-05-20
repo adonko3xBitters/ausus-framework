@@ -19,7 +19,7 @@ so the namespace is documented and claimed; they are planned to ship as working
 code in v0.2.0. Do not depend on them as functional packages.
 :::
 
-## Implemented — Composer
+## Implemented — Composer {#implemented--composer}
 
 | Package | Layer | Role |
 |---|---|---|
@@ -28,7 +28,7 @@ code in v0.2.0. Do not depend on them as functional packages.
 | [`ausus/persistence-sql`](#aususpersistence-sql) | L3 | SQLite persistence driver |
 | [`ausus/api-http`](#aususapi-http) | L4 | PSR-7/15 HTTP API |
 
-### ausus/kernel
+### ausus/kernel {#aususkernel}
 
 Layer L0. Contracts and value objects only — no runtime side effects. Defines
 the [metadata graph](../concepts/metadata-graph.md) node types, the `Plugin`
@@ -38,32 +38,32 @@ contracts, the value objects (`Tenant`, `Reference`, `Actor`, …), `Ulid`, and
 the [exception taxonomy](../reference/errors.md). Every other package depends
 on it.
 
-### ausus/runtime-default
+### ausus/runtime-default {#aususruntime-default}
 
 Layer L2. The execution engine: `Invoker`, `PolicyEngine`, `WorkflowRuntime`,
 `EffectDispatcher` and the built-in effects, `DefaultAuditor`, and
 `ProjectionRenderer`. Depends on `kernel`. See [The Runtime](../backend/runtime.md).
 
-### ausus/persistence-sql
+### ausus/persistence-sql {#aususpersistence-sql}
 
 Layer L3. A SQLite-backed `PersistenceDriver`: `SqlitePersistenceDriver`,
 `SqliteRepository`, `SchemaDeriver`, and `DatabaseAuditSink`. Depends on
 `kernel`. See [SQL Persistence](../backend/sql-persistence.md).
 
-### ausus/api-http
+### ausus/api-http {#aususapi-http}
 
 Layer L4. A PSR-15 `Router` exposing projections and actions over HTTP, plus
 `ErrorMapper` and a minimal `Emitter`. Depends on `kernel` and
 `runtime-default`. See [The HTTP API](../backend/http-api.md).
 
-## Implemented — template and metapackage
+## Implemented — template and metapackage {#implemented--template-and-metapackage}
 
 | Package | Type | Role |
 |---|---|---|
 | `ausus/starter` | project | `composer create-project` template — wires the stack and ships the HelloInvoice sample |
 | `ausus/standard-stack` | metapackage | pins the validated v0.1.0 package set; depends on `kernel`, `persistence-sql`, `runtime-default`, `api-http` |
 
-## Implemented — npm
+## Implemented — npm {#implemented--npm}
 
 | Package | Role |
 |---|---|
@@ -72,7 +72,7 @@ Layer L4. A PSR-15 `Router` exposing projections and actions over HTTP, plus
 ESM-only; `react`/`react-dom` are peer dependencies. See
 [The React renderer](../frontend/react-renderer.md).
 
-## Reserved — name only, no code in v0.1.0
+## Reserved — name only, no code in v0.1.0 {#reserved--name-only-no-code-in-v010}
 
 These four packages are **reserved names**. They ship in v0.1.0 with metadata
 but **no implementation**, and are planned for v0.2.0.
@@ -94,7 +94,7 @@ but **no implementation**, and are planned for v0.2.0.
   security note in [The HTTP API](../backend/http-api.md).
 :::
 
-## Dependency order
+## Dependency order {#dependency-order}
 
 When installing packages by hand, follow the dependency order:
 
@@ -107,7 +107,7 @@ standard-stack           (-> kernel, persistence-sql, runtime-default, api-http)
 starter                  (-> kernel, persistence-sql, runtime-default)
 ```
 
-## Related
+## Related {#related}
 
 - [Installation](../getting-started/installation.md) — how to install them.
 - [Release Notes v0.1.0](../releases/v0.1.0.md) — the compatibility matrix.

@@ -10,7 +10,7 @@ description: Condensed cheat sheet for the AUSUS PHP DSL.
 A condensed cheat sheet for the AUSUS DSL. For the explained version, see
 [The PHP DSL](../backend/php-dsl.md).
 
-## Plugin skeleton
+## Plugin skeleton {#plugin-skeleton}
 
 ```php
 use Ausus\{DslPlugin, Dsl, Field, Action};
@@ -24,13 +24,13 @@ final class MyPlugin extends DslPlugin
 }
 ```
 
-## `Dsl`
+## `Dsl` {#dsl}
 
 | Call | Returns |
 |---|---|
 | `$dsl->entity('local')` | `EntityBuilder` for `{plugin}.local` |
 
-## `EntityBuilder`
+## `EntityBuilder` {#entitybuilder}
 
 | Call | Purpose |
 |---|---|
@@ -39,7 +39,7 @@ final class MyPlugin extends DslPlugin
 | `->workflow('fieldName')` | mark an `enum` field as workflow state |
 | `->projection('name', fields: [...], actions: [...], role: '...')` | declare a projection |
 
-## `Field`
+## `Field` {#field}
 
 | Call | Type |
 |---|---|
@@ -49,7 +49,7 @@ final class MyPlugin extends DslPlugin
 | `Field::money()` | `money` |
 | `Field::enum('A', 'B', ...)` | `enum` |
 
-### `FieldBuilder` modifiers
+### `FieldBuilder` modifiers {#fieldbuilder-modifiers}
 
 | Call | Effect |
 |---|---|
@@ -60,14 +60,14 @@ final class MyPlugin extends DslPlugin
 | `->currency('USD')` | money currency |
 | `->options([...])` | enum options |
 
-## `Action`
+## `Action` {#action}
 
 | Call | Kind | `subjectRequired` |
 |---|---|---|
 | `Action::create('f1', 'f2', ...)` | create | `false` |
 | `Action::transition('field', from: 'A', to: 'B')` | transition | `true` |
 
-### `ActionBuilder` modifiers
+### `ActionBuilder` modifiers {#actionbuilder-modifiers}
 
 | Call | Effect |
 |---|---|
@@ -75,17 +75,17 @@ final class MyPlugin extends DslPlugin
 | `->stamp('field')` | (transition) write current timestamp to `field` |
 | `->andTransition('field', from: 'B', to: 'C')` | (transition) add a source→target pair |
 
-## Field types
+## Field types {#field-types}
 
 `string` · `integer` · `enum` · `money` · `datetime` — declarable.
 `identity` · `version` · `system_string` — system types, injected by the kernel.
 
-## System fields (auto-injected)
+## System fields (auto-injected) {#system-fields-auto-injected}
 
 `id` (identity) · `tenant_id` (system_string) · `_version` (version) ·
 `created_at` (datetime) · `updated_at` (datetime).
 
-## FQN naming
+## FQN naming {#fqn-naming}
 
 | Thing | Pattern | Example |
 |---|---|---|
@@ -95,7 +95,7 @@ final class MyPlugin extends DslPlugin
 | Workflow | `{entity}.lifecycle` | `billing.invoice.lifecycle` |
 | SQL table | `{entity}` with `.` → `_` | `billing_invoice` |
 
-## Related
+## Related {#related}
 
 - [The PHP DSL](../backend/php-dsl.md) — full explanation.
 - [Error Reference](errors.md) — the exception taxonomy.
