@@ -36,7 +36,7 @@ final class HelloInvoiceDsl extends DslPlugin
                               ->andTransition('status', from: 'ISSUED', to: 'CANCELLED')
                               ->requireRole('invoice.canceler'),
             ])
-            ->workflow('status')
+            ->workflow(field: 'status', initial: 'DRAFT')
             ->projection('summary',
                 fields:  ['id', 'number', 'customer_name', 'status', 'amount'],
                 actions: ['create', 'cancel'],
