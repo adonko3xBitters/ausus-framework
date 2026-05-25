@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 320" role="img" aria-label="invoke() execution pipeline: preflight, policy, workflow guard, effect, audit, returning effect outputs">
+  <title>invoke() execution pipeline</title>
+  <desc>A horizontal pipeline of five steps. After a call to invoke(fqn, subject, inputs), the runtime runs Preflight (checks the action and subject), Policy (PolicyEngine evaluates), Workflow Guard (current state must allow the transition), Effect (CreateEffect or TransitionEffect or a custom Effect), and Audit (writes an AuditEntry). Steps 3 through 5 execute inside one database transaction. The pipeline returns the effect outputs.</desc>
+  <defs>
+    <style><![CDATA[
+      .bg{fill:#fff}
+      .step{fill:#f6f7f9;stroke:#cbd5e1;stroke-width:1}
+      .call{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}
+      .ret{fill:#d1fae5;stroke:#16a34a;stroke-width:1.5}
+      .num{font:700 14px system-ui,sans-serif;fill:#1d4ed8}
+      .title{font:600 13px system-ui,sans-serif;fill:#1a1a1a}
+      .sub{font:11px system-ui,sans-serif;fill:#475569}
+      .label{font:600 12px system-ui,sans-serif;fill:#1a1a1a}
+      .arrow{fill:none;stroke:#475569;stroke-width:1.5}
+      .tx{fill:none;stroke:#94a3b8;stroke-width:1;stroke-dasharray:6 4}
+      .tx-text{font:600 11px ui-monospace,monospace;fill:#475569}
+    ]]></style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="880" height="320"/>
+
+  <!-- call box -->
+  <rect class="call" x="20" y="120" width="120" height="58" rx="8"/>
+  <text class="title" x="36" y="142">invoke(...)</text>
+  <text class="sub"   x="36" y="160">action FQN</text>
+  <text class="sub"   x="36" y="173">subject · inputs</text>
+
+  <!-- step 1 -->
+  <rect class="step" x="170" y="110" width="120" height="80" rx="8"/>
+  <text class="num"   x="186" y="132">1</text>
+  <text class="title" x="206" y="132">Preflight</text>
+  <text class="sub"   x="186" y="152">action exists?</text>
+  <text class="sub"   x="186" y="166">subject?</text>
+  <text class="sub"   x="186" y="180">tenant match?</text>
+
+  <!-- step 2 -->
+  <rect class="step" x="310" y="110" width="120" height="80" rx="8"/>
+  <text class="num"   x="326" y="132">2</text>
+  <text class="title" x="346" y="132">Policy</text>
+  <text class="sub"   x="326" y="152">PolicyEngine</text>
+  <text class="sub"   x="326" y="166">evaluate</text>
+  <text class="sub"   x="326" y="180">→ Permit / Deny</text>
+
+  <!-- step 3 -->
+  <rect class="step" x="450" y="110" width="120" height="80" rx="8"/>
+  <text class="num"   x="466" y="132">3</text>
+  <text class="title" x="486" y="132">Workflow</text>
+  <text class="sub"   x="466" y="152">guard</text>
+  <text class="sub"   x="466" y="166">current state</text>
+  <text class="sub"   x="466" y="180">allows transition?</text>
+
+  <!-- step 4 -->
+  <rect class="step" x="590" y="110" width="120" height="80" rx="8"/>
+  <text class="num"   x="606" y="132">4</text>
+  <text class="title" x="626" y="132">Effect</text>
+  <text class="sub"   x="606" y="152">Create /</text>
+  <text class="sub"   x="606" y="166">Transition /</text>
+  <text class="sub"   x="606" y="180">custom</text>
+
+  <!-- step 5 -->
+  <rect class="step" x="730" y="110" width="120" height="80" rx="8"/>
+  <text class="num"   x="746" y="132">5</text>
+  <text class="title" x="766" y="132">Audit</text>
+  <text class="sub"   x="746" y="152">AuditEntry</text>
+  <text class="sub"   x="746" y="166">written in</text>
+  <text class="sub"   x="746" y="180">same tx</text>
+
+  <!-- return -->
+  <rect class="ret" x="356" y="232" width="160" height="44" rx="8"/>
+  <text class="title" x="376" y="252">return outputs</text>
+  <text class="sub"   x="376" y="269">effect result map</text>
+
+  <!-- Arrows between steps -->
+  <path class="arrow" d="M140,149 L170,149" marker-end="url(#arr)"/>
+  <path class="arrow" d="M290,149 L310,149" marker-end="url(#arr)"/>
+  <path class="arrow" d="M430,149 L450,149" marker-end="url(#arr)"/>
+  <path class="arrow" d="M570,149 L590,149" marker-end="url(#arr)"/>
+  <path class="arrow" d="M710,149 L730,149" marker-end="url(#arr)"/>
+
+  <!-- Final return -->
+  <path class="arrow" d="M790,190 L790,250 L516,250" marker-end="url(#arr)"/>
+
+  <!-- Transaction band around steps 3-5 -->
+  <rect class="tx" x="445" y="90" width="410" height="115" rx="8"/>
+  <text class="tx-text" x="445" y="84">begin transaction — commit on step 5, rollback on any throw</text>
+
+  <!-- caption -->
+  <text class="sub" x="20" y="305">If any step throws, the transaction rolls back; the effect and the audit entry are atomic together.</text>
+</svg>

@@ -36,7 +36,7 @@ final class MyPlugin extends DslPlugin
 |---|---|
 | `->fields(['name' => FieldBuilder, ...])` | declare domain fields |
 | `->actions(['name' => ActionBuilder, ...])` | declare actions |
-| `->workflow('fieldName')` | mark an `enum` field as workflow state |
+| `->workflow(field: '...', initial: '...')` | declare the workflow state field and initial state |
 | `->projection('name', fields: [...], actions: [...], role: '...')` | declare a projection |
 
 ## `Field` {#field}

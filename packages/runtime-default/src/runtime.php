@@ -4,8 +4,9 @@ declare(strict_types=1);
 namespace Ausus\Runtime;
 
 use Ausus\{
-    Actor, Auditor, AuditEntry, AuditSink, ActorRef, Context, Decision, Effect, EffectContext,
-    Instant, MetadataGraph, PersistenceContext, PersistenceDriver, Policy, PolicyDenied,
+    Actor, Auditor, AuditEntry, AuditSink, ActorRef, BuiltinEffect, Context, Decision,
+    Effect, EffectContext,
+    Instant, MetadataGraph, NotFound, PersistenceContext, PersistenceDriver, Policy, PolicyDenied,
     Reference, Repository, SingleSubject, Subject, Tenant, TransactionHandle, Ulid,
     UnknownAction, PolicySubjectRequired, ActorRequired, TenantContextRequired,
     TenantBoundaryViolation, WorkflowStateMismatch, WorkflowSubjectNotFound,
@@ -169,12 +170,79 @@ final class TransitionEffect implements Effect {
     }
 }
 
+/**
+ * UpdateEffect — partial PATCH semantics on a closed list of fields.
+ *
+ * Per ADR-0002:
+ *   - `subject` is required (the runtime rejects null at preflight).
+ *   - The effect loads the entity once inside the Invoker transaction,
+ *     uses its `_version` for the optimistic-lock check, and patches only
+ *     the fields the caller sent that are listed in `updatableFields`.
+ *   - Unknown input keys → BadRequest-shaped runtime error.
+ *   - Null on a non-nullable field → BadRequest-shaped runtime error.
+ *   - Workflow state fields are unreachable here: the DSL builder refuses
+ *     to declare an `update` action that touches them.
+ *   - Empty inputs → idempotent no-op; returns the current version.
+ */
+final class UpdateEffect implements Effect {
+    /**
+     * @param array{
+     *     entityFqn:string,
+     *     updatableFields:list<array{name:string,type:string,nullable:bool}>
+     * } $config
+     */
+    public function __construct(private readonly array $config) {}
+
+    public function execute(EffectContext $context, ?Reference $subject, array $inputs): array {
+        if ($subject === null) {
+            throw new \RuntimeException("UpdateEffect requires Subject");
+        }
+        $repo = $context->repository($this->config['entityFqn']);
+        $entity = $repo->find($subject);
+        if ($entity === null) {
+            throw new NotFound($subject);
+        }
+
+        // Index the closed list by name for O(1) checks.
+        $allowed = [];
+        foreach ($this->config['updatableFields'] as $f) {
+            $allowed[$f['name']] = $f;
+        }
+
+        $patch = [];
+        foreach ($inputs as $name => $value) {
+            if (!isset($allowed[$name])) {
+                throw new \RuntimeException(
+                    "UpdateEffect: field '{$name}' is not patchable by this action."
+                );
+            }
+            if ($value === null && $allowed[$name]['nullable'] === false) {
+                throw new \RuntimeException(
+                    "UpdateEffect: field '{$name}' is not nullable; got null."
+                );
+            }
+            $patch[$name] = $value;
+        }
+
+        // Idempotent no-op when the caller sent nothing.
+        if ($patch === []) {
+            return ['_version' => $entity->version->value];
+        }
+
+        $updated = $repo->update($subject, $patch, $entity->version);
+        return $patch + ['_version' => $updated->version->value];
+    }
+}
+
 final class EffectDispatcher {
     public function dispatch(ActionNode $action): Effect {
-        return match ($action->effectClass) {
-            'kernel.builtin.create'     => new CreateEffect($action->effectConfig),
-            'kernel.builtin.transition' => new TransitionEffect($action->effectConfig),
-            default                     => new ($action->effectClass)(),
+        // `effectClass` is either a `BuiltinEffect` sentinel value or a class FQN.
+        $builtin = BuiltinEffect::tryFrom($action->effectClass);
+        return match ($builtin) {
+            BuiltinEffect::Create     => new CreateEffect($action->effectConfig),
+            BuiltinEffect::Transition => new TransitionEffect($action->effectConfig),
+            BuiltinEffect::Update     => new UpdateEffect($action->effectConfig),
+            null                      => new ($action->effectClass)(),
         };
     }
 }
@@ -329,12 +397,14 @@ final class ProjectionRenderer {
             $fields[] = [
                 'name' => $f->name,
                 'type' => $f->type,
-                'label' => ucfirst(str_replace('_', ' ', $f->name)),
+                'label' => $f->label ?? ucfirst(str_replace('_', ' ', $f->name)),
                 'typeOptions' => $f->typeOptions,
             ];
         }
 
-        // Build actions block
+        // Build actions block. Each action carries its declared input fields
+        // (with required / default / nullable hints) so the renderer can
+        // generate a working create or update form from the metadata alone.
         $actions = [];
         foreach ($proj->actionFqns as $afqn) {
             $a = $this->graph->actions[$afqn] ?? null;
@@ -344,10 +414,11 @@ final class ProjectionRenderer {
                 'name' => substr($a->fqn, strrpos($a->fqn, '.') + 1),
                 'label' => ucfirst(substr($a->fqn, strrpos($a->fqn, '.') + 1)),
                 'subjectRequired' => $a->subjectRequired,
+                'inputs' => $this->describeActionInputs($a),
             ];
         }
 
-        // Data
+        // Data — go through the Repository contract for both shapes.
         $data = null;
         $tx = $this->driver->beginTransaction($this->tenant);
         try {
@@ -357,19 +428,12 @@ final class ProjectionRenderer {
                 $found = $repo->find($subject);
                 $data = ['item' => $found?->fields];
             } else {
-                // V0 minimal list — just enumerate via raw SQL (Repository V0 lacks findMany)
-                // For HelloInvoice list view: read all rows for this tenant
-                // This bypasses Repository contract — documented as V0 finding
-                $tableName = str_replace('.', '_', $entity->fqn);
-                $pdo = (new \ReflectionProperty($this->driver, 'pdo'))->getValue($this->driver);
-                $stmt = $pdo->prepare("SELECT * FROM \"{$tableName}\" WHERE tenant_id = :tid ORDER BY id");
-                $stmt->execute(['tid' => $this->tenant->value()]);
-                $items = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+                $entities = $repo->findAll();
                 $projected = [];
-                foreach ($items as $row) {
+                foreach ($entities as $row) {
                     $r = [];
                     foreach ($proj->fields as $fn) {
-                        $r[$fn] = $row[$fn] ?? null;
+                        $r[$fn] = $row->fields[$fn] ?? null;
                     }
                     $projected[] = $r;
                 }
@@ -379,6 +443,23 @@ final class ProjectionRenderer {
         } catch (\Throwable $e) {
             $this->driver->rollback($tx);
             throw $e;
+        }
+
+        // Inject `initialValues` on every update-action descriptor when the
+        // projection rendered a detail subject. The renderer uses this to
+        // prefill the form. Per ADR-0002 §8: list views never carry
+        // initialValues (there is no single subject to prefill from).
+        if (is_array($data['item'] ?? null)) {
+            foreach ($actions as $i => $descriptor) {
+                $action = $this->graph->actions[$descriptor['fqn']] ?? null;
+                if ($action === null) continue;
+                if ($action->effectClass !== BuiltinEffect::Update->value) continue;
+                $initial = [];
+                foreach ($action->inputs as $f) {
+                    $initial[$f->name] = $data['item'][$f->name] ?? null;
+                }
+                $actions[$i]['initialValues'] = $initial;
+            }
         }
 
         return [
@@ -396,5 +477,33 @@ final class ProjectionRenderer {
             'filters' => [],
             'data'    => $data,
         ];
+    }
+
+    /**
+     * Render an action's declared input fields as ViewSchema-shaped
+     * FieldDescriptors carrying enough metadata for the React renderer to draw
+     * a working form: name, scalar type, label, required flag, default value,
+     * and the underlying type options (`maxLength`, `currency`, `options`).
+     *
+     * @return list<array<string,mixed>>
+     */
+    private function describeActionInputs(ActionNode $a): array {
+        $out = [];
+        foreach ($a->inputs as $f) {
+            $required = !$f->nullable && $f->default === null;
+            $desc = [
+                'name'        => $f->name,
+                'type'        => $f->type,
+                'label'       => $f->label ?? ucfirst(str_replace('_', ' ', $f->name)),
+                'typeOptions' => $f->typeOptions,
+                'required'    => $required,
+                'nullable'    => $f->nullable,
+            ];
+            if ($f->default !== null) {
+                $desc['default'] = $f->default;
+            }
+            $out[] = $desc;
+        }
+        return $out;
     }
 }

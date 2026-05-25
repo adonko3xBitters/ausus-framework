@@ -60,8 +60,243 @@ export function FieldDisplay({ field, value }: { field: FieldDescriptor; value: 
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ActionModal — confirmation + input form for an Action invocation.
-// V0: no rich inputs; just confirmation + a basic dispatcher.
+//
+// The form is generated entirely from `action.inputs` (FieldDescriptor[])
+// emitted by the runtime. Per-type inputs (text, number, select, checkbox,
+// datetime, money), required validation, and shape-correct payload assembly
+// are all metadata-driven — no entity-specific UI lives here.
 // ─────────────────────────────────────────────────────────────────────────────
+
+/** Initial form value for an input, honoring its declared default. */
+export function inputDefault(input: FieldDescriptor): unknown {
+  if (input.default !== undefined && input.default !== null) {
+    return input.default;
+  }
+  switch (input.type) {
+    case "boolean": return false;
+    case "enum":
+      // Required enum with options → preselect the first option, so the form
+      // always submits a valid value. Optional enum starts empty.
+      if (input.required && input.typeOptions?.options?.length) {
+        return input.typeOptions.options[0];
+      }
+      return "";
+    default: return "";
+  }
+}
+
+/**
+ * Initial form value for an input when the descriptor carries
+ * `initialValues` (update action). Falls through to {@see inputDefault}
+ * when no prefill is available. Compound `money` values flatten to the
+ * amount string for the input box; `shapeValue` reconstitutes the tuple
+ * on submit.
+ */
+export function initialFor(input: FieldDescriptor, prefill: unknown): unknown {
+  if (prefill === undefined || prefill === null) return inputDefault(input);
+  if (
+    input.type === "money"
+    && typeof prefill === "object"
+    && prefill !== null
+    && "amount" in (prefill as Record<string, unknown>)
+  ) {
+    return String((prefill as { amount: unknown }).amount);
+  }
+  return prefill;
+}
+
+/** Equality test that knows about money's `{amount, currency}` compound shape. */
+export function isUnchanged(
+  input: FieldDescriptor,
+  current: unknown,
+  initial: unknown,
+): boolean {
+  if (current === initial) return true;
+  if (current == null && initial == null) return true;
+  if (
+    input.type === "money"
+    && typeof current === "object" && current !== null
+    && typeof initial === "object" && initial !== null
+  ) {
+    const a = current as { amount: unknown; currency: unknown };
+    const b = initial as { amount: unknown; currency: unknown };
+    return String(a.amount) === String(b.amount) && a.currency === b.currency;
+  }
+  return false;
+}
+
+/**
+ * Build the payload for a **create** action: every non-empty shaped value
+ * is included.
+ */
+export function buildCreatePayload(
+  inputs: FieldDescriptor[],
+  values: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const f of inputs) {
+    const shaped = shapeValue(f, values[f.name]);
+    if (shaped !== undefined) out[f.name] = shaped;
+  }
+  return out;
+}
+
+/**
+ * Build the payload for an **update** action: only fields whose current
+ * value differs from `initialValues` are included. Empty/cleared inputs
+ * are treated as "untouched" (PATCH no-op for that key); explicit
+ * null-on-nullable clearing is a deferred concern, see ADR-0002 §12.4.
+ */
+export function buildUpdatePayload(
+  inputs: FieldDescriptor[],
+  values: Record<string, unknown>,
+  initialValues: Record<string, unknown>,
+): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const f of inputs) {
+    const shaped = shapeValue(f, values[f.name]);
+    if (shaped === undefined) continue;
+    if (isUnchanged(f, shaped, initialValues[f.name])) continue;
+    out[f.name] = shaped;
+  }
+  return out;
+}
+
+/** Required when the runtime says so; fall back to "not explicitly nullable". */
+export function isRequired(input: FieldDescriptor): boolean {
+  if (typeof input.required === "boolean") return input.required;
+  return input.nullable !== true;
+}
+
+/** Shape a raw form value into the payload form the runtime expects. */
+export function shapeValue(input: FieldDescriptor, raw: unknown): unknown {
+  if (raw === undefined || raw === null || raw === "") return undefined;
+  switch (input.type) {
+    case "integer": {
+      const n = typeof raw === "number" ? raw : Number(raw);
+      return Number.isFinite(n) ? Math.trunc(n) : undefined;
+    }
+    case "money":
+      return { amount: String(raw), currency: input.typeOptions?.currency ?? "USD" };
+    case "boolean":
+      return Boolean(raw);
+    default:
+      return raw;
+  }
+}
+
+/** Synchronous validation of the current form values. */
+export function validateInputs(
+  inputs: FieldDescriptor[],
+  values: Record<string, unknown>,
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+  for (const f of inputs) {
+    if (!isRequired(f)) continue;
+    const v = values[f.name];
+    if (v === undefined || v === null || v === "") {
+      errors[f.name] = `${f.label} is required.`;
+      continue;
+    }
+    if (f.type === "integer" && !Number.isFinite(Number(v))) {
+      errors[f.name] = `${f.label} must be a whole number.`;
+    }
+    if (f.type === "money" && !Number.isFinite(Number(v))) {
+      errors[f.name] = `${f.label} must be a number.`;
+    }
+  }
+  return errors;
+}
+
+interface InputControlProps {
+  input: FieldDescriptor;
+  value: unknown;
+  onChange: (next: unknown) => void;
+  disabled: boolean;
+  invalid: boolean;
+}
+
+/** One typed form control. Defensive: unknown types fall back to text. */
+function InputControl({ input, value, onChange, disabled, invalid }: InputControlProps) {
+  const cls = "ausus-input" + (invalid ? " ausus-input--invalid" : "");
+  switch (input.type) {
+    case "enum": {
+      const options = input.typeOptions?.options ?? [];
+      return (
+        <select
+          className={cls}
+          value={String(value ?? "")}
+          onChange={e => onChange(e.target.value)}
+          disabled={disabled}
+        >
+          {!isRequired(input) && <option value="">—</option>}
+          {options.map(opt => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+      );
+    }
+    case "integer":
+      return (
+        <input
+          className={cls}
+          type="number"
+          step="1"
+          value={String(value ?? "")}
+          onChange={e => onChange(e.target.value)}
+          disabled={disabled}
+        />
+      );
+    case "money":
+      return (
+        <span className="ausus-money-input">
+          <input
+            className={cls}
+            type="number"
+            step="0.01"
+            min="0"
+            value={String(value ?? "")}
+            onChange={e => onChange(e.target.value)}
+            disabled={disabled}
+          />
+          <span className="ausus-money-input__currency">
+            {input.typeOptions?.currency ?? ""}
+          </span>
+        </span>
+      );
+    case "boolean":
+      return (
+        <input
+          className={cls}
+          type="checkbox"
+          checked={Boolean(value)}
+          onChange={e => onChange(e.target.checked)}
+          disabled={disabled}
+        />
+      );
+    case "datetime":
+      return (
+        <input
+          className={cls}
+          type="datetime-local"
+          value={String(value ?? "")}
+          onChange={e => onChange(e.target.value)}
+          disabled={disabled}
+        />
+      );
+    default:
+      return (
+        <input
+          className={cls}
+          type="text"
+          maxLength={input.typeOptions?.maxLength}
+          value={String(value ?? "")}
+          onChange={e => onChange(e.target.value)}
+          disabled={disabled}
+        />
+      );
+  }
+}
 
 export function ActionModal(props: {
   action: ActionDescriptor;
@@ -70,11 +305,46 @@ export function ActionModal(props: {
   onSuccess?: (outputs: Record<string, unknown>) => void;
 }) {
   const { invoke, pending, lastError } = useAction(props.action.fqn);
-  const hasInputs = (props.action.inputs?.length ?? 0) > 0;
-  const [inputs, setInputs] = useState<Record<string, unknown>>({});
+  const inputs = props.action.inputs ?? [];
+  const hasInputs = inputs.length > 0;
+  // Presence of `initialValues` is how the runtime signals "this is an
+  // update action with a prefilled subject" (ADR-0002 §8). The form
+  // prefills, and the submit handler sends only changed fields.
+  const initialValues = props.action.initialValues ?? null;
+  const isUpdate = initialValues !== null;
+
+  const [values, setValues] = useState<Record<string, unknown>>(() => {
+    const initial: Record<string, unknown> = {};
+    for (const f of inputs) {
+      initial[f.name] = isUpdate
+        ? initialFor(f, initialValues[f.name])
+        : inputDefault(f);
+    }
+    return initial;
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  function setOne(name: string, next: unknown) {
+    setValues(prev => ({ ...prev, [name]: next }));
+    if (errors[name]) {
+      const { [name]: _drop, ...rest } = errors;
+      setErrors(rest);
+    }
+  }
 
   async function handleConfirm() {
-    const result = await invoke({ subject: props.subject, inputs });
+    if (hasInputs) {
+      const errs = validateInputs(inputs, values);
+      if (Object.keys(errs).length > 0) {
+        setErrors(errs);
+        return;
+      }
+      setErrors({});
+    }
+    const payload = isUpdate
+      ? buildUpdatePayload(inputs, values, initialValues!)
+      : buildCreatePayload(inputs, values);
+    const result = await invoke({ subject: props.subject, inputs: payload });
     if (result.ok) {
       props.onSuccess?.(result.outputs);
       props.onClose();
@@ -85,26 +355,38 @@ export function ActionModal(props: {
     <div className="ausus-modal-backdrop" role="dialog" aria-modal="true">
       <div className="ausus-modal">
         <h2 className="ausus-modal__title">{props.action.label}</h2>
-        <p className="ausus-modal__body">
-          {props.action.confirmation?.prompt ?? `Confirm ${props.action.label}?`}
-        </p>
+        {!hasInputs && (
+          <p className="ausus-modal__body">
+            {props.action.confirmation?.prompt ?? `Confirm ${props.action.label}?`}
+          </p>
+        )}
         {hasInputs && (
           <div className="ausus-modal__inputs">
-            {props.action.inputs!.map(input => (
-              <label key={input.name} className="ausus-modal__input">
-                <span>{input.label}</span>
-                <input
-                  type="text"
-                  value={String(inputs[input.name] ?? "")}
-                  onChange={e => setInputs(prev => ({ ...prev, [input.name]: e.target.value }))}
-                  disabled={pending}
-                />
-              </label>
-            ))}
+            {inputs.map(input => {
+              const err = errors[input.name];
+              return (
+                <label key={input.name} className="ausus-modal__input">
+                  <span>
+                    {input.label}
+                    {isRequired(input) && <span className="ausus-required" aria-label="required"> *</span>}
+                  </span>
+                  <InputControl
+                    input={input}
+                    value={values[input.name]}
+                    onChange={next => setOne(input.name, next)}
+                    disabled={pending}
+                    invalid={Boolean(err)}
+                  />
+                  {err && (
+                    <span className="ausus-input-error" role="alert">{err}</span>
+                  )}
+                </label>
+              );
+            })}
           </div>
         )}
         {lastError && (
-          <div className="ausus-modal__error">
+          <div className="ausus-modal__error" role="alert">
             <strong>{props.action.label} failed:</strong> {lastError.message}
           </div>
         )}

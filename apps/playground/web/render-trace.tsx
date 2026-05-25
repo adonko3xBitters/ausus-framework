@@ -14,7 +14,13 @@ import React from "react";
  * Run:  npx tsx render-trace.tsx
  */
 import { renderToString } from "react-dom/server";
-import { AususProvider, ListView, DetailView } from "@ausus/renderer-react";
+import {
+  AususProvider, ListView, DetailView, ActionModal,
+  shapeValue, validateInputs, inputDefault, isRequired,
+  // ADR-0002 helpers
+  initialFor, isUnchanged, buildCreatePayload, buildUpdatePayload,
+} from "@ausus/renderer-react";
+import type { FieldDescriptor } from "@ausus/renderer-react";
 import { App } from "./src/App";
 import { createMockFetcher } from "./src/mockApi";
 import { buildSummarySchema, buildDetailSchema } from "./src/fixtures";
@@ -102,6 +108,46 @@ async function main() {
   const failedJson = await failedResp.json();
   traces.push(frame("TRACE 6 — Cancel on already-CANCELLED row (WorkflowStateMismatch)", JSON.stringify(failedJson, null, 2)));
 
+  // ───── trace 7: ActionModal renders a create form from action.inputs ─────
+  const summaryForForm = buildSummarySchema(mockList.state());
+  const createAction   = summaryForForm.actions.find(a => a.name === "create")!;
+  const issueAction    = summaryForForm.actions.find(a => a.name === "issue")!;
+  const mockForm = createMockFetcher();
+  const html7 = renderToString(
+    <AususProvider apiBaseUrl="/api" tenant="acme" fetcher={mockForm.fetcher}>
+      <ActionModal action={createAction} onClose={() => {}} />
+    </AususProvider>,
+  );
+  traces.push(frame("TRACE 7 — ActionModal renders create form from action.inputs", html7));
+
+  // ───── trace 8: ActionModal with no inputs falls back to confirmation prompt ─────
+  const html8 = renderToString(
+    <AususProvider apiBaseUrl="/api" tenant="acme" fetcher={mockForm.fetcher}>
+      <ActionModal
+        action={issueAction}
+        subject={{ tenantId: "acme", entityFqn: "billing.invoice", identityHandle: "x" }}
+        onClose={() => {}}
+      />
+    </AususProvider>,
+  );
+  traces.push(frame("TRACE 8 — ActionModal falls back to confirmation prompt", html8));
+
+  // ───── trace 9: ActionModal prefills from initialValues (ADR-0002 update) ─────
+  // The update fixture lives on the DETAIL builder (initialValues is only
+  // meaningful for a single rendered subject).
+  const detailWithUpdate = buildDetailSchema(mockList.state()[0]);
+  const renameAction = detailWithUpdate.actions.find(a => a.name === "rename")!;
+  const html9 = renderToString(
+    <AususProvider apiBaseUrl="/api" tenant="acme" fetcher={mockForm.fetcher}>
+      <ActionModal
+        action={renameAction}
+        subject={{ tenantId: "acme", entityFqn: "billing.invoice", identityHandle: "x" }}
+        onClose={() => {}}
+      />
+    </AususProvider>,
+  );
+  traces.push(frame("TRACE 9 — ActionModal prefills from initialValues (update)", html9));
+
   // ───── Dump ─────
   console.log("\n══════════════════════════════════════════════════════════════════════");
   console.log("  AUSUS @ausus/renderer-react — V0 render traces");
@@ -128,6 +174,93 @@ async function main() {
   check("DetailView renders all 8 fields",            (html5.match(/<dt>/g) ?? []).length === 8);
   check("DetailView shows ISSUED status badge",       html5.includes("ausus-badge--blue"));
   check("Stale Cancel → WorkflowStateMismatch",       failedJson.ok === false && failedJson.error?.kind === "WorkflowStateMismatch");
+
+  // ── form rendering (TRACE 7) ──
+  check("ActionModal renders 3 inputs (number, customer_name, amount)",
+        (html7.match(/class="ausus-modal__input"/g) ?? []).length === 3);
+  check("Required inputs carry the ausus-required marker",
+        (html7.match(/class="ausus-required"/g) ?? []).length === 3);
+  check("Money input renders the currency label (USD)",
+        html7.includes("ausus-money-input__currency") && html7.includes("USD"));
+  check("String input renders maxLength=200 for customer_name",
+        html7.includes('maxLength="200"') || html7.includes('maxlength="200"'));
+
+  // ── confirmation fallback (TRACE 8) ──
+  check("Inputless action falls back to confirmation prompt",
+        html8.includes("Issue this invoice?") && !html8.includes("ausus-modal__inputs"));
+
+  // ── pure helpers (validation + payload shaping) ──
+  const createInputs = createAction.inputs ?? [];
+  const emptyValues: Record<string, unknown> = {};
+  for (const f of createInputs) emptyValues[f.name] = inputDefault(f);
+  const errsEmpty = validateInputs(createInputs, emptyValues);
+  check("validateInputs flags all 3 required fields when empty",
+        Object.keys(errsEmpty).length === 3);
+
+  const okValues: Record<string, unknown> = {
+    number: "INV-FORM-001", customer_name: "Form Co", amount: "42.50",
+  };
+  const errsOk = validateInputs(createInputs, okValues);
+  check("validateInputs returns no errors when required fields are filled",
+        Object.keys(errsOk).length === 0);
+
+  const moneyInput: FieldDescriptor = createInputs.find(f => f.name === "amount")!;
+  const shapedMoney = shapeValue(moneyInput, "42.50") as { amount: string; currency: string };
+  check("shapeValue(money) → { amount, currency } shape",
+        shapedMoney?.amount === "42.50" && shapedMoney?.currency === "USD");
+
+  const fakeInt: FieldDescriptor = { name: "n", type: "integer", label: "N", required: true };
+  check("shapeValue(integer) → truncated number",
+        shapeValue(fakeInt, "7.9") === 7);
+
+  // ── ADR-0002 helpers + prefilled form (TRACE 9) ──
+  check("ActionModal with initialValues prefills the input (renames already-named row)",
+        html9.includes('value="ACME Corporation"'));
+  check("update descriptor (rename) does NOT show the confirmation prompt",
+        !html9.includes("Confirm Rename?"));
+
+  // initialFor — flatten money compound; otherwise pass-through.
+  const stringInput: FieldDescriptor = { name: "title", type: "string", label: "Title", nullable: false };
+  check("initialFor(string, 'hello') → 'hello'",
+        initialFor(stringInput, "hello") === "hello");
+  check("initialFor(string, null) → inputDefault (empty string)",
+        initialFor(stringInput, null) === "");
+
+  const moneyInput2: FieldDescriptor = { name: "price", type: "money", label: "Price", typeOptions: { currency: "USD" } };
+  check("initialFor(money, {amount, currency}) flattens to amount string for the form",
+        initialFor(moneyInput2, { amount: "12.34", currency: "USD" }) === "12.34");
+
+  // isUnchanged — string + money compound.
+  check("isUnchanged(string, 'x', 'x') is true",
+        isUnchanged(stringInput, "x", "x"));
+  check("isUnchanged(string, 'x', 'y') is false",
+        !isUnchanged(stringInput, "x", "y"));
+  check("isUnchanged(money, {12.34 USD}, {12.34 USD}) is true",
+        isUnchanged(moneyInput2, { amount: "12.34", currency: "USD" }, { amount: "12.34", currency: "USD" }));
+
+  // buildCreatePayload — every non-empty value included.
+  const createInputsSet: FieldDescriptor[] = [stringInput, moneyInput2];
+  const createPayload = buildCreatePayload(createInputsSet, { title: "hi", price: "9.99" });
+  check("buildCreatePayload includes every non-empty value",
+        createPayload.title === "hi"
+        && typeof createPayload.price === "object"
+        && (createPayload.price as { amount: string }).amount === "9.99");
+
+  // buildUpdatePayload — diff against initialValues; unchanged keys omitted.
+  const updatePayload = buildUpdatePayload(
+    createInputsSet,
+    { title: "hi", price: "9.99" },           // user values match initial
+    { title: "hi", price: { amount: "9.99", currency: "USD" } },
+  );
+  check("buildUpdatePayload omits unchanged fields entirely",
+        Object.keys(updatePayload).length === 0);
+  const updatePayload2 = buildUpdatePayload(
+    createInputsSet,
+    { title: "hi (renamed)", price: "9.99" }, // only title changed
+    { title: "hi", price: { amount: "9.99", currency: "USD" } },
+  );
+  check("buildUpdatePayload includes only the changed field",
+        Object.keys(updatePayload2).length === 1 && updatePayload2.title === "hi (renamed)");
 
   console.log(`\nRESULT: passed=${passed} failed=${failed}`);
   if (failed > 0) process.exit(1);

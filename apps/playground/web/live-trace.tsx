@@ -44,9 +44,16 @@ async function getJson(url: string): Promise<any> {
 }
 
 async function postAction(actionFqn: string, subject: Reference | null, inputs: Record<string, unknown> = {}): Promise<any> {
+  // X-Actor-Roles must be supplied explicitly. The Router used to fall back
+  // to a hardcoded invoice.* role set when this header was missing; that
+  // fallback has been removed in favour of fail-closed behaviour.
   const r = await fetcher(`${API_BASE_URL}/actions/${actionFqn}`, {
     method: "POST",
-    headers: { "X-Tenant-ID": TENANT, "Content-Type": "application/json" },
+    headers: {
+      "X-Tenant-ID":   TENANT,
+      "X-Actor-Roles": "invoice.creator,invoice.issuer,invoice.canceler,invoice.viewer",
+      "Content-Type":  "application/json",
+    },
     body: JSON.stringify({ subject, inputs }),
   });
   const json = await r.json();
@@ -136,6 +143,32 @@ async function main(): Promise<void> {
   const badBody = await badResp.json();
   traces.push(frame("07 — GET without X-Tenant-ID (expect 400)", `HTTP ${badResp.status}\n${JSON.stringify(badBody, null, 2)}`));
 
+  // ── 11. Schema describes create inputs (the renderer's form metadata) ─────
+  const createDescriptor = schema1.actions.find((a: any) => a.name === "create");
+  traces.push(frame("08 — create action descriptor inputs",
+    JSON.stringify({ fqn: createDescriptor?.fqn, inputs: createDescriptor?.inputs }, null, 2)));
+
+  // ── 12. POST create with the exact payload shape the renderer would build ─
+  const createResp = await fetch(`${API_BASE_URL}/actions/billing.invoice.create`, {
+    method: "POST",
+    headers: {
+      "X-Tenant-ID":   TENANT,
+      "X-Actor-Roles": "invoice.creator",
+      "Content-Type":  "application/json",
+    },
+    body: JSON.stringify({
+      subject: null,
+      inputs: {
+        number:        "INV-FORM-001",
+        customer_name: "Form Co",
+        amount:        { amount: "42.50", currency: "USD" },
+      },
+    }),
+  });
+  const createJson = await createResp.json();
+  traces.push(frame("09 — POST create with renderer-shaped payload",
+    `HTTP ${createResp.status}\n${JSON.stringify(createJson, null, 2)}`));
+
   // ── Dump ──────────────────────────────────────────────────────────────────
   console.log("══════════════════════════════════════════════════════════════════════");
   console.log("  AUSUS L4 — live HTTP integration trace");
@@ -161,6 +194,12 @@ async function main(): Promise<void> {
   ok("DetailView shows ISSUED badge",             html4.includes("ausus-badge--blue"));
   ok("stale cancel → 409 WorkflowStateMismatch",  stale.status === 409 && stale.json.ok === false && stale.json.error?.kind === "WorkflowStateMismatch");
   ok("missing X-Tenant-ID → 400 BadRequest",      badResp.status === 400 && badBody.error?.kind === "BadRequest");
+
+  ok("create descriptor carries inputs metadata",
+     Array.isArray(createDescriptor?.inputs) && (createDescriptor?.inputs?.length ?? 0) === 3);
+  ok("create POST with renderer-shaped payload → 200",
+     createResp.status === 200 && createJson.ok === true
+     && typeof createJson.outputs?.id === "string" && createJson.outputs.id.length === 26);
 
   // ── Latency report (real timings) ─────────────────────────────────────────
   console.log("\n── measured latency (ms) ──────────────────────────────────────────────");

@@ -34,6 +34,13 @@ invoke(actionFqn, subject?, inputs)
 If any step throws, the transaction is **rolled back** — the effect and the
 audit entry are atomic together.
 
+The same chain as a single flow:
+
+![invoke() execution pipeline: a horizontal sequence of Preflight, Policy, Workflow guard, Effect, and Audit, with steps 3 through 5 bracketed inside a single database transaction; the call returns the effect outputs.](/img/diagrams/invoker-pipeline.svg)
+
+Steps 3 → 5 run inside one database transaction; steps 1–2 run before it
+opens.
+
 ```php
 $outputs = $invoker->invoke('billing.invoice.create', null, [
     'number'        => 'INV-2026-001',

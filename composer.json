@@ -21,12 +21,13 @@
         "ausus/persistence-sql":      "0.1.*",
         "ausus/runtime-default":      "0.1.*",
         "ausus/api-http":             "0.1.*",
+        "ausus/standard-stack":       "0.1.*",
         "ausus/starter":              "0.1.*",
         "nyholm/psr7":                "^1.8",
         "nyholm/psr7-server":         "^1.1"
     },
     "autoload": {
-        "classmap": ["apps/playground"]
+        "classmap": ["apps/playground", "apps/issue-tracker/src"]
     },
     "config": {
         "preferred-install": "dist",

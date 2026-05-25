@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" role="img" aria-label="Terminal output of running php tickets.php">
+  <title>Terminal output of running php tickets.php</title>
+  <desc>A terminal window showing the CLI runner: the three created tickets, the workflow transitions to IN_PROGRESS and RESOLVED, the workflow guard rejecting an illegal resolve, and a final summary showing three tickets.</desc>
+  <defs>
+    <style><![CDATA[
+      .term-bg{fill:#1f2430}
+      .term-bar{fill:#2b3140}
+      .dot{fill:#3b4254}
+      .term-text{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#e6e6e6}
+      .term-prompt{font:13px ui-monospace,monospace;fill:#7dd3fc}
+      .term-ok{font:13px ui-monospace,monospace;fill:#a7f3d0}
+      .term-dim{font:13px ui-monospace,monospace;fill:#94a3b8}
+      .term-warn{font:13px ui-monospace,monospace;fill:#fcd34d}
+    ]]></style>
+  </defs>
+
+  <rect class="term-bg" width="760" height="360" rx="8"/>
+  <rect class="term-bar" x="0" y="0" width="760" height="28" rx="8"/>
+  <rect class="term-bar" x="0" y="20" width="760" height="8"/>
+  <circle class="dot" cx="16" cy="14" r="5"/>
+  <circle class="dot" cx="32" cy="14" r="5"/>
+  <circle class="dot" cx="48" cy="14" r="5"/>
+  <text class="term-dim" x="334" y="18">ticket-system — zsh</text>
+
+  <g transform="translate(16, 50)">
+    <text class="term-prompt" y="0">$ <tspan class="term-text">php tickets.php</tspan></text>
+    <text class="term-text"   y="22">AUSUS Ticket System — CLI run</text>
+    <text class="term-text"   y="40">database: /home/me/ticket-system/tickets.sqlite</text>
+    <text class="term-text"   y="64">creating tickets:</text>
+    <text class="term-text"   y="82">  created 01J7HG3WC0D3K  [HIGH]    Printer on floor 3 is offline</text>
+    <text class="term-text"   y="100">  created 01J7HG6QYJF7M  [NORMAL]  VPN drops every hour</text>
+    <text class="term-text"   y="118">  created 01J7HG8R2NJ2N  [LOW]     Request a second monitor</text>
+    <text class="term-text"   y="142">driving the workflow:</text>
+    <text class="term-text"   y="160">  ticket 01J7HG6QYJF7M → IN_PROGRESS</text>
+    <text class="term-text"   y="178">  ticket 01J7HG8R2NJ2N → RESOLVED at 2026-05-25T13:42:18.117Z</text>
+    <text class="term-text"   y="202">workflow guard:</text>
+    <text class="term-warn"   y="220">  rejected resolve on an OPEN ticket — as expected</text>
+    <text class="term-text"   y="244">summary projection lists 3 tickets.</text>
+    <text class="term-ok"     y="262">done.</text>
+    <text class="term-prompt" y="290">$ <tspan class="term-text">_</tspan></text>
+  </g>
+</svg>

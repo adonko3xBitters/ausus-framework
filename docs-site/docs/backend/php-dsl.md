@@ -53,14 +53,14 @@ The local name is prefixed with the plugin name to form the entity FQN.
 |---|---|
 | `->fields([...])` | declare domain fields (`name => FieldBuilder`) |
 | `->actions([...])` | declare actions (`name => ActionBuilder`) |
-| `->workflow($fieldName)` | mark an `enum` field as the workflow state field |
+| `->workflow(field:, initial:)` | declare the workflow: the `enum` state field and its initial state |
 | `->projection($name, fields:, actions:, role:)` | declare a read projection |
 
 ```php
 $dsl->entity('invoice')
     ->fields([ /* ... */ ])
     ->actions([ /* ... */ ])
-    ->workflow('status')
+    ->workflow(field: 'status', initial: 'DRAFT')
     ->projection('summary', fields: ['id', 'number', 'status'], role: 'invoice.viewer');
 ```
 
@@ -86,13 +86,47 @@ $dsl->entity('invoice')
 | `->max($n)` | string max length |
 | `->currency($code)` | money currency code |
 | `->options([...])` | enum options (usually set via `Field::enum(...)`) |
+| `->label($text)` | human-friendly label for table headers / form fields (overrides the auto-humanised default) |
 
 ```php
-'number'    => Field::string()->unique()->max(32),
-'amount'    => Field::money()->currency('USD'),
-'status'    => Field::enum('DRAFT', 'ISSUED')->default('DRAFT'),
-'issued_at' => Field::datetime()->nullable(),
+'number'     => Field::string()->unique()->max(32),
+'amount'     => Field::money()->currency('USD'),
+'status'     => Field::enum('DRAFT', 'ISSUED')->default('DRAFT'),
+'issued_at'  => Field::datetime()->nullable(),
+'project_id' => Field::string()->max(26)->label('Project'),   // header reads "Project", not "Project id"
 ```
+
+### `Action::create` / `Action::update` / `Action::transition` {#action-kinds}
+
+| Builder | Action kind | Purpose |
+|---|---|---|
+| `Action::create(...$inputs)` | create | bring a new entity into existence; inputs declare the create payload |
+| `Action::update(...$fields)` | update | **partial-PATCH** a fixed closed list of fields on an existing entity |
+| `Action::transition($field, from:, to:)` | transition | move the workflow state field along a declared `from → to` arrow |
+
+`Action::update(...)` was added in v0.2 (ADR-0002). Compile-time rules:
+
+- Every named field must exist on the entity.
+- System fields (`id`, `tenant_id`, `_version`, `created_at`, `updated_at`)
+  cannot be patched.
+- The workflow state field — the one passed to `->workflow(field:, ...)` —
+  **cannot** be patched by an update action. State moves remain
+  exclusively the job of `Action::transition(...)`.
+
+```php
+'rename'   => Action::update('title')
+                ->requireRole('issue.maintainer'),
+'reassign' => Action::update('assignee')
+                ->requireRole('issue.maintainer'),
+'edit'     => Action::update('title', 'assignee', 'priority')
+                ->requireRole('issue.maintainer'),
+```
+
+The label is **cosmetic only** — the field `name` (`project_id` above) remains
+the source of truth for persistence, projection field lookups, action input
+keys, and HTTP payloads. Without `->label()`, the runtime auto-humanises the
+name (`project_id` → `"Project id"`); the explicit form is purely an opt-in
+override.
 
 You declare only domain fields. The five
 [system fields](../concepts/entities-fields-actions.md#system-fields) are

@@ -3,12 +3,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-use Ausus\{Compiler, Tenant, TenantId, ActorRef, StubActor, Reference};
-use Ausus\Persistence\Sql\{SqlitePersistenceDriver, SchemaDeriver, DatabaseAuditSink};
-use Ausus\Runtime\{
-    PolicyEngine, WorkflowRuntime, TransitionSetIndex, EffectDispatcher,
-    DefaultAuditor, SequenceCounter, Invoker, ProjectionRenderer
-};
+use Ausus\{Application, Compiler, Reference};
 use Acme\Billing\{HelloInvoicePlugin, HelloInvoiceDsl};
 
 /**
@@ -34,32 +29,27 @@ $pdo = new PDO("sqlite:{$dbPath}");
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 echo "[boot] SQLite db: {$dbPath}\n";
 
-// 1. Compile MetadataGraph
-$plugin = new HelloInvoicePlugin();
-$compiler = new Compiler();
-$graph = $compiler->compile([$plugin]);
+// Application::create()->register()->boot() composes the compiler, the SQLite
+// persistence driver, the runtime (Invoker + policy/workflow/effect/audit) and
+// applies the derived schema. The booted services are still reachable via the
+// accessors below, so the low-level assertions further down keep working.
+$app = Application::create([
+    'tenant'   => 'acme',
+    'actorId'  => 'user42',
+    'roles'    => ['invoice.creator', 'invoice.issuer', 'invoice.canceler', 'invoice.viewer'],
+    'database' => $pdo,
+])->register(new HelloInvoicePlugin())->boot();
+
+$graph    = $app->graph();
+$driver   = $app->driver();
+$invoker  = $app->invoker();
+$tenant   = $app->tenant();
+$actor    = $app->actor();
+$compiler = new Compiler();   // still used directly for the DSL-parity hash test
+
 echo "[boot] graph hash: " . substr($graph->hash, 0, 16) . "...\n";
 echo "[boot] entities={".count($graph->entities)."} actions={".count($graph->actions)."} policies={".count($graph->policies)."} workflows={".count($graph->workflows)."} projections={".count($graph->projections)."}\n";
-
-// 2. Derive + apply schema
-foreach (SchemaDeriver::deriveAll($graph) as $stmt) {
-    $pdo->exec($stmt);
-}
 echo "[boot] schema applied\n";
-
-// 3. Wire runtime
-$driver = new SqlitePersistenceDriver($pdo, $graph);
-$auditor = new DefaultAuditor(new DatabaseAuditSink($pdo));
-$policies = new PolicyEngine($graph);
-$workflow = new WorkflowRuntime(new TransitionSetIndex($graph));
-$effects = new EffectDispatcher();
-$sequence = new SequenceCounter();
-$tenant = new Tenant(new TenantId('acme'));
-$actor = new StubActor(
-    new ActorRef('user', 'user42', 'acme'),
-    ['invoice.creator', 'invoice.issuer', 'invoice.canceler', 'invoice.viewer'],
-);
-$invoker = new Invoker($graph, $driver, $policies, $workflow, $effects, $auditor, $sequence, $tenant, $actor);
 echo "[boot] runtime ready\n\n";
 
 // -----------------------------------------------------------------------------
@@ -145,7 +135,7 @@ _assert('stale update raises ConcurrencyConflict',
         $caught !== null ? get_class($caught) : 'no exception');
 
 echo "\n── test 9: render projection ViewSchema ──────────────────────\n";
-$renderer = new ProjectionRenderer($graph, $driver, $tenant);
+$renderer = $app->renderer();
 $summary = $renderer->render('billing.invoice.summary');
 _assert('viewschema.schemaVersion == 1.0.0',  $summary['schemaVersion'] === '1.0.0');
 _assert('viewschema.targetProfile == react.web.v1', $summary['targetProfile'] === 'react.web.v1');
@@ -176,19 +166,19 @@ _assert('workflow FQNs match',   array_keys($graphDsl->workflows)   === array_ke
 _assert('projection FQNs match', array_keys($graphDsl->projections) === array_keys($graph->projections));
 
 echo "\n── test 11: DSL plugin — full pipeline integration ───────────\n";
-// Re-create everything against the DSL plugin's graph (fresh SQLite db, same schema).
+// Re-bootstrap a second Application against the DSL plugin (fresh SQLite db).
 $dbPath2 = __DIR__ . '/playground-dsl.sqlite';
 if (file_exists($dbPath2)) unlink($dbPath2);
 $pdo2 = new PDO("sqlite:{$dbPath2}");
 $pdo2->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-foreach (SchemaDeriver::deriveAll($graphDsl) as $stmt) $pdo2->exec($stmt);
 
-$driver2  = new SqlitePersistenceDriver($pdo2, $graphDsl);
-$auditor2 = new DefaultAuditor(new DatabaseAuditSink($pdo2));
-$policies2 = new PolicyEngine($graphDsl);
-$workflow2 = new WorkflowRuntime(new TransitionSetIndex($graphDsl));
-$invoker2 = new Invoker($graphDsl, $driver2, $policies2, $workflow2, new EffectDispatcher(),
-                       $auditor2, new SequenceCounter(), $tenant, $actor);
+$app2 = Application::create([
+    'tenant'   => 'acme',
+    'actorId'  => 'user42',
+    'roles'    => ['invoice.creator', 'invoice.issuer', 'invoice.canceler', 'invoice.viewer'],
+    'database' => $pdo2,
+])->register(new HelloInvoiceDsl())->boot();
+$invoker2 = $app2->invoker();
 
 $o = $invoker2->invoke('billing.invoice.create', null, [
     'number' => 'INV-DSL-001', 'customer_name' => 'DSL Customer',

@@ -49,6 +49,12 @@ La compilation effectue trois opérations :
 3. **Canonicalisation et hachage** — les tables de nœuds sont triées par clé,
    sérialisées dans une forme JSON canonique, puis hachées avec SHA-256.
 
+Le graphe est la **seule** configuration d'exécution que lit AUSUS. La
+persistance, l'API HTTP et le moteur de rendu le consomment directement —
+ils ne réanalysent jamais le code source :
+
+![Cycle de vie du graphe de métadonnées : Plugin A et Plugin B alimentent Compiler::compile(), qui produit un unique MetadataGraph immuable ; ce graphe est consommé indépendamment par le Runtime/Invoker, le SchemaDeriver et le ProjectionRenderer.](/img/diagrams/metadata-graph-lifecycle.svg)
+
 ## Validation {#validation}
 
 Le compilateur rejette un graphe incohérent au moment de la compilation, et non

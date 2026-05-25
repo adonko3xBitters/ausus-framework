@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 240" role="img" aria-label="Ticket workflow state machine: OPEN to IN_PROGRESS via start, IN_PROGRESS to RESOLVED via resolve, RESOLVED to CLOSED via close">
+  <title>Ticket workflow state machine</title>
+  <desc>Four states arranged left to right: OPEN, IN_PROGRESS, RESOLVED, CLOSED. The create action lands a new ticket in OPEN. The start action transitions OPEN to IN_PROGRESS. The resolve action transitions IN_PROGRESS to RESOLVED. The close action transitions RESOLVED to CLOSED.</desc>
+  <defs>
+    <style><![CDATA[
+      .bg{fill:#fff}
+      .state{fill:#f6f7f9;stroke:#475569;stroke-width:1.5}
+      .start-state{fill:#1a1a1a;stroke:#1a1a1a}
+      .state-text{font:600 14px ui-monospace,monospace;fill:#1a1a1a}
+      .action-label{font:600 12px system-ui,sans-serif;fill:#2563eb}
+      .stamp{font:11px system-ui,sans-serif;fill:#475569}
+      .arrow{fill:none;stroke:#2563eb;stroke-width:1.8}
+    ]]></style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="760" height="240"/>
+
+  <!-- start point -->
+  <circle class="start-state" cx="40" cy="120" r="8"/>
+
+  <!-- OPEN -->
+  <rect class="state" x="80" y="90" width="130" height="60" rx="14"/>
+  <text class="state-text" x="118" y="125">OPEN</text>
+
+  <!-- IN_PROGRESS -->
+  <rect class="state" x="265" y="90" width="170" height="60" rx="14"/>
+  <text class="state-text" x="290" y="125">IN_PROGRESS</text>
+
+  <!-- RESOLVED -->
+  <rect class="state" x="490" y="90" width="140" height="60" rx="14"/>
+  <text class="state-text" x="513" y="125">RESOLVED</text>
+
+  <!-- CLOSED -->
+  <rect class="state" x="685" y="90" width="60" height="60" rx="14"/>
+  <text class="state-text" x="691" y="125">CLOSED</text>
+
+  <!-- Arrows + labels -->
+  <path class="arrow" d="M52,120 L80,120" marker-end="url(#arr)"/>
+  <text class="action-label" x="40" y="100">create</text>
+
+  <path class="arrow" d="M210,120 L265,120" marker-end="url(#arr)"/>
+  <text class="action-label" x="218" y="105">start</text>
+
+  <path class="arrow" d="M435,120 L490,120" marker-end="url(#arr)"/>
+  <text class="action-label" x="439" y="105">resolve</text>
+  <text class="stamp"       x="439" y="140">stamps resolved_at</text>
+
+  <path class="arrow" d="M630,120 L685,120" marker-end="url(#arr)"/>
+  <text class="action-label" x="638" y="105">close</text>
+
+  <!-- caption -->
+  <text class="stamp" x="40" y="200">The runtime enforces this diagram: calling resolve on an OPEN ticket throws WorkflowStateMismatch before any data is written.</text>
+</svg>

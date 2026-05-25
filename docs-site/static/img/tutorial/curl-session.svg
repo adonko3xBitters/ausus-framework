@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" role="img" aria-label="Terminal session showing curl requests against the AUSUS HTTP API">
+  <title>Terminal session showing curl requests against the AUSUS HTTP API</title>
+  <desc>A terminal showing a GET /_health response with the graph hash, a GET /projections/helpdesk.ticket.summary returning a ViewSchema fragment, and a POST /actions/helpdesk.ticket.create returning an ok:true response with a generated id.</desc>
+  <defs>
+    <style><![CDATA[
+      .term-bg{fill:#1f2430}
+      .term-bar{fill:#2b3140}
+      .dot{fill:#3b4254}
+      .term-text{font:12px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#e6e6e6}
+      .term-prompt{font:12px ui-monospace,monospace;fill:#7dd3fc}
+      .term-key{font:12px ui-monospace,monospace;fill:#fcd34d}
+      .term-str{font:12px ui-monospace,monospace;fill:#a7f3d0}
+      .term-dim{font:12px ui-monospace,monospace;fill:#94a3b8}
+    ]]></style>
+  </defs>
+
+  <rect class="term-bg" width="760" height="380" rx="8"/>
+  <rect class="term-bar" x="0" y="0" width="760" height="28" rx="8"/>
+  <rect class="term-bar" x="0" y="20" width="760" height="8"/>
+  <circle class="dot" cx="16" cy="14" r="5"/>
+  <circle class="dot" cx="32" cy="14" r="5"/>
+  <circle class="dot" cx="48" cy="14" r="5"/>
+  <text class="term-dim" x="350" y="18">ticket-system — curl</text>
+
+  <g transform="translate(16, 48)" font-size="12">
+    <text class="term-prompt" y="0">$ <tspan class="term-text">curl -s http://localhost:8080/api/_health</tspan></text>
+    <text class="term-text"   y="18">{<tspan class="term-key">"ok"</tspan>:true,<tspan class="term-key">"service"</tspan>:<tspan class="term-str">"ausus/api-http"</tspan>,<tspan class="term-key">"graphHash"</tspan>:<tspan class="term-str">"7c1e9b3a..."</tspan>}</text>
+
+    <text class="term-prompt" y="46">$ <tspan class="term-text">curl -s -H 'X-Tenant-ID: helpdesk' \</tspan></text>
+    <text class="term-text"   y="62">    http://localhost:8080/api/projections/helpdesk.ticket.summary</text>
+    <text class="term-text"   y="80">{</text>
+    <text class="term-text"   y="96">  <tspan class="term-key">"schemaVersion"</tspan>: <tspan class="term-str">"1.0.0"</tspan>,</text>
+    <text class="term-text"   y="112">  <tspan class="term-key">"targetProfile"</tspan>: <tspan class="term-str">"react.web.v1"</tspan>,</text>
+    <text class="term-text"   y="128">  <tspan class="term-key">"data"</tspan>: { <tspan class="term-key">"items"</tspan>: [ {<tspan class="term-key">"id"</tspan>:<tspan class="term-str">"01J..."</tspan>, <tspan class="term-key">"status"</tspan>:<tspan class="term-str">"OPEN"</tspan>, ... } ] }</text>
+    <text class="term-text"   y="144">}</text>
+
+    <text class="term-prompt" y="172">$ <tspan class="term-text">curl -s -X POST http://localhost:8080/api/actions/helpdesk.ticket.create \</tspan></text>
+    <text class="term-text"   y="188">    -H 'X-Tenant-ID: helpdesk' -H 'X-Actor-Roles: ticket.agent' \</text>
+    <text class="term-text"   y="204">    -H 'Content-Type: application/json' \</text>
+    <text class="term-text"   y="220">    -d '{"subject":null,"inputs":{"title":"Laptop won'\''t boot",</text>
+    <text class="term-text"   y="236">         "requester":"max@example.com","priority":"HIGH"}}'</text>
+    <text class="term-text"   y="260">{<tspan class="term-key">"ok"</tspan>:true,<tspan class="term-key">"outputs"</tspan>:{<tspan class="term-key">"id"</tspan>:<tspan class="term-str">"01J7HJ1Z2X..."</tspan>,<tspan class="term-key">"status"</tspan>:<tspan class="term-str">"OPEN"</tspan>,...}}</text>
+
+    <text class="term-prompt" y="290">$ <tspan class="term-text">_</tspan></text>
+  </g>
+</svg>

@@ -54,7 +54,7 @@ final class HelloInvoiceDsl extends DslPlugin
         $dsl->entity('invoice')
             ->fields([ /* ... */ ])
             ->actions([ /* ... */ ])
-            ->workflow('status')
+            ->workflow(field: 'status', initial: 'DRAFT')
             ->projection('summary', fields: [/* ... */]);
     }
 }

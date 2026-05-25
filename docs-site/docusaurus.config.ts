@@ -37,6 +37,7 @@ const config: Config = {
   // files, if added later, still get full MDX.
   markdown: {
     format: 'detect',
+    mermaid: true,
   },
 
   presets: [
@@ -59,6 +60,7 @@ const config: Config = {
   ],
 
   themes: [
+    '@docusaurus/theme-mermaid',
     [
       require.resolve('@easyops-cn/docusaurus-search-local'),
       {

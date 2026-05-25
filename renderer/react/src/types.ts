@@ -17,6 +17,7 @@ export interface FieldDescriptor {
     | "datetime"
     | "enum"
     | "money"
+    | "boolean"
     | "identity"
     | "version"
     | "system_string";
@@ -26,6 +27,15 @@ export interface FieldDescriptor {
     currency?: string;
     options?: string[];
   };
+  /**
+   * The following fields are only meaningful on ActionDescriptor.inputs; the
+   * runtime emits them so the renderer can build a working form. They are
+   * **always optional** so this type stays usable for read-only projection
+   * fields that carry no form semantics.
+   */
+  required?: boolean;
+  nullable?: boolean;
+  default?: unknown;
 }
 
 export interface ActionDescriptor {
@@ -34,6 +44,14 @@ export interface ActionDescriptor {
   label: string;
   subjectRequired: boolean;
   inputs?: FieldDescriptor[];
+  /**
+   * Set on **update** action descriptors when the projection is a detail
+   * shape (`data.item`); maps each input field name to its current value
+   * from the rendered subject. The renderer's ActionModal uses this to
+   * prefill the form. Absent on create / transition descriptors and on
+   * list-view renderings.
+   */
+  initialValues?: Record<string, unknown>;
   confirmation?: { required: boolean; prompt?: string };
 }
 

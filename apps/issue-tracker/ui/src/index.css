@@ -1,0 +1,77 @@
+/*  Issue tracker — minimal styling for the AUSUS renderer's ausus-* classes.
+    The renderer ships no CSS in v0.1.x. */
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  margin: 0;
+  background: #f6f7f9;
+  color: #1a1a1a;
+}
+
+.ausus-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 20px;
+  background: #fff;
+  border-bottom: 1px solid #e3e3e3;
+  flex-wrap: wrap;
+}
+.ausus-header strong { font-size: 15px; }
+.tt-nav { display: flex; gap: 6px; }
+.tt-note { margin-left: auto; font-size: 12px; color: #475569; max-width: 420px; }
+.tt-note code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; }
+.tt-main { padding: 20px; max-width: 1280px; margin: 0 auto; }
+
+.ausus-list__title, .ausus-detail__title { font-size: 18px; margin: 0 0 12px 0; }
+
+.ausus-table { width: 100%; border-collapse: collapse; background: #fff; }
+.ausus-table th, .ausus-table td {
+  text-align: left; padding: 8px 12px; border-bottom: 1px solid #eee;
+  font-size: 13px;
+}
+.ausus-table th { background: #fafafa; font-weight: 600; color: #475569; }
+
+.ausus-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.ausus-badge--gray    { background: #e2e8f0; color: #1a1a1a; }
+.ausus-badge--blue    { background: #dbeafe; color: #1e3a8a; }
+.ausus-badge--green   { background: #d1fae5; color: #065f46; }
+.ausus-badge--red     { background: #fee2e2; color: #991b1b; }
+.ausus-badge--default { background: #f1f5f9; color: #475569; }
+
+.ausus-btn {
+  padding: 5px 10px; border: 1px solid #ccc; border-radius: 6px;
+  background: #fff; cursor: pointer; font-size: 13px;
+}
+.ausus-btn:hover { background: #f8fafc; }
+.ausus-btn--primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+.ausus-btn--primary:hover { background: #1d4ed8; }
+.ausus-btn--ghost { background: #fff; }
+.ausus-btn--action { margin: 0 3px; }
+
+.ausus-action-bar { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.ausus-modal-backdrop {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, .45);
+  display: flex; align-items: center; justify-content: center; z-index: 50;
+}
+.ausus-modal { background: #fff; padding: 20px 24px; border-radius: 10px; min-width: 360px; max-width: 540px; }
+.ausus-modal__title { font-size: 16px; margin: 0 0 12px 0; }
+.ausus-modal__inputs { display: flex; flex-direction: column; gap: 12px; margin: 12px 0; }
+.ausus-modal__input { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.ausus-modal__input input, .ausus-modal__input select { padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font: inherit; }
+.ausus-input--invalid { border-color: #dc2626 !important; }
+.ausus-input-error { color: #dc2626; font-size: 12px; }
+.ausus-required { color: #dc2626; }
+.ausus-money-input { display: inline-flex; align-items: center; gap: 6px; }
+.ausus-money-input__currency { font-size: 12px; color: #475569; }
+.ausus-modal__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+.ausus-modal__error { background: #fee2e2; color: #991b1b; padding: 8px 10px; border-radius: 6px; font-size: 13px; }
+
+.ausus-loading, .ausus-error, .ausus-empty { padding: 24px; color: #475569; }
+
+.ausus-detail__list { display: grid; grid-template-columns: 180px 1fr; gap: 8px 16px; background: #fff; padding: 16px; border-radius: 8px; border: 1px solid #e3e3e3; }
+.ausus-detail__row { display: contents; }
+.ausus-detail__row dt { color: #475569; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.ausus-detail__row dd { margin: 0; font-size: 13px; }
+.ausus-detail__footer { margin-top: 12px; }

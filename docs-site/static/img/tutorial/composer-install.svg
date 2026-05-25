@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 280" role="img" aria-label="Terminal output of running composer install in the tutorial project">
+  <title>Terminal output of running composer install in the tutorial project</title>
+  <desc>A terminal showing composer locking and installing the AUSUS packages kernel, runtime-default, persistence-sql, api-http and standard-stack, then writing the lock file and generating the autoloader.</desc>
+  <defs>
+    <style><![CDATA[
+      .term-bg{fill:#1f2430}
+      .term-bar{fill:#2b3140}
+      .dot{fill:#3b4254}
+      .term-text{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#e6e6e6}
+      .term-prompt{font:13px ui-monospace,monospace;fill:#7dd3fc}
+      .term-emph{font:13px ui-monospace,monospace;fill:#fcd34d}
+      .term-ok{font:13px ui-monospace,monospace;fill:#a7f3d0}
+      .term-dim{font:13px ui-monospace,monospace;fill:#94a3b8}
+    ]]></style>
+  </defs>
+
+  <rect class="term-bg" width="760" height="280" rx="8"/>
+  <rect class="term-bar" x="0" y="0" width="760" height="28" rx="8"/>
+  <rect class="term-bar" x="0" y="20" width="760" height="8"/>
+  <circle class="dot" cx="16" cy="14" r="5"/>
+  <circle class="dot" cx="32" cy="14" r="5"/>
+  <circle class="dot" cx="48" cy="14" r="5"/>
+  <text class="term-dim" x="334" y="18">ticket-system — zsh</text>
+
+  <g transform="translate(16, 50)">
+    <text class="term-prompt" y="0">$ <tspan class="term-text">composer install</tspan></text>
+    <text class="term-dim"    y="22">Loading composer repositories with package information</text>
+    <text class="term-dim"    y="40">Updating dependencies</text>
+    <text class="term-emph"   y="64">Lock file operations: 5 installs, 0 updates, 0 removals</text>
+    <text class="term-text"   y="82">  - Locking ausus/kernel (0.1.0)</text>
+    <text class="term-text"   y="100">  - Locking ausus/runtime-default (0.1.0)</text>
+    <text class="term-text"   y="118">  - Locking ausus/persistence-sql (0.1.0)</text>
+    <text class="term-text"   y="136">  - Locking ausus/api-http (0.1.0)</text>
+    <text class="term-text"   y="154">  - Locking ausus/standard-stack (0.1.0)</text>
+    <text class="term-text"   y="178">Writing lock file</text>
+    <text class="term-ok"     y="196">Generating autoload files</text>
+    <text class="term-prompt" y="220">$ <tspan class="term-text">_</tspan></text>
+  </g>
+</svg>

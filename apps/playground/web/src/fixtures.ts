@@ -59,12 +59,22 @@ export function buildSummarySchema(items: InvoiceRow[]): ViewSchema {
       { name: "amount",        type: "money",    label: "Amount",   typeOptions: { currency: "USD" } },
     ],
     actions: [
-      { fqn: "billing.invoice.create", name: "create", label: "New invoice", subjectRequired: false,
-        confirmation: { required: false } },
+      {
+        fqn: "billing.invoice.create",
+        name: "create",
+        label: "New invoice",
+        subjectRequired: false,
+        confirmation: { required: false },
+        inputs: [
+          { name: "number",        type: "string", label: "Number",        required: true, nullable: false, typeOptions: { maxLength: 32 } },
+          { name: "customer_name", type: "string", label: "Customer name", required: true, nullable: false, typeOptions: { maxLength: 200 } },
+          { name: "amount",        type: "money",  label: "Amount",        required: true, nullable: false, typeOptions: { currency: "USD" } },
+        ],
+      },
       { fqn: "billing.invoice.issue",  name: "issue",  label: "Issue",       subjectRequired: true,
-        confirmation: { required: true, prompt: "Issue this invoice?" } },
+        confirmation: { required: true, prompt: "Issue this invoice?" }, inputs: [] },
       { fqn: "billing.invoice.cancel", name: "cancel", label: "Cancel",      subjectRequired: true,
-        confirmation: { required: true, prompt: "Cancel this invoice? This cannot be undone." } },
+        confirmation: { required: true, prompt: "Cancel this invoice? This cannot be undone." }, inputs: [] },
     ],
     filters: [],
     data: { items },
@@ -94,9 +104,23 @@ export function buildDetailSchema(row: InvoiceRow | null): ViewSchema {
     ],
     actions: [
       { fqn: "billing.invoice.issue",  name: "issue",  label: "Issue",  subjectRequired: true,
-        confirmation: { required: true, prompt: "Issue this invoice?" } },
+        confirmation: { required: true, prompt: "Issue this invoice?" }, inputs: [] },
       { fqn: "billing.invoice.cancel", name: "cancel", label: "Cancel", subjectRequired: true,
-        confirmation: { required: true, prompt: "Cancel this invoice? This cannot be undone." } },
+        confirmation: { required: true, prompt: "Cancel this invoice? This cannot be undone." }, inputs: [] },
+      // ADR-0002 fixture: an update descriptor with initialValues for renderer prefill.
+      {
+        fqn: "billing.invoice.rename",
+        name: "rename",
+        label: "Rename",
+        subjectRequired: true,
+        inputs: [
+          { name: "customer_name", type: "string", label: "Customer",
+            required: true, nullable: false, typeOptions: { maxLength: 200 } },
+        ],
+        initialValues: row !== null
+          ? { customer_name: row.customer_name }
+          : { customer_name: "" },
+      },
     ],
     filters: [],
     data: { item: row as unknown as Record<string, unknown> | null },

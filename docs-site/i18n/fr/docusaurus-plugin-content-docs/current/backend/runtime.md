@@ -34,6 +34,13 @@ invoke(actionFqn, subject?, inputs)
 Si une étape lève une exception, la transaction est **annulée** (rollback) — l'effet et
 l'entrée d'audit sont atomiques ensemble.
 
+La même chaîne sous forme de flux unique :
+
+![Pipeline d'exécution d'invoke() : séquence horizontale Preflight, Policy, Workflow guard, Effect, Audit ; les étapes 3 à 5 s'exécutent dans une seule transaction de base de données ; l'appel renvoie les sorties de l'effet.](/img/diagrams/invoker-pipeline.svg)
+
+Les étapes 3 → 5 s'exécutent dans une seule transaction de base de données ;
+les étapes 1–2 s'exécutent avant son ouverture.
+
 ```php
 $outputs = $invoker->invoke('billing.invoice.create', null, [
     'number'        => 'INV-2026-001',

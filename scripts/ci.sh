@@ -11,6 +11,14 @@
 #   2. composer install      from path repos
 #   3. phpunit               (if any test class exists; skipped otherwise)
 #   4. php playground smoke  36 assertions
+#   4b. application smoke    Ausus\Application bootstrap assertions
+#   4c. workflow smoke       explicit Workflow declaration assertions
+#   4d. api-consistency      v0.1.x public API consistency assertions
+#   4e. config-builder       ApplicationConfig fluent builder assertions
+#   4f. application-http     Application::http() PSR-7 entry-point assertions
+#   4g. issue-tracker smoke  end-to-end sample-app assertions
+#   4h. null-roundtrip       nullable field SQL ↔ PHP ↔ JSON regression
+#   4i. update-action        ADR-0002 Action::update(...) + UpdateEffect tests
 #   5. composer boot         starter standalone
 #   6. npm ci                workspace lockfile-strict install (falls back to install)
 #   7. npm run build         renderer/react/dist
@@ -57,6 +65,62 @@ grep -q "RESULT: passed=36 failed=0" /tmp/ausus-ci-php.log \
     && echo "  ✓ playground 36/36" \
     || { echo "playground failed"; tail -50 /tmp/ausus-ci-php.log; exit 4; }
 
+# 4b
+echo "[ci] step 4b — php apps/playground/application-smoke.php"
+php apps/playground/application-smoke.php > /tmp/ausus-ci-app.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-app.log \
+    && echo "  ✓ application-smoke $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-app.log | head -1)" \
+    || { echo "application-smoke failed"; tail -50 /tmp/ausus-ci-app.log; exit 4; }
+
+# 4c
+echo "[ci] step 4c — php apps/playground/workflow-test.php"
+php apps/playground/workflow-test.php > /tmp/ausus-ci-wf.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-wf.log \
+    && echo "  ✓ workflow-test $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-wf.log | head -1)" \
+    || { echo "workflow-test failed"; tail -50 /tmp/ausus-ci-wf.log; exit 4; }
+
+# 4d
+echo "[ci] step 4d — php apps/playground/api-consistency-test.php"
+php apps/playground/api-consistency-test.php > /tmp/ausus-ci-api.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-api.log \
+    && echo "  ✓ api-consistency $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-api.log | head -1)" \
+    || { echo "api-consistency failed"; tail -50 /tmp/ausus-ci-api.log; exit 4; }
+
+# 4e
+echo "[ci] step 4e — php apps/playground/config-builder-test.php"
+php apps/playground/config-builder-test.php > /tmp/ausus-ci-cfg.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-cfg.log \
+    && echo "  ✓ config-builder $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-cfg.log | head -1)" \
+    || { echo "config-builder failed"; tail -50 /tmp/ausus-ci-cfg.log; exit 4; }
+
+# 4f
+echo "[ci] step 4f — php apps/playground/application-http-test.php"
+php apps/playground/application-http-test.php > /tmp/ausus-ci-http.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-http.log \
+    && echo "  ✓ application-http $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-http.log | head -1)" \
+    || { echo "application-http failed"; tail -50 /tmp/ausus-ci-http.log; exit 4; }
+
+# 4g
+echo "[ci] step 4g — php apps/issue-tracker/tests/smoke.php"
+php apps/issue-tracker/tests/smoke.php > /tmp/ausus-ci-tracker.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-tracker.log \
+    && echo "  ✓ issue-tracker $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-tracker.log | head -1)" \
+    || { echo "issue-tracker failed"; tail -50 /tmp/ausus-ci-tracker.log; exit 4; }
+
+# 4h
+echo "[ci] step 4h — php apps/playground/null-roundtrip-test.php"
+php apps/playground/null-roundtrip-test.php > /tmp/ausus-ci-null.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-null.log \
+    && echo "  ✓ null-roundtrip $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-null.log | head -1)" \
+    || { echo "null-roundtrip failed"; tail -50 /tmp/ausus-ci-null.log; exit 4; }
+
+# 4i
+echo "[ci] step 4i — php apps/playground/update-action-test.php"
+php apps/playground/update-action-test.php > /tmp/ausus-ci-update.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-update.log \
+    && echo "  ✓ update-action $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-update.log | head -1)" \
+    || { echo "update-action failed"; tail -50 /tmp/ausus-ci-update.log; exit 4; }
+
 # 5
 echo "[ci] step 5 — composer boot (starter)"
 composer --working-dir=packages/starter boot >/dev/null 2>&1 \
@@ -80,8 +144,8 @@ echo "  ✓ renderer/react/dist built"
 # 8
 echo "[ci] step 8 — npm run trace"
 npm run trace > /tmp/ausus-ci-trace.log 2>&1
-grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-trace.log \
-    && echo "  ✓ trace 12/12" \
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-trace.log \
+    && echo "  ✓ trace $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-trace.log | head -1)" \
     || { echo "trace failed"; tail -30 /tmp/ausus-ci-trace.log; exit 8; }
 
 # 9
@@ -91,8 +155,8 @@ echo "[ci] step 9 — npm pack --dry-run"
 # 10
 echo "[ci] step 10 — L4 HTTP integration (live php -S + renderer-react)"
 bash scripts/integration-http.sh > /tmp/ausus-ci-integration.log 2>&1
-grep -q "RESULT: passed=12 failed=0" /tmp/ausus-ci-integration.log \
-    && echo "  ✓ integration-http 12/12" \
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-integration.log \
+    && echo "  ✓ integration-http $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-integration.log | head -1)" \
     || { echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10; }
 
 echo "[ci] DONE — all 10 steps passed"

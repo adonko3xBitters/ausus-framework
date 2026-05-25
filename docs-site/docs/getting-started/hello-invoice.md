@@ -50,7 +50,7 @@ final class HelloInvoiceDsl extends DslPlugin
                               ->andTransition('status', from: 'ISSUED', to: 'CANCELLED')
                               ->requireRole('invoice.canceler'),
             ])
-            ->workflow('status')
+            ->workflow(field: 'status', initial: 'DRAFT')
             ->projection('summary',
                 fields:  ['id', 'number', 'customer_name', 'status', 'amount'],
                 actions: ['create', 'cancel'],
@@ -70,29 +70,57 @@ What this declares:
   automatically (`id`, `tenant_id`, `_version`, `created_at`, `updated_at`).
 - Three **actions**: `create` (a create action) plus `issue` and `cancel`
   (transition actions).
-- A **workflow** on the `status` enum field — the runtime infers states and
-  initial value from the field.
+- A **workflow** declared explicitly on the `status` enum field, starting in
+  `DRAFT`. The enum options become the workflow states. See
+  [Workflows](../concepts/workflows.md).
 - Two **projections** — read-shaped views named `summary` and `detail`.
 
 ## 2. Compile and boot {#2-compile-and-boot}
 
-```php
-use Ausus\Compiler;
-use Ausus\Persistence\Sql\SchemaDeriver;
+`Ausus\Application` bootstraps the whole stack — it compiles the graph, wires
+the runtime, and applies the derived schema:
 
-$graph = (new Compiler())->compile([new HelloInvoiceDsl()]);
+```php
+use Ausus\Application;
+
+$app = Application::create([
+        'tenant' => 'acme',
+        'roles'  => ['invoice.creator', 'invoice.issuer', 'invoice.canceler', 'invoice.viewer'],
+    ])
+    ->register(new HelloInvoiceDsl())
+    ->boot();
+
+$graph = $app->graph();
 echo "entities=", count($graph->entities),
      " actions=",  count($graph->actions),
      " workflows=", count($graph->workflows), "\n";
 // entities=1 actions=3 workflows=1
-
-foreach (SchemaDeriver::deriveAll($graph) as $stmt) {
-    $pdo->exec($stmt);
-}
 ```
 
-See [Your first app](first-app.md) for the full runtime wiring; the steps
-below assume an `$invoker` and `$renderer` are in scope.
+The same configuration with the typed
+[`ApplicationConfig`](first-app.md#typed-config-builder) builder reads:
+
+```php
+use Ausus\{Application, ApplicationConfig};
+
+$app = Application::create(
+        ApplicationConfig::make()
+            ->tenant('acme')
+            ->roles(['invoice.creator', 'invoice.issuer', 'invoice.canceler', 'invoice.viewer'])
+    )
+    ->register(new HelloInvoiceDsl())
+    ->boot();
+```
+
+See [Your first app](first-app.md) for the full configuration surface and the
+equivalent manual wiring. The steps below use these booted services:
+
+```php
+$invoker  = $app->invoker();
+$renderer = $app->renderer();
+$driver   = $app->driver();
+$tenant   = $app->tenant();
+```
 
 ## 3. Create an invoice {#3-create-an-invoice}
 

@@ -49,6 +49,12 @@ Compilation does three things:
 3. **Canonicalize and hash** — node maps are key-sorted, serialized to a
    canonical JSON form, and hashed with SHA-256.
 
+The graph is the **only** runtime configuration AUSUS reads. Persistence,
+the HTTP API, and the renderer all consume it directly — they never re-parse
+the source code:
+
+![Metadata graph lifecycle: Plugin A and Plugin B both feed Compiler::compile(), which produces one immutable MetadataGraph; that graph is independently consumed by the Runtime / Invoker, the SchemaDeriver, and the ProjectionRenderer.](/img/diagrams/metadata-graph-lifecycle.svg)
+
 ## Validation {#validation}
 
 The compiler rejects an incoherent graph at compile time, not at runtime:

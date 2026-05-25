@@ -24,6 +24,20 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
+      label: 'Tutorial: Ticket System',
+      collapsed: false,
+      items: [
+        'tutorial/index',
+        'tutorial/installation',
+        'tutorial/domain',
+        'tutorial/persistence',
+        'tutorial/http-api',
+        'tutorial/react-ui',
+        'tutorial/troubleshooting',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Core Concepts',
       collapsed: false,
       items: [

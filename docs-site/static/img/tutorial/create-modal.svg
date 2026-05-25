@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 460" role="img" aria-label="ActionModal create form rendered from helpdesk.ticket.create inputs">
+  <title>ActionModal create form rendered from helpdesk.ticket.create inputs</title>
+  <desc>A modal titled Create with three labelled inputs: Title (required, showing the inline error "Title is required."), Requester (required, empty), and Priority (a select preset to NORMAL). Discard and Create buttons at the bottom.</desc>
+  <defs>
+    <style><![CDATA[
+      .backdrop{fill:rgba(0,0,0,.40)}
+      .card{fill:#fff;stroke:#e3e3e3;stroke-width:1}
+      .heading{font:600 18px system-ui,sans-serif;fill:#1a1a1a}
+      .label{font:500 13px system-ui,sans-serif;fill:#1a1a1a}
+      .required{font:600 13px system-ui,sans-serif;fill:#dc2626}
+      .input-text{font:13px system-ui,sans-serif;fill:#1a1a1a}
+      .placeholder{font:13px system-ui,sans-serif;fill:#999}
+      .err{font:500 12px system-ui,sans-serif;fill:#dc2626}
+      .btn-text{font:500 13px system-ui,sans-serif;fill:#1a1a1a}
+      .btn-text-primary{font:500 13px system-ui,sans-serif;fill:#fff}
+    ]]></style>
+  </defs>
+
+  <!-- dimmed page behind -->
+  <rect class="backdrop" width="560" height="460"/>
+
+  <!-- modal -->
+  <rect class="card" x="40" y="30" width="480" height="400" rx="8"/>
+  <text class="heading" x="60" y="68">Create</text>
+
+  <!-- Title field — required, INVALID (inline error shown) -->
+  <text class="label"    x="60" y="108">Title <tspan class="required"> *</tspan></text>
+  <rect x="60" y="118" width="440" height="32" rx="6" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+  <text class="placeholder" x="72" y="138"></text>
+  <text class="err"      x="60" y="172">Title is required.</text>
+
+  <!-- Requester field — required, empty -->
+  <text class="label"    x="60" y="208">Requester <tspan class="required"> *</tspan></text>
+  <rect x="60" y="218" width="440" height="32" rx="6" fill="#fff" stroke="#ccc"/>
+
+  <!-- Priority field — enum select, preset to NORMAL -->
+  <text class="label"    x="60" y="280">Priority</text>
+  <rect x="60" y="290" width="440" height="32" rx="6" fill="#fff" stroke="#ccc"/>
+  <text class="input-text" x="72" y="311">NORMAL</text>
+  <!-- chevron -->
+  <path d="M480,304 l8,8 l8,-8" fill="none" stroke="#666" stroke-width="1.5"/>
+
+  <!-- footer buttons -->
+  <line x1="60" y1="358" x2="500" y2="358" stroke="#eee"/>
+  <rect x="320" y="378" width="80" height="32" rx="6" fill="#fff" stroke="#ccc"/>
+  <text class="btn-text" x="340" y="399">Discard</text>
+  <rect x="410" y="378" width="92" height="32" rx="6" fill="#2563eb" stroke="#2563eb"/>
+  <text class="btn-text-primary" x="429" y="399">Create</text>
+</svg>
