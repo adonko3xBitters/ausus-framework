@@ -7,7 +7,7 @@
 [![PHP](https://img.shields.io/badge/PHP-%E2%89%A5%208.3-777BB4.svg)](https://www.php.net/)
 [![Node](https://img.shields.io/badge/Node-%E2%89%A5%2018-339933.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18%20%7C%2019-61DAFB.svg)](https://react.dev/)
-[![Version](https://img.shields.io/badge/version-0.1.1-blue.svg)](RELEASE-NOTES-v0.1.1.md)
+[![Version](https://img.shields.io/badge/version-0.2.0--alpha.1-blue.svg)](RELEASE-NOTES-v0.2.0-alpha.1.md)
 
 AUSUS is a PHP framework for building enterprise apps — CRUD platforms,
 ERP workflows, SaaS multi-tenant products, internal tools — from
@@ -18,7 +18,7 @@ substrate: a deterministic, layered, plugin-composable kernel.
 
 ---
 
-## What ships today (v0.1.1)
+## What ships today (v0.2.0-alpha.1)
 
 | Package | Role | Status |
 |---|---|---|
@@ -31,7 +31,36 @@ substrate: a deterministic, layered, plugin-composable kernel.
 | [`@ausus/renderer-react`](renderer/react)      | React 18+ renderer for the RFC-004 ViewSchema    | implemented |
 | `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, ship in v0.2.0 |
 
-Full release notes: [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md). The v0.1.0 release-candidate notes remain available at [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md).
+Current alpha: [`RELEASE-NOTES-v0.2.0-alpha.1.md`](RELEASE-NOTES-v0.2.0-alpha.1.md). Last stable: [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md). The v0.1.0 release-candidate notes remain available at [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md).
+
+---
+
+## Runtime hardening (v0.2 alpha)
+
+`v0.2.0-alpha.1` is a **stabilization line**, not yet stable. It is purely
+additive on top of `v0.1.1` — no public API rename, no wire-format change,
+no `schemaVersion` bump. The recommended line for production remains
+`v0.1.1`.
+
+What it adds:
+
+- **Typed runtime exception markers.** Five marker interfaces in
+  `Ausus\Errors\*` (`BadRequestError`, `ForbiddenError`, `NotFoundError`,
+  `ConflictError`, `InternalError`) tag the intended HTTP status of every
+  kernel exception. No methods, no abstract base classes — pure type
+  metadata.
+- **Marker-first HTTP error classification.** `ErrorMapper::classify()`
+  dispatches on the marker interface first; the legacy short-name table
+  is preserved verbatim as a back-compat fallback for out-of-tree
+  consumers.
+- **Plugin exception opt-in.** A custom plugin exception implementing one
+  of the five markers routes to its HTTP status (`400` / `403` / `404` /
+  `409` / `500`) automatically — no edit to `ErrorMapper` required.
+- **Additive, back-compatible runtime hardening.** `catch (AususError $e)`
+  and `catch (PolicyDenied $e)` keep matching the exact same instances as
+  `v0.1.1`; the 14 existing kernel exception status codes are
+  bit-identical. Pinned by `apps/playground/error-taxonomy-test.php`
+  (70 assertions, CI step `4j`).
 
 ---
 
@@ -74,8 +103,9 @@ deterministic, content-addressable `MetadataGraph`.
 
 | Document | What it covers |
 |---|---|
-| [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md) | current release — v0.1.x stabilisation, breaking changes, migration |
-| [`CHANGELOG.md`](CHANGELOG.md) | consolidated changelog across v0.1.0 and v0.1.1 (Keep a Changelog) |
+| [`RELEASE-NOTES-v0.2.0-alpha.1.md`](RELEASE-NOTES-v0.2.0-alpha.1.md) | current alpha — typed runtime error markers, marker-first HTTP classification |
+| [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md) | last stable — v0.1.x stabilisation, breaking changes, migration |
+| [`CHANGELOG.md`](CHANGELOG.md) | consolidated changelog (Keep a Changelog) |
 | [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md) | initial release-candidate notes (v0.1.0) — packages, compatibility, publish order, rollback |
 | [`docs/PUBLICATION-READINESS.md`](docs/PUBLICATION-READINESS.md) | publication audit |
 | [`docs/L4-API-DESIGN.md`](docs/L4-API-DESIGN.md) | L4 HTTP API design + integration evidence |
