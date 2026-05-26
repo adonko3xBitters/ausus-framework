@@ -8,7 +8,7 @@
     "bundle": "esbuild src/App.tsx --bundle --minify --format=esm --jsx=automatic --loader:.tsx=tsx --outfile=dist/bundle.js --alias:@ausus/renderer-react=../../../renderer/react/src/index.ts"
   },
   "dependencies": {
-    "@ausus/renderer-react": "0.1.0",
+    "@ausus/renderer-react": "0.1.1",
     "react":                 "^18.3.1 || ^19.0.0",
     "react-dom":             "^18.3.1 || ^19.0.0"
   },

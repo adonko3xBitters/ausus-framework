@@ -3,6 +3,22 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased] — v0.1.x stabilisation
+
+### Changed
+- **`bin/boot.php` refactored onto `Ausus\Application`.** Removes the
+  10-import, 30-line manual `Invoker` wiring used in v0.1.0; the boot
+  script is now `Application::create()->register()->boot()` followed
+  by a couple of `$app->invoke()` calls. CI step `5` continues to run
+  `composer boot` on every push.
+- **`src/HelloInvoiceDsl.php`** now uses the explicit
+  `->workflow(field: 'status', initial: 'DRAFT')` form. The manual
+  `HelloInvoicePlugin.php` shape is unchanged; both still compile to a
+  byte-identical `MetadataGraph` hash (playground test 10).
+- **`composer.json`** adds `ausus/standard-stack` to `require` so a
+  fresh `composer create-project ausus/starter` provides
+  `Ausus\Application` out of the box.
+
 ## [0.1.0] — 2026-05-19
 
 First public release. Project template that boots a working AUSUS app

@@ -3,6 +3,41 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased] — v0.1.x stabilisation
+
+### Documentation
+- **API stability sweep.** `Ausus\Api\Http\BadRequest` now carries an
+  `@internal` PHPDoc tag — it is the wire-error sentinel inside the
+  Router and is mapped to `400 Bad Request` by `ErrorMapper`. Consumers
+  MUST NOT catch or reference it; the public boundary is the HTTP
+  status code plus the `{ error: { code, message } }` JSON body.
+
+### Changed (BREAKING)
+- **`Router::resolveActor()` is now fail-closed.** A missing or empty
+  `X-Actor-Roles` header yields a roleless actor; every action with a
+  `requireRole(...)` policy returns `403 PolicyDenied`. The previous
+  behaviour substituted the HelloInvoice-specific role set
+  (`invoice.creator, invoice.issuer, invoice.canceler, invoice.viewer`)
+  — that fallback is gone. An authenticated gateway must set
+  `X-Actor-Roles` from the verified session.
+  See [Operations · Authenticated gateway](../../docs-site/docs/operations/authenticated-gateway.md).
+
+### Fixed (BREAKING in status-code terms, correctness wins)
+- **`ErrorMapper::classify()` short-name table corrected.** The map
+  referenced `PolicyDeniedException` / `EffectFailure` — class names
+  that never existed; the kernel's actual `PolicyDenied`,
+  `EffectFailed`, `NotFound`, `UnknownAction`, `WorkflowSubjectNotFound`,
+  `PolicySubjectRequired`, `ActorRequired`, `TenantContextRequired`,
+  `WorkflowGuardDenied` and `AuditEmissionFailed` silently routed to
+  `500 InternalError`. Each now maps to its documented status (403 /
+  404 / 400 / 500 per [HTTP routes reference](../../docs-site/docs/reference/http-routes.md#status-codes)).
+
+### Notes
+- Clients that ignored the HTTP status and relied solely on
+  `response.body.error.kind` are unaffected.
+- The route layout, request body shapes, and `OPTIONS *` CORS
+  behaviour are unchanged.
+
 ## [0.1.0] — 2026-05-19
 
 First public release. L4 — the HTTP API surface for the AUSUS metadata

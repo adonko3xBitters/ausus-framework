@@ -1,5 +1,15 @@
 # ausus/audit-database
 
+> ⚠️ **Name reservation only — not yet implemented.**
+> This package ships an empty composer manifest so the
+> `ausus/audit-database` name is reserved on Packagist. The actual
+> in-database audit sink is already provided by
+> [`ausus/persistence-sql`](../persistence-sql) as
+> `Ausus\Persistence\Sql\DatabaseAuditSink` — every successful action
+> writes to `kernel_audit_log` in the same transaction as the row it
+> changed. This standalone package will house the eventual split-out
+> implementation; v0.1.x consumers do not need to require it.
+
 L3 — `TransactionalSink` implementation writing audit entries to the same database as `ausus/persistence-sql`.
 
 ## Owned RFC surfaces

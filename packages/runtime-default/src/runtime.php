@@ -18,6 +18,15 @@ use Ausus\{
 // EFFECT CONTEXT IMPLEMENTATION
 // =============================================================================
 
+/**
+ * @internal Package-private. Public only because PHP cannot model
+ *           package visibility — this class is constructed exclusively
+ *           by {@see Invoker} and passed to {@see Effect::execute()} as
+ *           an {@see EffectContext}. Consumers MUST depend on the
+ *           `EffectContext` interface (the public contract); the
+ *           concrete class, its constructor signature, and its method
+ *           set carry no backward-compatibility guarantee.
+ */
 final class DefaultEffectContext implements EffectContext {
     public function __construct(
         private readonly PersistenceContext $persistence,

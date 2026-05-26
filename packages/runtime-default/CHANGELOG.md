@@ -3,6 +3,48 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased] — v0.1.x stabilisation
+
+### Documentation
+- **API stability sweep.** `DefaultEffectContext` now carries
+  `@internal` PHPDoc — consumers MUST depend on the
+  `Ausus\EffectContext` interface (the public contract), not on the
+  concrete class.
+
+### Added
+- **`UpdateEffect`** — backs `BuiltinEffect::Update`. Loads the entity
+  inside the Invoker transaction, polices the inputs against the
+  action's closed `updatableFields` list, refuses null on a
+  non-nullable field, and dispatches a partial patch through
+  `Repository::update()`. Empty inputs are an idempotent no-op
+  (returns the current `_version` without writing).
+- **`EffectDispatcher`** new `BuiltinEffect::Update` branch.
+- **`ProjectionRenderer.action-descriptors`** now always emit
+  `inputs[]` (was: missing). This unblocks the renderer's create- and
+  update-form generation end-to-end.
+- **`ProjectionRenderer`** injects `ActionDescriptor.initialValues` on
+  update-action descriptors when the projection renders a single
+  subject (`data.item`). Drives the renderer's prefill +
+  diff-payload submit branch.
+- **`FieldDescriptor.label`** now respects an explicit
+  `FieldBuilder::label(...)` value; falls back to the auto-humanised
+  field name only when none is declared.
+
+### Changed
+- **`ProjectionRenderer::render()` no longer reflects into the SQLite
+  driver's private PDO** — it iterates entities through the new
+  `Repository::findAll()` contract. As a side effect, projection
+  `data.items[i]` shapes are now consistent with `data.item` for
+  every field type (notably: `money` SQL NULL now reads back as PHP
+  null rather than the truncated tuple).
+- **`EffectDispatcher::dispatch()`** uses `BuiltinEffect::tryFrom()`
+  to resolve the sentinel string; behaviour for unknown class FQNs
+  is unchanged (`new ($action->effectClass)()`).
+
+### Notes
+- Existing custom `Effect` classes continue to dispatch through the
+  fallback branch. No public method signature changed.
+
 ## [0.1.0] — 2026-05-19
 
 First public release. L2 runtime: the Invoker chain and its co-engines

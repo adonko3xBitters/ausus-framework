@@ -3,6 +3,35 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased] — v0.1.x stabilisation
+
+### Documentation
+- **API stability sweep.** `SqliteTransactionHandle`, `SqliteContext`,
+  and `SqliteRepository` now carry `@internal` PHPDoc — consumers MUST
+  depend on the kernel interfaces (`TransactionHandle`,
+  `PersistenceContext`, `Repository`), not on the concrete classes.
+
+### Fixed
+- **Nullable-column serialisation (high severity).**
+  `serializeField()` used to route PHP null through `json_encode(null)`
+  (because `is_scalar(null)` is `false`), storing the literal
+  4-character string `"null"` on disk. Symmetric corruption hit
+  `integer` (stored `0`), `datetime` (stored `""`), and `money`
+  (stored `""` on disk; read back as `{amount: '', currency: '…'}`).
+  Fixed by a single null-guard at the top of `serializeField()` plus a
+  matching guard in `unwrapFields()` — every nullable type now
+  round-trips as a real PHP null / SQL NULL.
+  Regression-guarded by `apps/playground/null-roundtrip-test.php` (30
+  assertions, CI step `4h`).
+- **`SqliteRepository::findAll()`** added (kernel contract addition).
+  The projection renderer no longer reads the driver's private PDO via
+  `\ReflectionProperty` — list rendering walks the repository contract.
+
+### Notes
+- No SQL schema change. Existing rows on disk that were corrupted by
+  the pre-fix `serializeField()` are not rewritten; backfill is the
+  consumer's responsibility.
+
 ## [0.1.0] — 2026-05-19
 
 First public release. L3 driver: SQL-backed `PersistenceDriver` over PDO.

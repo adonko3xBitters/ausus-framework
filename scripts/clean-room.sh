@@ -12,7 +12,7 @@
 #   4.  composer boot        (starter standalone)
 #   5.  npm install          (workspace hoist)
 #   6.  npm run build        (renderer dist/)
-#   7.  npm run trace        (12 render assertions)
+#   7.  npm run trace        (render assertions; gate is failed=0)
 #   8.  npm pack --dry-run   (publishable tarball)
 #
 # Exits non-zero on any step failure. Streams transcript to stdout.
@@ -92,11 +92,13 @@ log "step 6 — npm run build"
 npm run build 2>&1 | tail -5
 [[ -f renderer/react/dist/index.js ]] || { echo "BUILD MISSING dist/index.js"; exit 5; }
 
-# ─── 7. npm trace (12 render assertions) ──────────────────────────────────────
+# ─── 7. npm trace (render assertions; gate is failed=0) ──────────────────────
 log "step 7 — npm run trace"
 npm run trace > /tmp/ausus-cleanroom-trace.log 2>&1
 tail -3 /tmp/ausus-cleanroom-trace.log
-grep -q "RESULT: passed=12 failed=0" /tmp/ausus-cleanroom-trace.log \
+# The assertion count grows as the trace adds coverage; only the
+# `failed=0` part is the gate. Mirrors scripts/ci.sh:147.
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-cleanroom-trace.log \
     || { echo "TRACE FAILED"; tail -40 /tmp/ausus-cleanroom-trace.log; exit 6; }
 
 # ─── 8. npm pack --dry-run (publishable tarball) ──────────────────────────────

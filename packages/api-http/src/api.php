@@ -308,6 +308,14 @@ final class ErrorMapper
 // (missing header, malformed body). ErrorMapper turns it into a 400.
 // ─────────────────────────────────────────────────────────────────────────────
 
+/**
+ * @internal Internal exception type, raised only by {@see Router} for
+ *           wire-protocol failures (missing headers, malformed JSON body,
+ *           unsupported method on a known path). The HTTP boundary maps it
+ *           to `400 Bad Request` via {@see ErrorMapper}. Consumers MUST
+ *           NOT catch or reference it — the stable boundary is the HTTP
+ *           status code and the JSON `{ error: { code, message } }` body.
+ */
 final class BadRequest extends \RuntimeException {}
 
 // ─────────────────────────────────────────────────────────────────────────────

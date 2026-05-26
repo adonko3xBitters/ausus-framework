@@ -13,11 +13,27 @@ use Ausus\{
 // SQLite-backed PersistenceDriver  (V0 minimal)
 // =============================================================================
 
+/**
+ * @internal Package-private. Public only because PHP cannot model
+ *           package visibility — constructed by {@see SqlitePersistenceDriver}
+ *           and passed back to it as a {@see TransactionHandle}. Consumers
+ *           MUST depend on the `TransactionHandle` interface (the public
+ *           contract); the concrete class and its public `$closed` flag
+ *           carry no backward-compatibility guarantee.
+ */
 final class SqliteTransactionHandle implements TransactionHandle {
     public function __construct(public readonly Tenant $tenantBound, public bool $closed = false) {}
     public function tenant(): Tenant { return $this->tenantBound; }
 }
 
+/**
+ * @internal Package-private. Public only because PHP cannot model
+ *           package visibility — manufactured by {@see SqlitePersistenceDriver}
+ *           once per transaction. Consumers MUST depend on the
+ *           {@see PersistenceContext} interface (the public contract); the
+ *           concrete class, its constructor signature, and its dependency
+ *           on the `MetadataGraph` are intra-package details.
+ */
 final class SqliteContext implements PersistenceContext {
     public function __construct(
         private readonly \PDO $pdo,
@@ -35,6 +51,14 @@ final class SqliteContext implements PersistenceContext {
     }
 }
 
+/**
+ * @internal Package-private. Public only because PHP cannot model
+ *           package visibility — instantiated by {@see SqliteContext::repository()}.
+ *           Consumers MUST depend on the {@see Repository} interface
+ *           (the public contract); the concrete class, its constructor
+ *           signature, and its private SQL emission are intra-package
+ *           details. Custom drivers ship their own Repository class.
+ */
 final class SqliteRepository implements Repository {
     public function __construct(
         private readonly \PDO $pdo,

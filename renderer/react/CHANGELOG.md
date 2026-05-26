@@ -3,6 +3,20 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased] — v0.1.x stabilisation
+
+### Documentation
+- **API stability declared explicitly.** The eight action-form helpers
+  exported from `src/components.tsx` (`inputDefault`, `initialFor`,
+  `isUnchanged`, `isRequired`, `shapeValue`, `validateInputs`,
+  `buildCreatePayload`, `buildUpdatePayload`) are now marked as
+  **stable** with `@public stable` TSDoc tags, and `README.md` carries
+  a new "API stability" section spelling out the v0.1.x
+  backward-compatibility guarantee, the permitted evolutions
+  (additive type-union entries, additive optional descriptor keys,
+  new helpers alongside the existing ones), and what counts as a
+  breaking change.
+
 ## [0.1.0] — 2026-05-19
 
 First public release. React 18 / 19 renderer for the AUSUS RFC-004
