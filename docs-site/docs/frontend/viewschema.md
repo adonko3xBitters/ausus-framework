@@ -157,6 +157,38 @@ backward-compatible.
 - `confirmation` is part of the `ActionDescriptor` type but is not populated by
   the v0.1.0 backend renderer.
 
+## Reserved fields {#reserved-fields}
+
+Some wire fields appear in the schema for forward compatibility — they are
+emitted today with a fixed v0.1.x value, but their value will become
+**dynamic** in a later minor release. Consumers MUST tolerate the documented
+v0.1.x value, MUST NOT pin assertions to it, and SHOULD render the future
+shape without code changes.
+
+| Field | v0.1.x value | Will carry in a later release |
+|---|---|---|
+| `targetProfile` | exactly `"react.web.v1"` | Other rendering profiles (e.g. `react.web.v2`, `react.native.v1`). |
+| `metadata.locale` | exactly `"en-US"` | Per-request locale negotiated from `Accept-Language`. |
+| `filters` | always `[]` | A list of `FilterDescriptor` items once filtering ships. |
+| `data.pagination.nextCursor` | always `null` (when `pagination` is present) | An opaque cursor string when there is another page; `null` when the current page is the last. |
+| `ActionDescriptor.confirmation` | declared in the TS type, never emitted by the v0.1.x backend renderer | `{ required: boolean, prompt?: string }` when the action is declared to require confirmation. |
+
+Forward-compatibility contract:
+
+- Reading code: treat `targetProfile` and `metadata.locale` as opaque strings;
+  do not branch on the exact v0.1.x value beyond a single "do I support this
+  profile?" gate at the consumer boundary.
+- Reading code: treat `filters: []` and `nextCursor: null` as the empty case of
+  the future shape — render the empty case today, render the populated case
+  when it ships.
+- Reading code: treat the **absence** of `ActionDescriptor.confirmation` and a
+  populated `confirmation.required: false` as equivalent ("no confirmation
+  required"). A populated `confirmation.required: true` will mean what the
+  TS type already says.
+- Producing code: outside the framework you SHOULD NOT emit non-default values
+  for these fields in v0.1.x — the renderer does not yet act on them and they
+  are reserved for the runtime to populate.
+
 ## Related {#related}
 
 - [Projections](../concepts/projections.md) — what renders into a ViewSchema.

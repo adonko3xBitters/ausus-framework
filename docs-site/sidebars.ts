@@ -11,6 +11,7 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
 const sidebars: SidebarsConfig = {
   docs: [
     'intro',
+    'glossary',
     {
       type: 'category',
       label: 'Getting Started',
@@ -20,6 +21,7 @@ const sidebars: SidebarsConfig = {
         'getting-started/first-app',
         'getting-started/hello-invoice',
         'getting-started/project-structure',
+        'getting-started/sample-apps',
       ],
     },
     {
@@ -78,7 +80,11 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Reference',
       items: [
+        'reference/application',
+        'reference/configuration',
         'reference/dsl',
+        'reference/http-routes',
+        'reference/view-schema-wire',
         'reference/errors',
       ],
     },
@@ -93,6 +99,8 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Operations',
       items: [
+        'operations/deployment',
+        'operations/authenticated-gateway',
         'operations/publication-runbook',
         'operations/release-rehearsal',
         'operations/package-integrity',
