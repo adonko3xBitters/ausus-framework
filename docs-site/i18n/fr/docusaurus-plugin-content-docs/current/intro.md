@@ -37,6 +37,19 @@ C'est l'idée centrale : le **graphe de métadonnées est l'application**. Les b
 les API et les interfaces utilisateur sont des rendus du même graphe plutôt que du code
 maintenu indépendamment.
 
+## Vue d'ensemble de l'architecture {#architecture-overview}
+
+La même image sous forme de flux — votre plugin entre par le haut ; tout ce
+qui suit est ce que le framework compile et exécute à partir de lui :
+
+![Pile architecturale AUSUS : les Plugins (L7) écrits par l'utilisateur alimentent le Compiler (L1) qui construit le MetadataGraph (L0) ; le Runtime (L2) lit le graphe et pilote les Drivers (L3) ; l'API HTTP (L4) et la couche Presentation (L5) exposent les données au moteur de rendu React (L6).](/img/diagrams/architecture.svg)
+
+Le pipeline d'invocation du runtime est détaillé dans
+[Le runtime](backend/runtime.md) ; le cycle de vie du graphe dans
+[Le graphe de métadonnées](concepts/metadata-graph.md) ;
+le flux de données du moteur de rendu dans
+[Le moteur de rendu React](frontend/react-renderer.md).
+
 ## Installation {#install}
 
 Créez un nouveau projet à partir du modèle de démarrage :

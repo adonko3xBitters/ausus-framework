@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 360" role="img" aria-label="HTTP request lifecycle: Router matches method and path, dispatches to /_health, /projections/{fqn} via ProjectionRenderer, or /actions/{fqn} via the Invoker; kernel exceptions are mapped by ErrorMapper to status codes">
+  <title>HTTP request lifecycle</title>
+  <desc>An inbound HTTP request enters the Router. The Router matches by method+path: /_health returns directly; /projections/{fqn} renders a ViewSchema via the ProjectionRenderer; /actions/{fqn} runs the full Invoker pipeline. Kernel exceptions are caught and mapped to HTTP status codes by the ErrorMapper. The final response is JSON with permissive CORS headers.</desc>
+  <defs>
+    <style><![CDATA[
+      .bg{fill:#fff}
+      .box{fill:#f6f7f9;stroke:#cbd5e1;stroke-width:1}
+      .req{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}
+      .res{fill:#d1fae5;stroke:#16a34a;stroke-width:1.5}
+      .err{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}
+      .title{font:600 13px system-ui,sans-serif;fill:#1a1a1a}
+      .sub{font:11px system-ui,sans-serif;fill:#475569}
+      .mono{font:11px ui-monospace,monospace;fill:#475569}
+      .arrow{fill:none;stroke:#475569;stroke-width:1.5}
+      .arrow-err{fill:none;stroke:#dc2626;stroke-width:1.5;stroke-dasharray:5 3}
+    ]]></style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <marker id="arr-err" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="820" height="360"/>
+
+  <!-- Request -->
+  <rect class="req" x="20" y="140" width="160" height="70" rx="8"/>
+  <text class="title" x="36" y="162">HTTP Request</text>
+  <text class="mono"  x="36" y="180">X-Tenant-ID</text>
+  <text class="mono"  x="36" y="194">X-Actor-Id / Roles</text>
+  <text class="mono"  x="36" y="208">body (POST)</text>
+
+  <!-- Router -->
+  <rect class="box" x="210" y="140" width="140" height="70" rx="8"/>
+  <text class="title" x="226" y="162">Router</text>
+  <text class="sub"   x="226" y="180">match method + path</text>
+  <text class="sub"   x="226" y="194">parse body</text>
+  <text class="sub"   x="226" y="208">resolve actor</text>
+
+  <!-- /_health -->
+  <rect class="box" x="390" y="30" width="200" height="60" rx="8"/>
+  <text class="title" x="406" y="52">GET /_health</text>
+  <text class="sub"   x="406" y="70">direct: graph hash +</text>
+  <text class="sub"   x="406" y="84">service identity</text>
+
+  <!-- /projections -->
+  <rect class="box" x="390" y="140" width="200" height="60" rx="8"/>
+  <text class="title" x="406" y="162">GET /projections/{fqn}</text>
+  <text class="sub"   x="406" y="180">ProjectionRenderer →</text>
+  <text class="sub"   x="406" y="194">ViewSchema JSON</text>
+
+  <!-- /actions -->
+  <rect class="box" x="390" y="250" width="200" height="60" rx="8"/>
+  <text class="title" x="406" y="272">POST /actions/{fqn}</text>
+  <text class="sub"   x="406" y="290">Invoker.invoke():</text>
+  <text class="sub"   x="406" y="304">5-step pipeline</text>
+
+  <!-- Response -->
+  <rect class="res" x="630" y="140" width="160" height="70" rx="8"/>
+  <text class="title" x="646" y="162">HTTP Response</text>
+  <text class="mono"  x="646" y="180">application/json</text>
+  <text class="mono"  x="646" y="194">CORS *</text>
+  <text class="sub"   x="646" y="208">+ status code</text>
+
+  <!-- ErrorMapper -->
+  <rect class="err" x="630" y="245" width="160" height="62" rx="8"/>
+  <text class="title" x="646" y="265">ErrorMapper</text>
+  <text class="sub"   x="646" y="282">kernel exception →</text>
+  <text class="sub"   x="646" y="296">HTTP 400/403/404/409/500</text>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M180,175 L210,175" marker-end="url(#arr)"/>
+  <path class="arrow" d="M350,160 L370,75 L390,60"  marker-end="url(#arr)"/>
+  <path class="arrow" d="M350,175 L390,170" marker-end="url(#arr)"/>
+  <path class="arrow" d="M350,190 L370,275 L390,280" marker-end="url(#arr)"/>
+
+  <path class="arrow" d="M590,60  L620,140" marker-end="url(#arr)"/>
+  <path class="arrow" d="M590,170 L630,175" marker-end="url(#arr)"/>
+  <path class="arrow" d="M590,280 L620,210" marker-end="url(#arr)"/>
+
+  <!-- error path -->
+  <path class="arrow-err" d="M490,310 L710,310 L710,307" marker-end="url(#arr-err)"/>
+  <path class="arrow-err" d="M710,245 L710,210" marker-end="url(#arr-err)"/>
+  <text class="sub" x="500" y="328" fill="#dc2626">on throw — exception caught and classified</text>
+</svg>

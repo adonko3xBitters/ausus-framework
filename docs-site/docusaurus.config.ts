@@ -37,6 +37,7 @@ const config: Config = {
   // files, if added later, still get full MDX.
   markdown: {
     format: 'detect',
+    mermaid: true,
   },
 
   presets: [
@@ -59,6 +60,7 @@ const config: Config = {
   ],
 
   themes: [
+    '@docusaurus/theme-mermaid',
     [
       require.resolve('@easyops-cn/docusaurus-search-local'),
       {
@@ -86,7 +88,7 @@ const config: Config = {
         {type: 'doc', docId: 'getting-started/installation', label: 'Getting Started', position: 'left'},
         {type: 'doc', docId: 'concepts/metadata-graph', label: 'Concepts', position: 'left'},
         {type: 'doc', docId: 'packages/index', label: 'Packages', position: 'left'},
-        {type: 'doc', docId: 'releases/v0.1.0', label: 'Release Notes', position: 'left'},
+        {type: 'doc', docId: 'releases/v0.1.1', label: 'Release Notes', position: 'left'},
         {type: 'doc', docId: 'operations/publication-runbook', label: 'Operations', position: 'left'},
         {type: 'docSidebar', sidebarId: 'docs', label: 'All Docs', position: 'left'},
         {href: GITHUB_REPO, label: 'GitHub', position: 'right'},
@@ -105,6 +107,7 @@ const config: Config = {
             {label: 'Installation', to: '/getting-started/installation'},
             {label: 'HelloInvoice tutorial', to: '/getting-started/hello-invoice'},
             {label: 'Packages', to: '/packages/'},
+            {label: 'Release Notes v0.1.1', to: '/releases/v0.1.1'},
             {label: 'Release Notes v0.1.0', to: '/releases/v0.1.0'},
           ],
         },

@@ -61,7 +61,10 @@ composer require ausus/persistence-sql
 composer require ausus/api-http        # optional — HTTP API surface
 ```
 
-Or pin the whole validated v0.1.0 set with the metapackage:
+Or pin the whole validated v0.1.0 set with one package. `ausus/standard-stack`
+bundles the four packages above **and** ships the high-level
+[`Ausus\Application`](first-app.md) bootstrap facade and its typed
+[`Ausus\ApplicationConfig`](first-app.md#typed-config-builder) builder:
 
 ```bash
 composer require ausus/standard-stack
@@ -113,5 +116,5 @@ no bundled dependencies and no CSS file — see
 
 ## Next {#next}
 
-- [Your first app](first-app.md) — wire the layers together by hand.
+- [Your first app](first-app.md) — bootstrap an app with `Ausus\Application`.
 - [HelloInvoice tutorial](hello-invoice.md) — a full domain, end to end.

@@ -11,6 +11,10 @@
     "message": "Concepts fondamentaux",
     "description": "The label for category 'Core Concepts' in sidebar 'docs'"
   },
+  "sidebar.docs.category.Tutorial: Ticket System": {
+    "message": "Tutoriel : système de tickets",
+    "description": "The label for category 'Tutorial: Ticket System' in sidebar 'docs'"
+  },
   "sidebar.docs.category.Backend": {
     "message": "Backend",
     "description": "The label for category 'Backend' in sidebar 'docs'"

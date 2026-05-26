@@ -48,6 +48,15 @@ import {
 | `WorkflowBadge` | composant | badge coloré pour un état de workflow |
 | `FieldDisplay` | composant | rend une cellule de champ selon le type |
 
+## Flux de données {#data-flow}
+
+Ce que fait une page rendue, de bout en bout :
+
+![Flux de données du moteur de rendu React : l'API HTTP sert une ViewSchema ; ViewSchemaConsumer la dispatche vers ListView (items) ou DetailView (item), chacun exposant des actions ; un clic sur une action ouvre ActionModal, qui construit son formulaire à partir d'action.inputs et POSTe vers /actions/{fqn}.](/img/diagrams/renderer-flow.svg)
+
+Le moteur de rendu n'inspecte jamais directement les types du domaine —
+chaque choix est fait à partir de la ViewSchema.
+
 ## Utilisation {#usage}
 
 Enveloppez votre application une fois dans `AususProvider`, puis rendez une projection :

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 460" role="img" aria-label="AUSUS architecture stack from L7 user plugins through the L0 metadata graph down to drivers and out to the HTTP API and React renderer">
+  <title>AUSUS architecture stack</title>
+  <desc>Plugins (L7, user code) flow through the L1 Compiler into the L0 MetadataGraph, which feeds the L2 Runtime; the runtime drives L3 SQL/audit drivers and the L4 HTTP API, which is rendered into L5 ViewSchema for the L6 React renderer.</desc>
+  <defs>
+    <style><![CDATA[
+      .bg{fill:#fff}
+      .layer{fill:#f6f7f9;stroke:#cbd5e1;stroke-width:1}
+      .layer-text{font:600 13px system-ui,sans-serif;fill:#1a1a1a}
+      .layer-sub{font:12px system-ui,sans-serif;fill:#475569}
+      .layer-tag{font:600 11px ui-monospace,monospace;fill:#475569}
+      .user{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}
+      .arrow{fill:none;stroke:#475569;stroke-width:1.5}
+      .arrow-dashed{fill:none;stroke:#94a3b8;stroke-width:1.5;stroke-dasharray:4 3}
+    ]]></style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="760" height="460"/>
+
+  <!-- L7 plugin -->
+  <rect class="user" x="40"  y="40" width="200" height="58" rx="8"/>
+  <text class="layer-tag"  x="56"  y="60">L7</text>
+  <text class="layer-text" x="86"  y="60">Plugins</text>
+  <text class="layer-sub"  x="56"  y="80">your domain code (entities,</text>
+  <text class="layer-sub"  x="56"  y="93">fields, actions, workflows)</text>
+
+  <!-- L1 compiler -->
+  <rect class="layer" x="290" y="40" width="160" height="58" rx="8"/>
+  <text class="layer-tag"  x="306" y="60">L1</text>
+  <text class="layer-text" x="336" y="60">Compiler</text>
+  <text class="layer-sub"  x="306" y="80">plugins →</text>
+  <text class="layer-sub"  x="306" y="93">MetadataGraph</text>
+
+  <!-- L0 graph -->
+  <rect class="layer" x="500" y="40" width="220" height="58" rx="8"/>
+  <text class="layer-tag"  x="516" y="60">L0</text>
+  <text class="layer-text" x="546" y="60">MetadataGraph</text>
+  <text class="layer-sub"  x="516" y="80">entities · actions · workflows ·</text>
+  <text class="layer-sub"  x="516" y="93">projections (immutable, hashed)</text>
+
+  <!-- L2 runtime -->
+  <rect class="layer" x="290" y="160" width="430" height="58" rx="8"/>
+  <text class="layer-tag"  x="306" y="180">L2</text>
+  <text class="layer-text" x="336" y="180">Runtime / Invoker</text>
+  <text class="layer-sub"  x="306" y="200">preflight → policy → workflow guard → effect → audit</text>
+  <text class="layer-sub"  x="306" y="213">(all inside one DB transaction)</text>
+
+  <!-- L3 drivers -->
+  <rect class="layer" x="40"  y="160" width="220" height="58" rx="8"/>
+  <text class="layer-tag"  x="56"  y="180">L3</text>
+  <text class="layer-text" x="86"  y="180">Drivers</text>
+  <text class="layer-sub"  x="56"  y="200">SQLite persistence ·</text>
+  <text class="layer-sub"  x="56"  y="213">database audit sink</text>
+
+  <!-- L4 HTTP -->
+  <rect class="layer" x="40"  y="270" width="220" height="58" rx="8"/>
+  <text class="layer-tag"  x="56"  y="290">L4</text>
+  <text class="layer-text" x="86"  y="290">HTTP API</text>
+  <text class="layer-sub"  x="56"  y="310">PSR-7/15 Router</text>
+  <text class="layer-sub"  x="56"  y="323">/projections · /actions</text>
+
+  <!-- L5 ViewSchema -->
+  <rect class="layer" x="290" y="270" width="200" height="58" rx="8"/>
+  <text class="layer-tag"  x="306" y="290">L5</text>
+  <text class="layer-text" x="336" y="290">Presentation</text>
+  <text class="layer-sub"  x="306" y="310">ProjectionRenderer</text>
+  <text class="layer-sub"  x="306" y="323">emits ViewSchema</text>
+
+  <!-- L6 renderer -->
+  <rect class="user" x="520" y="270" width="200" height="58" rx="8"/>
+  <text class="layer-tag"  x="536" y="290">L6</text>
+  <text class="layer-text" x="566" y="290">Renderer</text>
+  <text class="layer-sub"  x="536" y="310">@ausus/renderer-react</text>
+  <text class="layer-sub"  x="536" y="323">draws lists · detail · forms</text>
+
+  <!-- Arrows -->
+  <!-- plugin → compiler -->
+  <path class="arrow" d="M240,69 L290,69" marker-end="url(#arr)"/>
+  <!-- compiler → graph -->
+  <path class="arrow" d="M450,69 L500,69" marker-end="url(#arr)"/>
+  <!-- graph → runtime (down + left) -->
+  <path class="arrow" d="M610,98 L610,140 L505,140 L505,160" marker-end="url(#arr)"/>
+  <!-- runtime → drivers (left) -->
+  <path class="arrow" d="M290,189 L260,189" marker-end="url(#arr)"/>
+  <!-- runtime → HTTP (down + left) -->
+  <path class="arrow" d="M306,218 L306,250 L150,250 L150,270" marker-end="url(#arr)"/>
+  <!-- HTTP → ViewSchema -->
+  <path class="arrow" d="M260,299 L290,299" marker-end="url(#arr)"/>
+  <!-- ViewSchema → Renderer -->
+  <path class="arrow" d="M490,299 L520,299" marker-end="url(#arr)"/>
+  <!-- ViewSchema/Renderer uses graph (dashed, very long) -->
+  <path class="arrow-dashed" d="M600,270 L600,140 L720,140 L720,98" marker-end="url(#arr)"/>
+
+  <!-- legend -->
+  <rect x="40" y="395" width="14" height="14" rx="3" class="user"/>
+  <text class="layer-sub" x="60" y="406">user code</text>
+  <rect x="150" y="395" width="14" height="14" rx="3" class="layer"/>
+  <text class="layer-sub" x="170" y="406">framework</text>
+  <path class="arrow" d="M260,402 L290,402" marker-end="url(#arr)"/>
+  <text class="layer-sub" x="298" y="406">data flow</text>
+  <path class="arrow-dashed" d="M380,402 L410,402"/>
+  <text class="layer-sub" x="418" y="406">reads from</text>
+</svg>

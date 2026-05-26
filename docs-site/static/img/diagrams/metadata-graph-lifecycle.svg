@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" role="img" aria-label="Metadata graph lifecycle: plugins feed the compiler, which emits one MetadataGraph that the runtime, schema deriver, and projection renderer all consume">
+  <title>Metadata graph lifecycle</title>
+  <desc>Two plugins (A and B) are passed to Compiler::compile(), which produces a single immutable MetadataGraph. The graph is consumed by three downstream components: the Runtime/Invoker, the SchemaDeriver (which emits CREATE TABLE statements), and the ProjectionRenderer (which emits ViewSchema for L4).</desc>
+  <defs>
+    <style><![CDATA[
+      .bg{fill:#fff}
+      .box{fill:#f6f7f9;stroke:#cbd5e1;stroke-width:1}
+      .graph{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}
+      .title{font:600 13px system-ui,sans-serif;fill:#1a1a1a}
+      .sub{font:12px system-ui,sans-serif;fill:#475569}
+      .arrow{fill:none;stroke:#475569;stroke-width:1.5}
+    ]]></style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="760" height="340"/>
+
+  <!-- Plugins -->
+  <rect class="box" x="30" y="60" width="140" height="44" rx="8"/>
+  <text class="title" x="50" y="78">Plugin A</text>
+  <text class="sub"   x="50" y="95">describe()</text>
+
+  <rect class="box" x="30" y="180" width="140" height="44" rx="8"/>
+  <text class="title" x="50" y="198">Plugin B</text>
+  <text class="sub"   x="50" y="215">describe()</text>
+
+  <!-- Compiler -->
+  <rect class="box" x="220" y="120" width="160" height="60" rx="8"/>
+  <text class="title" x="240" y="145">Compiler::compile()</text>
+  <text class="sub"   x="240" y="163">collect · validate · hash</text>
+
+  <!-- Graph -->
+  <rect class="graph" x="430" y="120" width="170" height="60" rx="8"/>
+  <text class="title" x="450" y="145">MetadataGraph</text>
+  <text class="sub"   x="450" y="163">immutable · content-hashed</text>
+
+  <!-- Downstream consumers -->
+  <rect class="box" x="650" y="40" width="90" height="56" rx="8"/>
+  <text class="title" x="664" y="62">Runtime</text>
+  <text class="sub"   x="664" y="79">Invoker</text>
+  <text class="sub"   x="664" y="92">policies · WF</text>
+
+  <rect class="box" x="650" y="125" width="90" height="56" rx="8"/>
+  <text class="title" x="664" y="147">Schema</text>
+  <text class="title" x="664" y="161">Deriver</text>
+  <text class="sub"   x="664" y="178">CREATE TABLE</text>
+
+  <rect class="box" x="650" y="210" width="90" height="56" rx="8"/>
+  <text class="title" x="664" y="232">Projection</text>
+  <text class="title" x="664" y="246">Renderer</text>
+  <text class="sub"   x="664" y="263">ViewSchema</text>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M170,82 C195,82 200,142 220,142" marker-end="url(#arr)"/>
+  <path class="arrow" d="M170,202 C195,202 200,158 220,158" marker-end="url(#arr)"/>
+  <path class="arrow" d="M380,150 L430,150" marker-end="url(#arr)"/>
+
+  <path class="arrow" d="M600,140 C620,140 625,68 650,68"  marker-end="url(#arr)"/>
+  <path class="arrow" d="M600,150 L650,153"                marker-end="url(#arr)"/>
+  <path class="arrow" d="M600,160 C620,160 625,238 650,238" marker-end="url(#arr)"/>
+
+  <!-- caption -->
+  <text class="sub" x="30" y="305">One graph; three independent consumers — every layer below derives its behaviour from the same compiled value.</text>
+</svg>

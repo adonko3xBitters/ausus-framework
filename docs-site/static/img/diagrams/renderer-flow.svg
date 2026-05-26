@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 340" role="img" aria-label="React renderer data flow: API serves a ViewSchema; ViewSchemaConsumer dispatches to ListView or DetailView; an action button opens ActionModal which POSTs back to the actions endpoint">
+  <title>React renderer data flow</title>
+  <desc>The React renderer fetches a ViewSchema from GET /projections/{fqn}, hands it to ViewSchemaConsumer which dispatches to ListView (data.items) or DetailView (data.item), each of which surfaces action buttons. Clicking an action opens ActionModal, which builds its form from action.inputs and POSTs to /actions/{fqn} to invoke the runtime, then refetches the projection.</desc>
+  <defs>
+    <style><![CDATA[
+      .bg{fill:#fff}
+      .box{fill:#f6f7f9;stroke:#cbd5e1;stroke-width:1}
+      .api{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}
+      .schema{fill:#fef3c7;stroke:#d97706;stroke-width:1.5}
+      .title{font:600 13px system-ui,sans-serif;fill:#1a1a1a}
+      .sub{font:11px system-ui,sans-serif;fill:#475569}
+      .mono{font:11px ui-monospace,monospace;fill:#475569}
+      .arrow{fill:none;stroke:#475569;stroke-width:1.5}
+      .arrow-post{fill:none;stroke:#2563eb;stroke-width:1.5}
+    ]]></style>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+    <marker id="arr-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="820" height="340"/>
+
+  <!-- HTTP API GET -->
+  <rect class="api" x="20" y="130" width="150" height="60" rx="8"/>
+  <text class="title" x="36" y="152">HTTP API</text>
+  <text class="mono"  x="36" y="170">GET /projections/</text>
+  <text class="mono"  x="36" y="184">{fqn}</text>
+
+  <!-- ViewSchema -->
+  <rect class="schema" x="200" y="130" width="150" height="60" rx="8"/>
+  <text class="title" x="216" y="152">ViewSchema</text>
+  <text class="sub"   x="216" y="170">fields · actions</text>
+  <text class="sub"   x="216" y="184">data · metadata</text>
+
+  <!-- ViewSchemaConsumer -->
+  <rect class="box" x="380" y="130" width="150" height="60" rx="8"/>
+  <text class="title" x="396" y="152">ViewSchemaConsumer</text>
+  <text class="sub"   x="396" y="170">dispatch by data shape</text>
+  <text class="sub"   x="396" y="184">(items vs item)</text>
+
+  <!-- ListView -->
+  <rect class="box" x="560" y="30" width="150" height="60" rx="8"/>
+  <text class="title" x="576" y="52">ListView</text>
+  <text class="sub"   x="576" y="70">data.items shape</text>
+  <text class="sub"   x="576" y="84">table + ActionBar</text>
+
+  <!-- DetailView -->
+  <rect class="box" x="560" y="230" width="150" height="60" rx="8"/>
+  <text class="title" x="576" y="252">DetailView</text>
+  <text class="sub"   x="576" y="270">data.item shape</text>
+  <text class="sub"   x="576" y="284">dt/dd + ActionBar</text>
+
+  <!-- ActionModal -->
+  <rect class="box" x="560" y="130" width="240" height="60" rx="8"/>
+  <text class="title" x="576" y="152">ActionModal</text>
+  <text class="sub"   x="576" y="170">form built from action.inputs</text>
+  <text class="sub"   x="576" y="184">type-aware controls + validation</text>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M170,160 L200,160" marker-end="url(#arr)"/>
+  <path class="arrow" d="M350,160 L380,160" marker-end="url(#arr)"/>
+  <path class="arrow" d="M530,150 L560,80"  marker-end="url(#arr)"/>
+  <path class="arrow" d="M530,170 L560,240" marker-end="url(#arr)"/>
+  <path class="arrow" d="M635,90 L635,130"  marker-end="url(#arr)"/>
+  <path class="arrow" d="M635,230 L635,190" marker-end="url(#arr)"/>
+
+  <!-- ActionModal → POST → API -->
+  <path class="arrow-post" d="M680,190 C680,235 95,290 95,190" marker-end="url(#arr-blue)"/>
+  <text class="mono" x="380" y="278" fill="#2563eb">POST /actions/{fqn}</text>
+
+  <!-- caption -->
+  <text class="sub" x="20" y="320">Every choice in the UI — columns, badges, action buttons, form fields — is made from the ViewSchema. No domain types live in the renderer.</text>
+</svg>

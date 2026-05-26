@@ -22,6 +22,10 @@ and dispatches [actions](../concepts/entities-fields-actions.md#actions).
 
 Paths are served under a configurable prefix (default `/api`).
 
+A single request's path through the system:
+
+![HTTP request lifecycle: an inbound request enters the Router, which dispatches to /_health (direct), /projections/{fqn} (via ProjectionRenderer) or /actions/{fqn} (via the Invoker pipeline); any kernel exception is caught and classified by the ErrorMapper into an HTTP status, and the final response is JSON with permissive CORS.](/img/diagrams/http-lifecycle.svg)
+
 ### `GET /projections/{fqn}` {#get-projectionsfqn}
 
 Query parameters:
@@ -98,14 +102,63 @@ It works with any PSR-7 implementation. A minimal `Emitter` is included for the
 demo front controller; production deployments can swap in a fuller PSR-7
 emitter.
 
+## `Application::http()` — one-call entry point {#application-http}
+
+For typical front controllers, you do not need to construct the `Router`
+yourself. `Ausus\Application::http()` accepts a PSR-7 `ServerRequest`, lazily
+builds a `Router` against the booted graph/driver/audit-sink **once**, and
+returns the response:
+
+```php
+use Ausus\{Application, ApplicationConfig};
+use Ausus\Api\Http\Emitter;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7Server\ServerRequestCreator;
+
+$factory = new Psr17Factory();
+$app = Application::create(
+        ApplicationConfig::make()
+            ->tenant('acme')
+            ->roles(['invoice.creator', 'invoice.issuer'])
+            ->sqlite(__DIR__ . '/app.sqlite')
+            ->psr17($factory)
+    )
+    ->register(new HelloInvoiceDsl())
+    ->boot();
+
+$creator = new ServerRequestCreator($factory, $factory, $factory, $factory);
+Emitter::emit($app->http($creator->fromGlobals()));
+```
+
+Notes, and **why**:
+
+- **One `Router` per process.** `http()` caches the Router on first call and
+  reuses it; the existing `$app->router(...)` factory is unchanged and still
+  builds a fresh instance per call when you need a custom configuration.
+- **PSR-17 factories.** `ApplicationConfig::psr17($factory)` is the simplest
+  form (one object that implements both `ResponseFactoryInterface` and
+  `StreamFactoryInterface`, like nyholm's). Split factories
+  (`->responseFactory()`/`->streamFactory()`) are accepted if your library
+  ships them separately. **If you supply none**, `http()` auto-instantiates
+  `Nyholm\Psr7\Factory\Psr17Factory` when it is available on the autoloader;
+  otherwise it throws a clear message naming the fix.
+- **Tenant / actor behaviour is preserved.** `http()` does not bind a tenant
+  or actor — the Router still reads `X-Tenant-ID` and `X-Actor-*` per request,
+  exactly as before. The `Application`'s configured tenant/actor are used by
+  `invoke()` / `run()`, not by HTTP.
+- **Custom URL prefix.** `ApplicationConfig::apiPrefix('/v2')` mounts the
+  routes under a different prefix.
+
 ## Current v0.1.0 limitations {#current-v010-limitations}
 
 - **No authentication** (see the warning above) and CORS is wide open
   (`Access-Control-Allow-Origin: *`).
 - The action and projection routes are the whole surface — there is no
   metadata/graph introspection endpoint beyond `/_health`.
-- The `StubActor` role default, when `X-Actor-Roles` is omitted, is the
-  HelloInvoice role set — convenient for the demo, not a production default.
+- A missing `X-Actor-Roles` header produces a **roleless** actor — every
+  action that declares `->requireRole(...)` returns `403 PolicyDenied`. An
+  authenticated gateway in front of the Router is responsible for setting
+  the header from the verified identity.
 
 ## Related {#related}
 

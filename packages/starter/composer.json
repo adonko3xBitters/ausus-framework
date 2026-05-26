@@ -2,7 +2,7 @@
     "name": "ausus/starter",
     "type": "project",
     "version": "0.1.0",
-    "description": "AUSUS V0 starter template — boots a working HelloInvoice demo on top of kernel + persistence-sql + runtime-default. Installs via `composer create-project ausus/starter myapp`.",
+    "description": "AUSUS V0 starter template — boots a working HelloInvoice demo on top of the Standard Stack via Ausus\\Application. Installs via `composer create-project ausus/starter myapp`.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "starter", "scaffold"],
     "homepage": "https://github.com/ausus-framework/ausus",
@@ -12,7 +12,8 @@
         "ext-pdo_sqlite": "*",
         "ausus/kernel":           "0.1.*",
         "ausus/persistence-sql":  "0.1.*",
-        "ausus/runtime-default":  "0.1.*"
+        "ausus/runtime-default":  "0.1.*",
+        "ausus/standard-stack":   "0.1.*"
     },
     "autoload": {
         "classmap": ["src/"]

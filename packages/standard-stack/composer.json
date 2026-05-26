@@ -1,10 +1,10 @@
 {
     "name": "ausus/standard-stack",
-    "type": "metapackage",
+    "type": "library",
     "version": "0.1.0",
-    "description": "AUSUS — meta-package installing the V0 Standard Stack (kernel + persistence-sql + runtime-default + api-http). Skeleton packages (tenancy-row, audit-database, auth-bridge, presentation-default) will be added as their RFC-12 §16 implementations land.",
+    "description": "AUSUS — the V0 Standard Stack: bundles kernel + persistence-sql + runtime-default + api-http and ships the high-level Ausus\\Application bootstrap facade. Skeleton packages (tenancy-row, audit-database, auth-bridge, presentation-default) will be added as their RFC-12 §16 implementations land.",
     "license": "MIT",
-    "keywords": ["ausus", "framework", "stack"],
+    "keywords": ["ausus", "framework", "stack", "bootstrap", "application"],
     "homepage": "https://github.com/adonko3xBitters/ausus-framework",
     "require": {
         "php": ">=8.3",
@@ -13,9 +13,13 @@
         "ausus/persistence-sql":  "0.1.*",
         "ausus/api-http":         "0.1.*"
     },
+    "autoload": {
+        "classmap": ["src/"]
+    },
     "extra": {
         "ausus": {
-            "role": "meta",
+            "layer": "L5",
+            "role": "stack",
             "v0-scope": ["ausus/kernel", "ausus/runtime-default", "ausus/persistence-sql", "ausus/api-http"]
         }
     },

@@ -22,6 +22,10 @@ et dispatche les [actions](../concepts/entities-fields-actions.md#actions).
 
 Les chemins sont servis sous un préfixe configurable (par défaut `/api`).
 
+Le trajet d'une requête à travers le système :
+
+![Cycle de vie d'une requête HTTP : la requête entrante passe par le Router, qui la dispatche vers /_health (direct), /projections/{fqn} (via ProjectionRenderer) ou /actions/{fqn} (via le pipeline Invoker) ; toute exception du noyau est attrapée et classifiée par l'ErrorMapper en code HTTP, et la réponse finale est JSON avec CORS permissif.](/img/diagrams/http-lifecycle.svg)
+
 ### `GET /projections/{fqn}` {#get-projectionsfqn}
 
 Paramètres de requête :

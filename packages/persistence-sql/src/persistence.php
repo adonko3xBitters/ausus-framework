@@ -142,6 +142,25 @@ final class SqliteRepository implements Repository {
     }
 
     private function serializeField(FieldNode $f, mixed $value): mixed {
+        // Bypass every per-type coercion when the caller explicitly passed null.
+        //
+        // Why this guard exists, before any other branch:
+        //   - `is_scalar(null)` is FALSE in PHP — null is neither a scalar nor
+        //     an array. The default branch's `is_scalar(...) ? (string) ... : json_encode(...)`
+        //     therefore routes null into `json_encode(null)`, which returns the
+        //     4-character string `"null"` — silently corrupting nullable
+        //     columns with a literal text value.
+        //   - `(string) null` is the empty string `""`, which would corrupt
+        //     the `datetime` / `money` branches in the same way.
+        //   - `(int) null` is `0`, which would erase the null state of a
+        //     nullable integer column.
+        //
+        // PDO::execute() binds PHP null as SQL NULL, so returning null here
+        // produces a real SQL NULL on disk and a real PHP null on read-back —
+        // which is the entire purpose of `Field::*()->nullable()`.
+        if ($value === null) {
+            return null;
+        }
         return match ($f->type) {
             'money' => is_array($value)
                 ? (string) $value['amount']                   // store amount only; currency in $value['currency']
@@ -150,6 +169,17 @@ final class SqliteRepository implements Repository {
             'datetime' => (string) $value,
             default   => is_scalar($value) ? (string) $value : json_encode($value),
         };
+    }
+
+    public function findAll(): array {
+        $table = $this->tableName();
+        $stmt = $this->pdo->prepare("SELECT * FROM \"{$table}\" WHERE tenant_id = :tid ORDER BY id");
+        $stmt->execute(['tid' => $this->tenant->value()]);
+        $entities = [];
+        foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            $entities[] = $this->hydrate($row);
+        }
+        return $entities;
     }
 
     private function hydrate(array $row): Entity {
@@ -167,8 +197,17 @@ final class SqliteRepository implements Repository {
         foreach ($this->entity->fields as $f) {
             if (!array_key_exists($f->name, $row)) continue;
             $v = $row[$f->name];
+            // Symmetric with serializeField's null guard: a column that is
+            // SQL NULL on disk reads back as PHP null on every type — including
+            // `money`, which would otherwise be wrapped into
+            // `['amount' => '', 'currency' => '…']` and break the nullable
+            // contract.
+            if ($v === null) {
+                $out[$f->name] = null;
+                continue;
+            }
             $out[$f->name] = match ($f->type) {
-                'integer' => $v === null ? null : (int) $v,
+                'integer' => (int) $v,
                 'money'   => ['amount' => (string) $v, 'currency' => $f->typeOptions['currency'] ?? 'USD'],
                 default   => $v,
             };

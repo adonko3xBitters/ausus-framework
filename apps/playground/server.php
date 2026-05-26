@@ -19,13 +19,8 @@ declare(strict_types=1);
 
 require __DIR__ . '/../../vendor/autoload.php';
 
-use Ausus\{Compiler, Tenant, TenantId, ActorRef, StubActor};
-use Ausus\Persistence\Sql\{SqlitePersistenceDriver, SchemaDeriver, DatabaseAuditSink};
-use Ausus\Runtime\{
-    PolicyEngine, WorkflowRuntime, TransitionSetIndex, EffectDispatcher,
-    DefaultAuditor, SequenceCounter, Invoker,
-};
-use Ausus\Api\Http\{Router, Emitter};
+use Ausus\{Application, ApplicationConfig};
+use Ausus\Api\Http\Emitter;
 use Acme\Billing\HelloInvoicePlugin;
 
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -41,36 +36,31 @@ if ($reset && file_exists($dbPath)) @unlink($dbPath);
 $pdo = new PDO("sqlite:$dbPath");
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-$compiler = new Compiler();
-$graph    = $compiler->compile([new HelloInvoicePlugin()]);
-$driver   = new SqlitePersistenceDriver($pdo, $graph);
-$sink     = new DatabaseAuditSink($pdo);
+// Single PSR-17 factory; both the inbound ServerRequestCreator and the
+// internal Router used by $app->http() consume it.
+$factory = new Psr17Factory();
+
+// Compile + wire the runtime, then expose it over HTTP — all in one chain.
+// $app->http($request) returns the response; no Router construction here.
+$app = Application::create(
+        ApplicationConfig::make()
+            ->tenant('acme')
+            ->actorId('seed')
+            ->roles(['invoice.creator', 'invoice.issuer', 'invoice.canceler', 'invoice.viewer'])
+            ->pdo($pdo)
+            ->psr17($factory)
+    )
+    ->register(new HelloInvoicePlugin())
+    ->boot();
 
 if ($fresh) {
-    foreach (SchemaDeriver::deriveAll($graph) as $stmt) {
-        $pdo->exec($stmt);
-    }
     // Seed two invoices so the renderer has data to render on first GET.
-    $tenant  = new Tenant(new TenantId('acme'));
-    $actor   = new StubActor(
-        new ActorRef('user', 'seed', 'acme'),
-        ['invoice.creator', 'invoice.issuer', 'invoice.canceler', 'invoice.viewer'],
-    );
-    $invoker = new Invoker(
-        $graph, $driver,
-        new PolicyEngine($graph),
-        new WorkflowRuntime(new TransitionSetIndex($graph)),
-        new EffectDispatcher(),
-        new DefaultAuditor($sink),
-        new SequenceCounter(),
-        $tenant, $actor,
-    );
-    $invoker->invoke('billing.invoice.create', null, [
+    $app->invoke('billing.invoice.create', null, [
         'number'        => 'INV-2026-001',
         'customer_name' => 'ACME Corporation',
         'amount'        => ['amount' => '1500.00', 'currency' => 'USD'],
     ]);
-    $invoker->invoke('billing.invoice.create', null, [
+    $app->invoke('billing.invoice.create', null, [
         'number'        => 'INV-2026-002',
         'customer_name' => 'Globex Industries',
         'amount'        => ['amount' => '2750.00', 'currency' => 'USD'],
@@ -78,12 +68,6 @@ if ($fresh) {
     error_log('[ausus] seeded fresh DB at ' . $dbPath);
 }
 
-// ── PSR-7 factories + Router ─────────────────────────────────────────────────
-$factory  = new Psr17Factory();
-$creator  = new ServerRequestCreator($factory, $factory, $factory, $factory);
-$router   = new Router($graph, $driver, $sink, $factory, $factory, '/api');
-
 // ── Dispatch + emit ──────────────────────────────────────────────────────────
-$request  = $creator->fromGlobals();
-$response = $router->handle($request);
-Emitter::emit($response);
+$creator = new ServerRequestCreator($factory, $factory, $factory, $factory);
+Emitter::emit($app->http($creator->fromGlobals()));

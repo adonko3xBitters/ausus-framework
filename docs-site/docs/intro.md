@@ -37,6 +37,17 @@ This is the central idea: the **metadata graph is the application**. Backends,
 APIs, and UIs are renderings of the same graph rather than independently
 maintained code.
 
+## Architecture Overview {#architecture-overview}
+
+The same picture as a flow — your plugin enters at the top; everything below
+is what the framework compiles and runs from it:
+
+![AUSUS architecture stack: user-authored Plugins (L7) feed the Compiler (L1) which builds the MetadataGraph (L0); the Runtime (L2) reads the graph and drives the Drivers (L3); the HTTP API (L4) and Presentation (L5) layer expose data to the React Renderer (L6).](/img/diagrams/architecture.svg)
+
+The runtime's invocation pipeline is unpacked in [The Runtime](backend/runtime.md);
+the graph's lifecycle is in [The metadata graph](concepts/metadata-graph.md);
+the renderer's data flow is in [The React renderer](frontend/react-renderer.md).
+
 ## Install {#install}
 
 Create a new project from the starter template:
@@ -89,7 +100,7 @@ final class HelloInvoiceDsl extends DslPlugin
                               ->andTransition('status', from: 'ISSUED', to: 'CANCELLED')
                               ->requireRole('invoice.canceler'),
             ])
-            ->workflow('status')
+            ->workflow(field: 'status', initial: 'DRAFT')
             ->projection('summary',
                 fields:  ['id', 'number', 'customer_name', 'status', 'amount'],
                 actions: ['create', 'cancel'],

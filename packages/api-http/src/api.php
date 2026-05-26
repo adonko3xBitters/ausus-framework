@@ -177,12 +177,28 @@ final class Router implements RequestHandlerInterface
         return $hdr;
     }
 
+    /**
+     * Build the per-request actor from the wire headers.
+     *
+     * A missing or empty `X-Actor-Roles` header yields a **roleless** actor
+     * (`roles = []`). Every action that declares `->requireRole(...)` will
+     * then return `403 PolicyDenied` — which is the safe and consistent
+     * outcome for an unauthenticated caller.
+     *
+     * v0.1.0 used to substitute a HelloInvoice-specific demo role set
+     * (`invoice.creator` + 3 others). That was generic-unfriendly (any
+     * non-invoice domain saw a confusing 403 that named roles the consumer
+     * never declared) and quietly attached privileges to anonymous callers.
+     * Removed in favour of fail-closed behaviour; consumers must send
+     * `X-Actor-Roles` explicitly (typically from an authenticated gateway in
+     * front of the Router — see the danger admonition in backend/http-api.md).
+     */
     private function resolveActor(ServerRequestInterface $request, string $tenantId): StubActor
     {
         $id       = $request->getHeaderLine('X-Actor-Id') ?: 'anon';
         $rolesRaw = $request->getHeaderLine('X-Actor-Roles');
         $roles    = $rolesRaw === ''
-            ? ['invoice.creator', 'invoice.issuer', 'invoice.canceler', 'invoice.viewer']
+            ? []
             : array_values(array_filter(array_map('trim', explode(',', $rolesRaw))));
         return new StubActor(new ActorRef('user', $id, $tenantId), $roles);
     }
@@ -221,15 +237,26 @@ final class Router implements RequestHandlerInterface
 // ─────────────────────────────────────────────────────────────────────────────
 // ErrorMapper — kernel exception taxonomy → HTTP status + envelope.
 //
-// Mapping (RFC-001 §A-1.5, RFC-006 Amendment-01, RFC-007 Amendment-01):
+// Maps the actual class short-names declared in packages/kernel/src/kernel.php
+// (the previous map referenced legacy names `PolicyDeniedException` and
+// `EffectFailure`, which never matched the kernel's `PolicyDenied` /
+// `EffectFailed` and silently fell through to 500).
 //
-//   BadRequest               → 400  Bad Request
-//   MalformedDescriptor      → 400  Bad Request
-//   PolicyDeniedException    → 403  Forbidden
-//   TenantBoundaryViolation  → 403  Forbidden
-//   WorkflowStateMismatch    → 409  Conflict
-//   ConcurrencyConflict      → 409  Conflict
-//   EffectFailure / unknown  → 500  Internal Server Error
+//   BadRequest                → 400  Bad Request
+//   PolicySubjectRequired     → 400
+//   ActorRequired             → 400
+//   TenantContextRequired     → 400
+//   PolicyDenied              → 403  Forbidden
+//   TenantBoundaryViolation   → 403
+//   WorkflowGuardDenied       → 403
+//   UnknownAction             → 404  Not Found
+//   NotFound                  → 404
+//   WorkflowSubjectNotFound   → 404
+//   WorkflowStateMismatch     → 409  Conflict
+//   ConcurrencyConflict       → 409
+//   EffectFailed              → 500  Internal Server Error
+//   AuditEmissionFailed       → 500
+//   any other throwable       → 500  InternalError
 // ─────────────────────────────────────────────────────────────────────────────
 
 final class ErrorMapper
@@ -258,12 +285,19 @@ final class ErrorMapper
         $short = (new \ReflectionClass($e))->getShortName();
         return match ($short) {
             'BadRequest'              => [400, 'BadRequest'],
-            'MalformedDescriptor'     => [400, 'MalformedDescriptor'],
-            'PolicyDeniedException'   => [403, 'PolicyDenied'],
+            'PolicySubjectRequired'   => [400, 'PolicySubjectRequired'],
+            'ActorRequired'           => [400, 'ActorRequired'],
+            'TenantContextRequired'   => [400, 'TenantContextRequired'],
+            'PolicyDenied'            => [403, 'PolicyDenied'],
             'TenantBoundaryViolation' => [403, 'TenantBoundaryViolation'],
+            'WorkflowGuardDenied'     => [403, 'WorkflowGuardDenied'],
+            'UnknownAction'           => [404, 'UnknownAction'],
+            'NotFound'                => [404, 'NotFound'],
+            'WorkflowSubjectNotFound' => [404, 'WorkflowSubjectNotFound'],
             'WorkflowStateMismatch'   => [409, 'WorkflowStateMismatch'],
             'ConcurrencyConflict'     => [409, 'ConcurrencyConflict'],
-            'EffectFailure'           => [500, 'EffectFailure'],
+            'EffectFailed'            => [500, 'EffectFailed'],
+            'AuditEmissionFailed'     => [500, 'AuditEmissionFailed'],
             default                   => [500, 'InternalError'],
         };
     }

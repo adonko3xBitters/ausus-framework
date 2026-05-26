@@ -107,6 +107,38 @@ de rester rétrocompatible.
 - `confirmation` fait partie du type `ActionDescriptor` mais n'est pas renseigné par
   le moteur de rendu backend de la v0.1.0.
 
+## Champs réservés {#reserved-fields}
+
+Certains champs du wire format apparaissent dans le schéma pour la compatibilité
+ascendante — ils sont émis aujourd'hui avec une valeur v0.1.x fixe, mais leur
+valeur deviendra **dynamique** dans une future version mineure. Les consommateurs
+DOIVENT tolérer la valeur v0.1.x documentée, NE DOIVENT PAS épingler d'assertions
+sur cette valeur, et DEVRAIENT rendre la forme future sans changement de code.
+
+| Champ | Valeur v0.1.x | Portera dans une version ultérieure |
+|---|---|---|
+| `targetProfile` | exactement `"react.web.v1"` | D'autres profils de rendu (par ex. `react.web.v2`, `react.native.v1`). |
+| `metadata.locale` | exactement `"en-US"` | La locale négociée par requête depuis `Accept-Language`. |
+| `filters` | toujours `[]` | Une liste d'éléments `FilterDescriptor` une fois le filtrage livré. |
+| `data.pagination.nextCursor` | toujours `null` (quand `pagination` est présent) | Une chaîne curseur opaque quand une page suivante existe ; `null` quand la page courante est la dernière. |
+| `ActionDescriptor.confirmation` | déclaré dans le type TS, jamais émis par le moteur de rendu backend v0.1.x | `{ required: boolean, prompt?: string }` quand l'action est déclarée comme nécessitant une confirmation. |
+
+Contrat de compatibilité ascendante :
+
+- Code lecteur : traitez `targetProfile` et `metadata.locale` comme des chaînes
+  opaques ; ne branchez pas sur la valeur exacte v0.1.x au-delà d'une seule
+  porte "est-ce que je supporte ce profil ?" à la frontière du consommateur.
+- Code lecteur : traitez `filters: []` et `nextCursor: null` comme le cas vide
+  de la forme future — rendez le cas vide aujourd'hui, rendez le cas peuplé
+  quand il sera livré.
+- Code lecteur : traitez l'**absence** de `ActionDescriptor.confirmation` et un
+  `confirmation.required: false` peuplé comme équivalents ("aucune confirmation
+  requise"). Un `confirmation.required: true` peuplé signifiera ce que le type
+  TS dit déjà.
+- Code producteur : en dehors du framework, vous NE DEVRIEZ PAS émettre de
+  valeurs non par défaut pour ces champs en v0.1.x — le moteur de rendu n'agit
+  pas encore dessus et ils sont réservés pour le runtime.
+
 ## Voir aussi {#related}
 
 - [Projections](../concepts/projections.md) — ce qui est rendu en un ViewSchema.

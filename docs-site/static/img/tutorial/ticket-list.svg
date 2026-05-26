@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" role="img" aria-label="Ticket System list view rendered by the AUSUS React renderer">
+  <title>Ticket System list view rendered by the AUSUS React renderer</title>
+  <desc>Three tickets in a table: an OPEN HIGH-priority ticket with a Start button, an IN_PROGRESS NORMAL-priority ticket with a Resolve button, and a RESOLVED LOW-priority ticket with a Close button. The header carries a Create button.</desc>
+  <defs>
+    <style><![CDATA[
+      .bg{fill:#f6f7f9}
+      .card{fill:#fff;stroke:#e3e3e3;stroke-width:1}
+      .sep{stroke:#eee;stroke-width:1}
+      .head{font:600 14px system-ui,sans-serif;fill:#1a1a1a}
+      .title{font:600 18px system-ui,sans-serif;fill:#1a1a1a}
+      .col{font:500 12px system-ui,sans-serif;fill:#666}
+      .cell{font:13px system-ui,sans-serif;fill:#1a1a1a}
+      .mono{font:12px ui-monospace,monospace;fill:#1a1a1a}
+      .badge-text{font:600 11px system-ui,sans-serif;fill:#1a1a1a}
+      .btn-text{font:500 11px system-ui,sans-serif;fill:#1a1a1a}
+      .btn-text-primary{font:500 11px system-ui,sans-serif;fill:#fff}
+    ]]></style>
+  </defs>
+
+  <rect class="bg" width="800" height="380"/>
+
+  <!-- top header bar -->
+  <rect x="0" y="0" width="800" height="40" fill="#fff"/>
+  <line x1="0" y1="40" x2="800" y2="40" stroke="#e3e3e3"/>
+  <text class="head" x="20" y="25">Ticket System · tenant <tspan font-family="ui-monospace,monospace" font-size="12">helpdesk</tspan></text>
+
+  <!-- title row -->
+  <text class="title" x="20" y="75">helpdesk.ticket.summary</text>
+  <rect x="700" y="58" width="80" height="26" rx="6" fill="#2563eb" stroke="#2563eb"/>
+  <text class="btn-text-primary" x="722" y="76">Create</text>
+
+  <!-- table card -->
+  <rect class="card" x="20" y="98" width="760" height="262" rx="2"/>
+
+  <!-- thead -->
+  <rect x="21" y="99" width="758" height="30" fill="#fafafa"/>
+  <text class="col" x="36"  y="118">Id</text>
+  <text class="col" x="160" y="118">Title</text>
+  <text class="col" x="400" y="118">Requester</text>
+  <text class="col" x="520" y="118">Priority</text>
+  <text class="col" x="600" y="118">Status</text>
+  <text class="col" x="690" y="118">Actions</text>
+  <line class="sep" x1="21" y1="129" x2="779" y2="129"/>
+
+  <!-- row 1: OPEN, HIGH -->
+  <text class="mono" x="36"  y="160">01J7HG…D3K</text>
+  <text class="cell" x="160" y="160">Printer on floor 3 is offline</text>
+  <text class="cell" x="400" y="160">dana@example.com</text>
+  <text class="cell" x="520" y="160">HIGH</text>
+  <rect x="598" y="146" width="56" height="20" rx="10" fill="#e6e6e6"/>
+  <text class="badge-text" x="612" y="160">OPEN</text>
+  <rect x="690" y="144" width="60" height="24" rx="6" fill="#fff" stroke="#ccc"/>
+  <text class="btn-text" x="709" y="160">Start</text>
+  <line class="sep" x1="21" y1="180" x2="779" y2="180"/>
+
+  <!-- row 2: IN_PROGRESS, NORMAL -->
+  <text class="mono" x="36"  y="211">01J7HG…F7M</text>
+  <text class="cell" x="160" y="211">VPN drops every hour</text>
+  <text class="cell" x="400" y="211">sam@example.com</text>
+  <text class="cell" x="520" y="211">NORMAL</text>
+  <rect x="598" y="197" width="100" height="20" rx="10" fill="#dbeafe"/>
+  <text class="badge-text" x="608" y="211">IN_PROGRESS</text>
+  <rect x="690" y="195" width="70" height="24" rx="6" fill="#fff" stroke="#ccc"/>
+  <text class="btn-text" x="704" y="211">Resolve</text>
+  <line class="sep" x1="21" y1="231" x2="779" y2="231"/>
+
+  <!-- row 3: RESOLVED, LOW -->
+  <text class="mono" x="36"  y="262">01J7HG…J2N</text>
+  <text class="cell" x="160" y="262">Request a second monitor</text>
+  <text class="cell" x="400" y="262">lee@example.com</text>
+  <text class="cell" x="520" y="262">LOW</text>
+  <rect x="598" y="248" width="80" height="20" rx="10" fill="#d1fae5"/>
+  <text class="badge-text" x="608" y="262">RESOLVED</text>
+  <rect x="690" y="246" width="62" height="24" rx="6" fill="#fff" stroke="#ccc"/>
+  <text class="btn-text" x="708" y="262">Close</text>
+  <line class="sep" x1="21" y1="282" x2="779" y2="282"/>
+
+  <!-- footer caption -->
+  <text class="col" x="20" y="358" fill="#999">SVG mockup of the @ausus/renderer-react ListView for helpdesk.ticket.summary — not a photographic screenshot.</text>
+</svg>

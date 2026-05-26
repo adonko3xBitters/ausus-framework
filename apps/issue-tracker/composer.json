@@ -1,0 +1,23 @@
+{
+    "name": "ausus-sample/issue-tracker",
+    "description": "AUSUS v0.1.x sample — small production-style issue tracker (3 entities, 2 workflows, 5 projections).",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "ausus/standard-stack": "0.1.*",
+        "nyholm/psr7":          "^1.8",
+        "nyholm/psr7-server":   "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "IssueTracker\\": "src/"
+        }
+    },
+    "scripts": {
+        "seed":  "@php bin/seed.php",
+        "smoke": "@php tests/smoke.php",
+        "serve": "@php -S 127.0.0.1:8787 -t public public/server.php"
+    },
+    "minimum-stability": "stable"
+}

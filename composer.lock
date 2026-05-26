@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "313bd32adcac50428020cafbff8b4d53",
+    "content-hash": "e86f9e7e97924e56463bca32cb276ffe",
     "packages": [
         {
             "name": "ausus/api-http",
@@ -196,17 +196,68 @@
             }
         },
         {
+            "name": "ausus/standard-stack",
+            "version": "0.1.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/standard-stack",
+                "reference": "86d69324a8038c3dbb97fc025439ba1f9bd1063d"
+            },
+            "require": {
+                "ausus/api-http": "0.1.*",
+                "ausus/kernel": "0.1.*",
+                "ausus/persistence-sql": "0.1.*",
+                "ausus/runtime-default": "0.1.*",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L5",
+                    "role": "stack",
+                    "v0-scope": [
+                        "ausus/kernel",
+                        "ausus/runtime-default",
+                        "ausus/persistence-sql",
+                        "ausus/api-http"
+                    ]
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS — the V0 Standard Stack: bundles kernel + persistence-sql + runtime-default + api-http and ships the high-level Ausus\\Application bootstrap facade. Skeleton packages (tenancy-row, audit-database, auth-bridge, presentation-default) will be added as their RFC-12 §16 implementations land.",
+            "homepage": "https://github.com/adonko3xBitters/ausus-framework",
+            "keywords": [
+                "application",
+                "ausus",
+                "bootstrap",
+                "framework",
+                "stack"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "ausus/starter",
             "version": "0.1.0",
             "dist": {
                 "type": "path",
                 "url": "packages/starter",
-                "reference": "7ad73731d6ffc502d09fb5c91cd1878fa1b52e79"
+                "reference": "182abcbe3595d29272e9c3ae8259e3b16f39d3d2"
             },
             "require": {
                 "ausus/kernel": "0.1.*",
                 "ausus/persistence-sql": "0.1.*",
                 "ausus/runtime-default": "0.1.*",
+                "ausus/standard-stack": "0.1.*",
                 "ext-pdo": "*",
                 "ext-pdo_sqlite": "*",
                 "php": ">=8.3"
@@ -240,7 +291,7 @@
             "license": [
                 "MIT"
             ],
-            "description": "AUSUS V0 starter template — boots a working HelloInvoice demo on top of kernel + persistence-sql + runtime-default. Installs via `composer create-project ausus/starter myapp`.",
+            "description": "AUSUS V0 starter template — boots a working HelloInvoice demo on top of the Standard Stack via Ausus\\Application. Installs via `composer create-project ausus/starter myapp`.",
             "homepage": "https://github.com/ausus-framework/ausus",
             "keywords": [
                 "ausus",
