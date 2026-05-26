@@ -1,7 +1,6 @@
 {
     "name": "ausus/tenancy-row",
     "type": "library",
-    "version": "0.1.1",
     "description": "AUSUS — row-level TenantIsolationStrategy (RFC-003). Skeleton: name reserved; implementation pending.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "tenancy", "row-level"],

@@ -1,7 +1,6 @@
 {
     "name": "ausus/presentation-default",
     "type": "library",
-    "version": "0.1.1",
     "description": "AUSUS — L5 Presentation + L3 ReportingDriver + standard field types (RFC-004, RFC-010, RFC-012 §7/§8). Skeleton: name reserved; ProjectionRenderer is V0-shipped inside ausus/runtime-default.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "presentation", "viewschema"],
