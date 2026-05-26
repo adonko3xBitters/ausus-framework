@@ -1,7 +1,6 @@
 {
     "name": "ausus/starter",
     "type": "project",
-    "version": "0.1.1",
     "description": "AUSUS V0 starter template — boots a working HelloInvoice demo on top of the Standard Stack via Ausus\\Application. Installs via `composer create-project ausus/starter myapp`.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "starter", "scaffold"],
