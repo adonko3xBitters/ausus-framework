@@ -4,15 +4,15 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e86f9e7e97924e56463bca32cb276ffe",
+    "content-hash": "3f6f7dcc944df55045f27440dcc52491",
     "packages": [
         {
             "name": "ausus/api-http",
-            "version": "0.1.0",
+            "version": "0.1.999",
             "dist": {
                 "type": "path",
                 "url": "packages/api-http",
-                "reference": "caa8bff8687c219efdb197dd87ef0861cabeb12a"
+                "reference": "b5e33e33dc098bcb499b05ded45bdf37147f5a93"
             },
             "require": {
                 "ausus/kernel": "0.1.*",
@@ -55,11 +55,11 @@
         },
         {
             "name": "ausus/kernel",
-            "version": "0.1.0",
+            "version": "0.1.999",
             "dist": {
                 "type": "path",
                 "url": "packages/kernel",
-                "reference": "7a04e4064163a7325eb56a32150882fc44ba99f6"
+                "reference": "7bca2a6b48c619bb35d79cbc9c3f38fd30770efd"
             },
             "require": {
                 "php": ">=8.3"
@@ -99,11 +99,11 @@
         },
         {
             "name": "ausus/persistence-sql",
-            "version": "0.1.0",
+            "version": "0.1.999",
             "dist": {
                 "type": "path",
                 "url": "packages/persistence-sql",
-                "reference": "14898d25b9ed77676079fbe4690b07a06c0c62ae"
+                "reference": "f3ecc2655e2a6361511e6ed5e8f74071af68625b"
             },
             "require": {
                 "ausus/kernel": "0.1.*",
@@ -151,11 +151,11 @@
         },
         {
             "name": "ausus/runtime-default",
-            "version": "0.1.0",
+            "version": "0.1.999",
             "dist": {
                 "type": "path",
                 "url": "packages/runtime-default",
-                "reference": "46eab568eac3cb9a59721f2e0c645a36191310b4"
+                "reference": "800b2b7e0434e59c129f19cd05590345aaa41e3a"
             },
             "require": {
                 "ausus/kernel": "0.1.*",
@@ -197,11 +197,11 @@
         },
         {
             "name": "ausus/standard-stack",
-            "version": "0.1.0",
+            "version": "0.1.999",
             "dist": {
                 "type": "path",
                 "url": "packages/standard-stack",
-                "reference": "86d69324a8038c3dbb97fc025439ba1f9bd1063d"
+                "reference": "5d70516ccb5ddf9bc09c80f69ba5247dd68caa8d"
             },
             "require": {
                 "ausus/api-http": "0.1.*",
@@ -247,11 +247,11 @@
         },
         {
             "name": "ausus/starter",
-            "version": "0.1.0",
+            "version": "0.1.999",
             "dist": {
                 "type": "path",
                 "url": "packages/starter",
-                "reference": "182abcbe3595d29272e9c3ae8259e3b16f39d3d2"
+                "reference": "cc089ecb1d831ffb897678ca845c4365ad6f8344"
             },
             "require": {
                 "ausus/kernel": "0.1.*",
