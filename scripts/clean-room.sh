@@ -9,6 +9,7 @@
 #   1.  composer validate    (every manifest)
 #   2.  composer install     (from path repos)
 #   3.  php playground       (36 assertions)
+#   3b. error-taxonomy       (Phase C marker-first dispatch; gate is failed=0)
 #   4.  composer boot        (starter standalone)
 #   5.  npm install          (workspace hoist)
 #   6.  npm run build        (renderer dist/)
@@ -75,6 +76,13 @@ php apps/playground/run.php > /tmp/ausus-cleanroom-php.log 2>&1
 tail -3 /tmp/ausus-cleanroom-php.log
 grep -q "RESULT: passed=36 failed=0" /tmp/ausus-cleanroom-php.log \
     || { echo "PHP SMOKE FAILED"; cat /tmp/ausus-cleanroom-php.log; exit 3; }
+
+# ─── 3b. error-taxonomy (Phase C marker dispatch; gate is failed=0) ───────────
+log "step 3b — php apps/playground/error-taxonomy-test.php"
+php apps/playground/error-taxonomy-test.php > /tmp/ausus-cleanroom-errors.log 2>&1
+tail -3 /tmp/ausus-cleanroom-errors.log
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-cleanroom-errors.log \
+    || { echo "ERROR-TAXONOMY FAILED"; cat /tmp/ausus-cleanroom-errors.log; exit 3; }
 
 # ─── 4. composer boot (starter standalone) ────────────────────────────────────
 log "step 4 — composer --working-dir=packages/starter boot"

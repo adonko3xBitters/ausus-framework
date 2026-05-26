@@ -19,6 +19,7 @@
 #   4g. issue-tracker smoke  end-to-end sample-app assertions
 #   4h. null-roundtrip       nullable field SQL ↔ PHP ↔ JSON regression
 #   4i. update-action        ADR-0002 Action::update(...) + UpdateEffect tests
+#   4j. error-taxonomy       Phase C marker-first ErrorMapper dispatch tests
 #   5. composer boot         starter standalone
 #   6. npm ci                workspace lockfile-strict install (falls back to install)
 #   7. npm run build         renderer/react/dist
@@ -120,6 +121,13 @@ php apps/playground/update-action-test.php > /tmp/ausus-ci-update.log 2>&1
 grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-update.log \
     && echo "  ✓ update-action $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-update.log | head -1)" \
     || { echo "update-action failed"; tail -50 /tmp/ausus-ci-update.log; exit 4; }
+
+# 4j
+echo "[ci] step 4j — php apps/playground/error-taxonomy-test.php"
+php apps/playground/error-taxonomy-test.php > /tmp/ausus-ci-errors.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-errors.log \
+    && echo "  ✓ error-taxonomy $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-errors.log | head -1)" \
+    || { echo "error-taxonomy failed"; tail -50 /tmp/ausus-ci-errors.log; exit 4; }
 
 # 5
 echo "[ci] step 5 — composer boot (starter)"
