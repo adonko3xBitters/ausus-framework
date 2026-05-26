@@ -283,6 +283,26 @@ final class ErrorMapper
     private static function classify(\Throwable $e): array
     {
         $short = (new \ReflectionClass($e))->getShortName();
+
+        // ── 1. Marker-first dispatch (Phase C of the typed-exception design).
+        //      A custom plugin exception implementing one of the marker
+        //      interfaces in `Ausus\Errors\*` automatically routes to the
+        //      marker's HTTP status — no edit to this method required. Every
+        //      kernel exception implements exactly one marker (pinned by
+        //      apps/playground/error-taxonomy-test.php). Wire `error.kind`
+        //      remains the short class name, bit-identical to v0.1.1.
+        if ($e instanceof \Ausus\Errors\BadRequestError) return [400, $short];
+        if ($e instanceof \Ausus\Errors\ForbiddenError)  return [403, $short];
+        if ($e instanceof \Ausus\Errors\NotFoundError)   return [404, $short];
+        if ($e instanceof \Ausus\Errors\ConflictError)   return [409, $short];
+        if ($e instanceof \Ausus\Errors\InternalError)   return [500, $short];
+
+        // ── 2. Legacy short-name fallback — preserved verbatim. Dead path for
+        //      kernel exceptions (all opted in to a marker), kept for forward
+        //      compatibility with any out-of-tree exception whose short-name
+        //      happens to collide with a kernel class. The final
+        //      `default => [500, 'InternalError']` arm is the catch-all for
+        //      every other throwable, identical to v0.1.1.
         return match ($short) {
             'BadRequest'              => [400, 'BadRequest'],
             'PolicySubjectRequired'   => [400, 'PolicySubjectRequired'],
@@ -316,7 +336,7 @@ final class ErrorMapper
  *           NOT catch or reference it — the stable boundary is the HTTP
  *           status code and the JSON `{ error: { code, message } }` body.
  */
-final class BadRequest extends \RuntimeException {}
+final class BadRequest extends \RuntimeException implements \Ausus\Errors\BadRequestError {}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Emitter — minimal PSR-7 → SAPI emit. Used by the demo front controller.
