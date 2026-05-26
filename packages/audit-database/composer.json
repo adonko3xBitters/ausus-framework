@@ -1,7 +1,6 @@
 {
     "name": "ausus/audit-database",
     "type": "library",
-    "version": "0.1.1",
     "description": "AUSUS — Database TransactionalSink (RFC-007). Skeleton: name reserved; V0 ships an inline DatabaseAuditSink inside ausus/persistence-sql.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "audit", "transactional"],
