@@ -7,7 +7,7 @@
 [![PHP](https://img.shields.io/badge/PHP-%E2%89%A5%208.3-777BB4.svg)](https://www.php.net/)
 [![Node](https://img.shields.io/badge/Node-%E2%89%A5%2018-339933.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18%20%7C%2019-61DAFB.svg)](https://react.dev/)
-[![Version](https://img.shields.io/badge/version-0.1.0--rc-blue.svg)](RELEASE-NOTES-v0.1.0.md)
+[![Version](https://img.shields.io/badge/version-0.1.1-blue.svg)](RELEASE-NOTES-v0.1.1.md)
 
 AUSUS is a PHP framework for building enterprise apps — CRUD platforms,
 ERP workflows, SaaS multi-tenant products, internal tools — from
@@ -18,7 +18,7 @@ substrate: a deterministic, layered, plugin-composable kernel.
 
 ---
 
-## What ships today (v0.1.0)
+## What ships today (v0.1.1)
 
 | Package | Role | Status |
 |---|---|---|
@@ -31,7 +31,7 @@ substrate: a deterministic, layered, plugin-composable kernel.
 | [`@ausus/renderer-react`](renderer/react)      | React 18+ renderer for the RFC-004 ViewSchema    | implemented |
 | `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, ship in v0.2.0 |
 
-Full release notes: [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md).
+Full release notes: [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md). The v0.1.0 release-candidate notes remain available at [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md).
 
 ---
 
@@ -74,7 +74,9 @@ deterministic, content-addressable `MetadataGraph`.
 
 | Document | What it covers |
 |---|---|
-| [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md) | this release — packages, compatibility, publish order, rollback |
+| [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md) | current release — v0.1.x stabilisation, breaking changes, migration |
+| [`CHANGELOG.md`](CHANGELOG.md) | consolidated changelog across v0.1.0 and v0.1.1 (Keep a Changelog) |
+| [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md) | initial release-candidate notes (v0.1.0) — packages, compatibility, publish order, rollback |
 | [`docs/PUBLICATION-READINESS.md`](docs/PUBLICATION-READINESS.md) | publication audit |
 | [`docs/L4-API-DESIGN.md`](docs/L4-API-DESIGN.md) | L4 HTTP API design + integration evidence |
 | [`docs/RFC-000-v0r2-remediation.md`](docs/RFC-000-v0r2-remediation.md) | Node-ESM + clean-room remediation pass |

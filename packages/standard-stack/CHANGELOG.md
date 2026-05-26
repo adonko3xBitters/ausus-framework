@@ -3,20 +3,43 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [Unreleased] — v0.1.x stabilisation
 
 ### Changed
 - Package `type` is now `library` (was `metapackage`) so it can ship code.
-- `require` now includes `ausus/api-http` alongside kernel, runtime-default and
-  persistence-sql — the four implemented core packages.
+- `require` now includes `ausus/api-http` alongside kernel, runtime-default
+  and persistence-sql — the four implemented core packages.
 
 ### Added
 - **`Ausus\Application`** — a high-level bootstrap facade with a four-call
-  lifecycle (`create → register → boot → invoke`). It composes the kernel
-  compiler, the SQLite persistence driver and the default runtime, eliminating
-  the manual `Invoker` wiring previously repeated across every entry point.
-  It is purely additive: the low-level `Invoker` API is unchanged and every
-  object `Application` builds remains directly constructable.
+  lifecycle (`create → register → boot → invoke`). Composes the kernel
+  compiler, the SQLite persistence driver and the default runtime,
+  eliminating the manual `Invoker` wiring previously repeated across every
+  entry point. Purely additive — every low-level service it builds
+  remains directly constructable. Public surface: `create`, `register`,
+  `boot`, `invoke`, `run`, `http`, `router`, `render`, plus typed
+  accessors (`graph`, `invoker`, `driver`, `renderer`, `auditSink`, `pdo`,
+  `tenant`, `actor`, `isBooted`, `reference`).
+- **`Ausus\ApplicationConfig`** — a typed, immutable, fluent builder for
+  `Application::create()`. Every setter returns a new instance; the
+  receiver is never mutated. `Application::create()` accepts either an
+  `ApplicationConfig` or the legacy associative array (both bit-for-bit
+  equivalent). 14 setters: tenant, actor / actorId, roles, permissions,
+  sqlite / pdo / driver / auditSink / migrate, kernelVersion, apiPrefix,
+  psr17 / responseFactory / streamFactory.
+- **`Application::http(ServerRequest): Response`** — one-call PSR-7
+  entry point. Lazily builds and caches a `Router` against the booted
+  graph/driver/audit-sink, autodetects `Nyholm\Psr7\Factory\Psr17Factory`
+  when none is configured, mounts at `ApplicationConfig::apiPrefix()`
+  (default `/api`). Collapses typical front controllers to ≈ 10 lines.
+- **`Application::run(...): InvocationResult`** — typed wrapper around
+  `invoke()`'s loose array return; carries the post-action `Reference`,
+  the action FQN, and the raw outputs.
+
+### Documentation
+- Reference page added at `docs-site/docs/reference/application.md`.
+
+## [0.1.0] — 2026-05-19
 
 ## [0.1.0] — 2026-05-19
 

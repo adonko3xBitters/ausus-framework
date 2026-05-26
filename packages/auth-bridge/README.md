@@ -1,5 +1,15 @@
 # ausus/auth-bridge
 
+> ⚠️ **Name reservation only — not yet implemented.**
+> This package ships an empty composer manifest so the
+> `ausus/auth-bridge` name is reserved on Packagist. **AUSUS v0.1.x
+> has no authentication layer** — the HTTP Router trusts the
+> `X-Tenant-ID` and `X-Actor-*` headers as set by an upstream
+> [authenticated gateway](../../docs-site/docs/operations/authenticated-gateway.md).
+> Installing this package in v0.1.x does nothing useful; the eventual
+> RFC-014 implementation (canonical `roleHash`, `ActorResolver`,
+> Laravel auth bridge) ships in a later release.
+
 Authorization plugin satisfying RFC-014 in two modes.
 
 ## Owned RFC surfaces

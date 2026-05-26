@@ -65,9 +65,25 @@ export function FieldDisplay({ field, value }: { field: FieldDescriptor; value: 
 // emitted by the runtime. Per-type inputs (text, number, select, checkbox,
 // datetime, money), required validation, and shape-correct payload assembly
 // are all metadata-driven — no entity-specific UI lives here.
+//
+// Action helper public API:
+//   inputDefault, initialFor, isUnchanged, isRequired, shapeValue,
+//   validateInputs, buildCreatePayload, buildUpdatePayload.
+//
+// Stability for v0.1.x: **stable**. These helpers are the supported
+// extension seam for consumers building a custom action UI on top of the
+// renderer's `FieldDescriptor` / `ActionDescriptor` types. Their names,
+// arities, and return shapes are covered by the v0.1.x backward-compatibility
+// guarantee (see `renderer/react/README.md`, "API stability"). Additions to
+// the `FieldDescriptor.type` union may add branches; existing branches will
+// keep returning the same shape.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** Initial form value for an input, honoring its declared default. */
+/**
+ * Initial form value for an input, honoring its declared default.
+ *
+ * @public stable
+ */
 export function inputDefault(input: FieldDescriptor): unknown {
   if (input.default !== undefined && input.default !== null) {
     return input.default;
@@ -87,10 +103,12 @@ export function inputDefault(input: FieldDescriptor): unknown {
 
 /**
  * Initial form value for an input when the descriptor carries
- * `initialValues` (update action). Falls through to {@see inputDefault}
+ * `initialValues` (update action). Falls through to {@link inputDefault}
  * when no prefill is available. Compound `money` values flatten to the
  * amount string for the input box; `shapeValue` reconstitutes the tuple
  * on submit.
+ *
+ * @public stable
  */
 export function initialFor(input: FieldDescriptor, prefill: unknown): unknown {
   if (prefill === undefined || prefill === null) return inputDefault(input);
@@ -105,7 +123,11 @@ export function initialFor(input: FieldDescriptor, prefill: unknown): unknown {
   return prefill;
 }
 
-/** Equality test that knows about money's `{amount, currency}` compound shape. */
+/**
+ * Equality test that knows about money's `{amount, currency}` compound shape.
+ *
+ * @public stable
+ */
 export function isUnchanged(
   input: FieldDescriptor,
   current: unknown,
@@ -128,6 +150,8 @@ export function isUnchanged(
 /**
  * Build the payload for a **create** action: every non-empty shaped value
  * is included.
+ *
+ * @public stable
  */
 export function buildCreatePayload(
   inputs: FieldDescriptor[],
@@ -146,6 +170,8 @@ export function buildCreatePayload(
  * value differs from `initialValues` are included. Empty/cleared inputs
  * are treated as "untouched" (PATCH no-op for that key); explicit
  * null-on-nullable clearing is a deferred concern, see ADR-0002 §12.4.
+ *
+ * @public stable
  */
 export function buildUpdatePayload(
   inputs: FieldDescriptor[],
@@ -162,13 +188,21 @@ export function buildUpdatePayload(
   return out;
 }
 
-/** Required when the runtime says so; fall back to "not explicitly nullable". */
+/**
+ * Required when the runtime says so; fall back to "not explicitly nullable".
+ *
+ * @public stable
+ */
 export function isRequired(input: FieldDescriptor): boolean {
   if (typeof input.required === "boolean") return input.required;
   return input.nullable !== true;
 }
 
-/** Shape a raw form value into the payload form the runtime expects. */
+/**
+ * Shape a raw form value into the payload form the runtime expects.
+ *
+ * @public stable
+ */
 export function shapeValue(input: FieldDescriptor, raw: unknown): unknown {
   if (raw === undefined || raw === null || raw === "") return undefined;
   switch (input.type) {
@@ -185,7 +219,11 @@ export function shapeValue(input: FieldDescriptor, raw: unknown): unknown {
   }
 }
 
-/** Synchronous validation of the current form values. */
+/**
+ * Synchronous validation of the current form values.
+ *
+ * @public stable
+ */
 export function validateInputs(
   inputs: FieldDescriptor[],
   values: Record<string, unknown>,

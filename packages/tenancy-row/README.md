@@ -1,5 +1,16 @@
 # ausus/tenancy-row
 
+> ⚠️ **Name reservation only — not yet implemented.**
+> This package ships an empty composer manifest so the
+> `ausus/tenancy-row` name is reserved on Packagist for the eventual
+> implementation. Installing it in v0.1.x adds nothing to your
+> autoloader. Tenancy in v0.1.x is **single-tenant per `Application`**
+> handled by the kernel directly (see the
+> [`Ausus\Tenant`](../kernel) value object + the `tenant` config key in
+> [`Ausus\ApplicationConfig`](../standard-stack)). Use the
+> `X-Tenant-ID` header to switch tenants per HTTP request.
+> Implementation lands when the RFC-003 § work below is completed.
+
 L3 — row-level Tenant isolation + Tenant catalog + per-context resolvers.
 
 ## Owned RFC surfaces

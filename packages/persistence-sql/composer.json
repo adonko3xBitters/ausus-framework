@@ -1,7 +1,7 @@
 {
     "name": "ausus/persistence-sql",
     "type": "library",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "L3 PersistenceDriver — SQL implementation of RFC-002 via PDO (SQLite/MySQL/Postgres). Includes SchemaDeriver + DatabaseAuditSink.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "persistence", "sql", "pdo"],

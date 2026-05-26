@@ -1,5 +1,17 @@
 # ausus/presentation-default
 
+> ⚠️ **Name reservation only — not yet implemented.**
+> This package ships an empty composer manifest so the
+> `ausus/presentation-default` name is reserved on Packagist. The L5
+> Presentation layer's v0.1.x shape is provided by
+> `Ausus\Runtime\ProjectionRenderer` (in
+> [`ausus/runtime-default`](../runtime-default)) and the npm half
+> ships separately as
+> [`@ausus/renderer-react`](../../renderer/react). Installing this
+> standalone package in v0.1.x adds nothing — the eventual RFC-012
+> implementation (broader field type library, profile registration,
+> reporting driver) will inhabit it.
+
 L5 — Presentation layer + L3 ReportingDriver + 11 standard Field Types + `react.web.v1` profile registration (composer half).
 
 Consolidates four RFC-012 components for V1: presentation generator, reporting driver, field type library, renderer profile registration. The npm half of `react.web.v1` lives in `renderer/react/` (separate Node toolchain).

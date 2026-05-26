@@ -1,7 +1,7 @@
 {
     "name": "ausus/auth-bridge",
     "type": "library",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "AUSUS — Laravel-bridge Authorization plugin (RFC-014). Skeleton: name reserved; V0 uses ausus/kernel's StubActor directly.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "authorization", "rbac"],
