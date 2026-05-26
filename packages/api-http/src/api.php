@@ -316,7 +316,7 @@ final class ErrorMapper
  *           NOT catch or reference it — the stable boundary is the HTTP
  *           status code and the JSON `{ error: { code, message } }` body.
  */
-final class BadRequest extends \RuntimeException {}
+final class BadRequest extends \RuntimeException implements \Ausus\Errors\BadRequestError {}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Emitter — minimal PSR-7 → SAPI emit. Used by the demo front controller.
