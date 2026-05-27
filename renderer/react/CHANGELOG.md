@@ -3,6 +3,36 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [0.2.0-alpha.4] — 2026-05-27
+
+### Added
+- **`peerSchemaVersion` field declared** in `package.json` as `"^1.0.0"`.
+  Formalises the renderer's ViewSchema compatibility contract with the
+  AUSUS backend. The renderer accepts any backend release whose emitted
+  `schemaVersion` (currently `1.0.0` in `Ausus\Runtime\ProjectionRenderer`)
+  satisfies this semver range. Enforced by
+  `scripts/check-renderer-alignment.sh` (CI step in `release-gate.yml`).
+
+### Changed
+- **Release alignment with backend.** Version bumped from `0.1.1` to
+  `0.2.0-alpha.4` to align with the AUSUS PHP packages
+  v0.2.0-alpha.4 hotfix release. No runtime code changes — pure version
+  alignment + introduction of the compatibility contract field.
+
+### Compatibility contract
+
+The renderer now follows independent semver per ViewSchema compatibility
+(cf. `docs/VERSIONING.md` §"Package version alignment"):
+
+- The renderer is forward-compatible with any backend release whose
+  `schemaVersion` satisfies `peerSchemaVersion` (`^1.0.0`).
+- A backend release that does NOT change `schemaVersion` does NOT require
+  a renderer release.
+- A renderer release that adds new optional widgets/props does NOT require
+  a backend bump.
+- A `schemaVersion` major bump (e.g., `1.x` → `2.x`) requires a synchronised
+  renderer release expanding `peerSchemaVersion` to include the new range.
+
 ## [Unreleased] — v0.1.x stabilisation
 
 ### Documentation
