@@ -1,6 +1,6 @@
 {
   "name": "@ausus/renderer-react",
-  "version": "0.1.1",
+  "version": "0.2.0-alpha.4",
   "description": "AUSUS React renderer — consumes RFC-004 ViewSchema JSON. React 18+, no third-party UI deps.",
   "license": "MIT",
   "type": "module",
@@ -31,6 +31,7 @@
     "react":     "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
+  "peerSchemaVersion": "^1.0.0",
   "devDependencies": {
     "@types/react":     "^19.2.15",
     "@types/react-dom": "^19.2.3",
