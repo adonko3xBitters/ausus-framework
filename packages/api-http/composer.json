@@ -11,8 +11,8 @@
         "psr/http-factory": "^1.0",
         "psr/http-server-handler": "^1.0",
         "psr/http-server-middleware": "^1.0",
-        "ausus/kernel": "0.1.*",
-        "ausus/runtime-default": "0.1.*"
+        "ausus/kernel": "^0.2@alpha",
+        "ausus/runtime-default": "^0.2@alpha"
     },
     "autoload": {
         "classmap": ["src/"]

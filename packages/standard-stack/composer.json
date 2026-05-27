@@ -7,10 +7,10 @@
     "homepage": "https://github.com/adonko3xBitters/ausus-framework",
     "require": {
         "php": ">=8.3",
-        "ausus/kernel":           "0.1.*",
-        "ausus/runtime-default":  "0.1.*",
-        "ausus/persistence-sql":  "0.1.*",
-        "ausus/api-http":         "0.1.*"
+        "ausus/kernel":           "^0.2@alpha",
+        "ausus/runtime-default":  "^0.2@alpha",
+        "ausus/persistence-sql":  "^0.2@alpha",
+        "ausus/api-http":         "^0.2@alpha"
     },
     "autoload": {
         "classmap": ["src/"]

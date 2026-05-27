@@ -9,10 +9,10 @@
         "php": ">=8.3",
         "ext-pdo": "*",
         "ext-pdo_sqlite": "*",
-        "ausus/kernel":           "0.1.*",
-        "ausus/persistence-sql":  "0.1.*",
-        "ausus/runtime-default":  "0.1.*",
-        "ausus/standard-stack":   "0.1.*"
+        "ausus/kernel":           "^0.2@alpha",
+        "ausus/persistence-sql":  "^0.2@alpha",
+        "ausus/runtime-default":  "^0.2@alpha",
+        "ausus/standard-stack":   "^0.2@alpha"
     },
     "autoload": {
         "classmap": ["src/"]

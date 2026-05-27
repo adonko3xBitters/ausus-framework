@@ -7,7 +7,7 @@
     "homepage": "https://github.com/ausus-framework/ausus",
     "require": {
         "php": ">=8.3",
-        "ausus/kernel": "0.1.*"
+        "ausus/kernel": "^0.2@alpha"
     },
     "autoload": {
         "classmap": ["src/"]
