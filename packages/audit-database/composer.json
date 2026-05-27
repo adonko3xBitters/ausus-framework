@@ -4,7 +4,7 @@
     "description": "AUSUS — Database TransactionalSink (RFC-007). Skeleton: name reserved; V0 ships an inline DatabaseAuditSink inside ausus/persistence-sql.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "audit", "transactional"],
-    "homepage": "https://github.com/ausus-framework/ausus",
+    "homepage": "https://github.com/adonko3xBitters/audit-database",
     "require": {
         "php": ">=8.3"
     },
