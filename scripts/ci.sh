@@ -46,9 +46,9 @@ echo "[ci] node=$(node --version)  npm=$(npm --version)"
 echo "[ci] step 1 — composer validate"
 fail=0
 for f in composer.json packages/*/composer.json; do
-    composer validate --no-check-publish --no-check-lock --no-check-version "$f" >/dev/null 2>&1 \
+    composer validate --no-check-publish --no-check-lock --strict "$f" >/dev/null 2>&1 \
         && echo "  ✓ $f" \
-        || { echo "  ✗ $f"; composer validate --no-check-publish --no-check-lock --no-check-version "$f" || true; fail=$((fail+1)); }
+        || { echo "  ✗ $f"; composer validate --no-check-publish --no-check-lock --strict "$f" || true; fail=$((fail+1)); }
 done
 [[ $fail -gt 0 ]] && { echo "validate failed ($fail)"; exit 2; }
 
