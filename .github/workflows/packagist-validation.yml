@@ -1,0 +1,74 @@
+name: packagist-validation
+
+on:
+  push:
+    tags:
+      - 'v*.*.*-alpha.*'
+      - 'v*.*.*-beta.*'
+      - 'v*.*.*-rc.*'
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to validate (e.g. v0.2.0-alpha.4)'
+        required: true
+
+jobs:
+  wait-and-validate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo, pdo_sqlite
+          tools: composer:v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Wait for Packagist webhook (initial delay 90s)
+        run: sleep 90
+
+      - name: Poll Packagist for the new version (per-package 180s timeout)
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          VERSION="${VERSION#v}"
+          echo "Polling Packagist for ausus/* @ v$VERSION (180s budget per package)"
+
+          PACKAGES=(kernel runtime-default persistence-sql api-http standard-stack starter tenancy-row audit-database auth-bridge presentation-default)
+
+          for pkg in "${PACKAGES[@]}"; do
+            DEADLINE=$(( $(date +%s) + 180 ))
+            FOUND=0
+            while [ "$(date +%s)" -lt "$DEADLINE" ]; do
+              SEEN=$(curl -s -m 10 "https://repo.packagist.org/p2/ausus/${pkg}.json" \
+                | jq -r --arg pkg "ausus/${pkg}" '.packages[$pkg][].version' 2>/dev/null || true)
+              if echo "$SEEN" | grep -qFx "v${VERSION}"; then
+                echo "  ✓ ausus/${pkg} @ v${VERSION} indexed"
+                FOUND=1
+                break
+              fi
+              sleep 15
+            done
+            if [ "$FOUND" != "1" ]; then
+              echo "::error::ausus/${pkg} @ v${VERSION} NOT indexed after 180s"
+              exit 1
+            fi
+          done
+
+          echo "VERSION=v${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Public install validation (release-gate live mode)
+        run: bash scripts/release-gate.sh
+        env:
+          RELEASE_GATE_LIVE: '1'
+          RELEASE_GATE_VERSION: ${{ env.VERSION }}
