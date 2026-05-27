@@ -193,6 +193,97 @@ is not in v0.1.x:
 - **Multiple entities and cross-entity references.** This tutorial uses a
   single entity; relations between entities are not covered.
 
+## Alpha resolution failure {#alpha-resolution-failure}
+
+**Symptom:**
+
+```
+Your requirements could not be resolved to an installable set of packages.
+
+  Problem 1
+    - Root composer.json requires ausus/standard-stack ^0.2@alpha
+    - ausus/standard-stack v0.2.0-alpha.X requires ausus/api-http ^0.2@alpha
+      → does not match your minimum-stability.
+```
+
+**Cause.** Your root `composer.json` has `minimum-stability: stable`
+(Composer default). When `ausus/standard-stack@^0.2@alpha` declares a
+transitive `ausus/api-http ^0.2@alpha`, that inner alpha constraint is
+evaluated against YOUR root's `minimum-stability`. Stable rejects it.
+
+The `@alpha` flag on a single root `require` does **not** propagate to
+transitive dependencies — this is documented Composer behaviour, not
+AUSUS-specific.
+
+**Fix.** Declare alpha stability at the root of your `composer.json`:
+
+```json
+{
+    "minimum-stability": "alpha",
+    "prefer-stable": true
+}
+```
+
+Or via CLI:
+
+```bash
+composer config minimum-stability alpha
+composer config prefer-stable true
+composer update
+```
+
+Starting at `v0.2.0-alpha.4`, `composer create-project ausus/starter`
+already sets this for you — you only hit this error if you set up the
+project manually.
+
+See [Alpha installation requirements](../getting-started/installation.md#alpha-installation-requirements)
+for the full explanation.
+
+## Packagist propagation delay {#packagist-propagation-delay}
+
+**Symptom.** A new `ausus/*` version was just tagged on GitHub but
+`composer require ausus/standard-stack:^0.2@alpha` still pulls the
+previous version.
+
+**Cause.** GitHub → Packagist webhook propagation typically takes
+**1–3 minutes** (occasionally up to 15 min on slow days). Composer's
+local cache may also serve a stale package list.
+
+**Fix.**
+
+```bash
+composer clear-cache
+composer require ausus/standard-stack:^0.2@alpha --no-cache
+```
+
+If after 15 min the new version still doesn't appear, click the manual
+**Update** button on the package's Packagist page
+(`https://packagist.org/packages/ausus/<name>`).
+
+## npm dist-tag confusion {#npm-dist-tag}
+
+**Symptom.** `npm install @ausus/renderer-react` returns a version that
+doesn't match what's documented as the current alpha.
+
+**Cause.** npm dist-tags. AUSUS publishes pre-releases to `@next` and
+also promotes `@latest` to the current pre-release as long as no stable
+v1+ exists.
+
+**Fix.** Be explicit:
+
+```bash
+# Default (gets @latest = current alpha until a stable v1+ exists)
+npm install @ausus/renderer-react
+
+# Always-current pre-release stream
+npm install @ausus/renderer-react@next
+
+# Specific version
+npm install @ausus/renderer-react@0.2.0-alpha.4
+```
+
+See [The React renderer — npm dist-tag policy](../frontend/react-renderer.md#peer-schema-version).
+
 ## Where to go next {#where-to-go-next}
 
 - [Core Concepts](../concepts/metadata-graph.md) — the model behind everything
