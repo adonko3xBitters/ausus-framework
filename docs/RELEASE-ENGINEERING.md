@@ -251,11 +251,138 @@ operator's workflow:
   against that registry — point `COMPOSER_REPOSITORIES` at it before
   invocation.
 
-## 8. Document version
+## 8. Permanent invariants (locked at v0.2.0-alpha.4)
+
+These rules are non-negotiable. Any PR or release procedure that
+violates them must be rejected without debate.
+
+### 8.1 Tag protection ruleset (HIGH-12)
+
+Every tag matching `v*.*.*` patterns is protected by a GitHub Ruleset.
+No tag can land without `release-gate / gate` workflow success.
+
+**Activation (one-time, BEFORE the first v0.2.0-alpha.4 tag push):**
+
+Via GitHub UI:
+
+```
+Settings → Rules → Rulesets → New ruleset
+  Name:               alpha-tag-protection
+  Enforcement status: Active
+  Target:             Tags
+  Target patterns:    v*.*.*-alpha.*, v*.*.*-beta.*, v*.*.*-rc.*, v*.*.*
+  Bypass actors:      (none)
+  Rules:
+    [x] Restrict creations
+    [x] Restrict updates
+    [x] Restrict deletions
+    [x] Require status checks to pass:
+        - release-gate / gate (required)
+```
+
+Via `gh` CLI:
+
+```bash
+gh api -X POST repos/adonko3xBitters/ausus-framework/rulesets \
+  -H "Accept: application/vnd.github+json" \
+  -F name='alpha-tag-protection' \
+  -F target='tag' \
+  -F enforcement='active' \
+  -F 'conditions[ref_name][include][]=refs/tags/v*' \
+  -F 'rules[][type]=required_status_checks' \
+  -F 'rules[][parameters][required_status_checks][][context]=release-gate / gate' \
+  -F 'rules[][type]=non_fast_forward' \
+  -F 'rules[][type]=deletion'
+```
+
+**Verify the rule is active:**
+
+```bash
+gh api repos/adonko3xBitters/ausus-framework/rulesets \
+  | jq '.[] | select(.name=="alpha-tag-protection")'
+```
+
+This rule **must** be in place before any v0.2.0-alpha.4+ tag push. Any
+deactivation triggers an audit log entry and must be justified in a
+release postmortem.
+
+### 8.2 Rebase merge prerequisite (MED-3)
+
+The repository `Settings → General → Pull Requests` MUST have:
+
+| Setting | Required value |
+|---|---|
+| Allow rebase merging | ☑ enabled |
+| Allow squash merging | ☑ enabled (acceptable but loses commit granularity) |
+| Allow merge commits | ☐ disabled (creates noise on main) |
+
+The v0.2.0-alpha.4 hotfix used 8 granular commits intentionally. Squash
+merging it would erase the commit-by-commit traceability required by
+`docs/RELEASE-ENGINEERING.md` §5 checklist step 3 (`scripts/ci.sh ends
+with [ci] DONE`).
+
+**Verify:**
+
+```bash
+gh repo view adonko3xBitters/ausus-framework --json mergeCommitAllowed,rebaseMergeAllowed,squashMergeAllowed
+# Expected: {"mergeCommitAllowed":false,"rebaseMergeAllowed":true,"squashMergeAllowed":true}
+```
+
+### 8.3 npm dist-tag policy
+
+The `@ausus/renderer-react` package is published with this dist-tag rule:
+
+| Tag shape | dist-tag(s) applied |
+|---|---|
+| `vX.Y.Z-alpha.N`, `vX.Y.Z-beta.N`, `vX.Y.Z-rc.N` | `@next` |
+| `vX.Y.Z` (stable) | `@latest` |
+| Any pre-release, **IFF no stable `1.x.x` exists on npm** | `@next` AND promoted to `@latest` |
+
+Rationale:
+- During the alpha-only phase, `@latest` points at the current alpha so
+  `npm install @ausus/renderer-react` (default `@latest`) returns
+  something installable.
+- Once a stable `1.x.x` ships, `@latest` moves to it and stays. Subsequent
+  pre-releases only update `@next`.
+
+Enforced in `.github/workflows/npm-publish.yml`. The `HAS_STABLE` check
+queries `npm view @ausus/renderer-react versions --json`.
+
+### 8.4 ViewSchema compatibility (peerSchemaVersion)
+
+`@ausus/renderer-react/package.json` declares a top-level
+`peerSchemaVersion` field. The renderer accepts any backend release
+whose `schemaVersion` satisfies this semver range.
+
+| Renderer release | Backend `schemaVersion` change required? |
+|---|---|
+| Adds optional widgets/props | No |
+| Bumps `peerSchemaVersion` minor (`^1.0.0` → `^1.0.0 || ^2.0.0`) | Yes (coordinated with backend `schemaVersion: 2.0.0`) |
+| Drops `peerSchemaVersion` minor range | Breaking — major bump |
+
+The backend release that bumps `schemaVersion` MUST coordinate a
+renderer release that expands `peerSchemaVersion` to include the new
+range. CI gate: `scripts/check-renderer-alignment.sh` in
+`release-gate.yml`.
+
+### 8.5 Source-of-truth files
+
+| File | Purpose | Read by |
+|---|---|---|
+| `docs-site/CURRENT_VERSION` | Documented current alpha version | `scripts/check-doc-version.sh` |
+| `renderer/react/package.json` `version` | Active npm tag | `scripts/check-renderer-alignment.sh`, `.github/workflows/npm-publish.yml` |
+| `renderer/react/package.json` `peerSchemaVersion` | ViewSchema compat range | `scripts/check-renderer-alignment.sh` |
+| `packages/runtime-default/src/runtime.php` `schemaVersion` | Wire format version emitted | `scripts/check-renderer-alignment.sh` |
+
+No other file is permitted to claim a version. README badges + Docusaurus
+quickstart pull from these source files. Drift = CI red.
+
+## 9. Document version
 
 This document describes the release engineering state as of the
-`v0.2.0-alpha.3` cut. Update Section 4 (`Remediation`) and Section 5
+`v0.2.0-alpha.4` cut. Update Section 4 (`Remediation`) and Section 5
 (`Checklist`) on every release that materially changes the
-publication procedure. Section 6 (`Anti-patterns`) is append-only —
-adding new lessons learned but never removing the history that
-explains them.
+publication procedure. Section 6 (`Anti-patterns`) and Section 8
+(`Permanent invariants`) are append-only — adding new lessons learned
+or new locked-down rules but never removing the history that explains
+them.

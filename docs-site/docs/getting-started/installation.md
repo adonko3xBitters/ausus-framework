@@ -114,6 +114,45 @@ no bundled dependencies and no CSS file — see
   `presentation-default`) are **not installable as working code** — they are
   name reservations. See [Packages](../packages/index.md).
 
+## Alpha installation requirements {#alpha-installation-requirements}
+
+AUSUS v0.2.x is currently in **alpha**. `composer create-project ausus/starter`
+handles this for you automatically — the scaffolded `composer.json` declares
+`"minimum-stability": "alpha"`. **Nothing to do** in the common case.
+
+If you set up the project manually instead of using `create-project`, you
+must declare alpha stability at the root of YOUR `composer.json`:
+
+```json
+{
+    "minimum-stability": "alpha",
+    "prefer-stable": true,
+    "require": {
+        "ausus/standard-stack": "^0.2@alpha"
+    }
+}
+```
+
+### Why this is required
+
+Composer's `@alpha` per-package flag does **not** propagate to a required
+package's own transitive dependencies. When `ausus/standard-stack ^0.2@alpha`
+declares `ausus/kernel ^0.2@alpha`, that inner constraint is evaluated
+against the **root**'s `minimum-stability` — which defaults to `stable`.
+Without opting in, Composer rejects the alpha chain and falls back to the
+v0.1.x stable line (which has the historical packaging defect described in
+the release notes).
+
+This is **standard Composer behaviour**, not specific to AUSUS. It applies
+identically to every pre-release in the PHP ecosystem.
+
+### What changes at v1.0 stable
+
+When AUSUS ships `v1.0.0` stable:
+- `minimum-stability: alpha` can be dropped.
+- `^0.2@alpha` becomes `^1.0`.
+- `composer create-project ausus/starter` continues to work without flags.
+
 ## Next {#next}
 
 - [Your first app](first-app.md) — bootstrap an app with `Ausus\Application`.

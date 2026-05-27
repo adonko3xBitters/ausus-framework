@@ -188,8 +188,60 @@ components.
 - The workflow-state field is detected by a heuristic (an `enum` field named
   `status`).
 
+## Renderer v0.2.0-alpha.4 — peerSchemaVersion contract {#peer-schema-version}
+
+Starting at `@ausus/renderer-react@0.2.0-alpha.4`, the package declares
+a `peerSchemaVersion` field at the top of its `package.json`:
+
+```json
+{
+    "peerSchemaVersion": "^1.0.0"
+}
+```
+
+This formalises the renderer's ViewSchema compatibility window. A backend
+release whose emitted `schemaVersion` satisfies this semver range is
+consumable by the renderer. The current backend (`v0.2.0-alpha.4`) emits
+`schemaVersion: "1.0.0"`, which satisfies `^1.0.0`.
+
+### Compatibility rules
+
+- A backend release that does NOT change `schemaVersion` does NOT require
+  a renderer release.
+- A renderer release that adds new optional widgets/props does NOT
+  require a backend bump.
+- A `schemaVersion` major bump (e.g., `1.x` → `2.x`) requires a
+  synchronised renderer release expanding `peerSchemaVersion` to
+  include the new range.
+
+The contract is enforced by `scripts/check-renderer-alignment.sh` (CI
+step in `release-gate.yml`). PRs that desynchronize the renderer and the
+backend wire format fail the release gate.
+
+### npm dist-tag policy
+
+The renderer is published to npm with this dist-tag rule:
+
+- **Pre-release tags** (`-alpha.*`, `-beta.*`, `-rc.*`) publish to `@next`.
+- Until a stable `1.x.x` exists on npm, the latest pre-release is also
+  promoted to `@latest`, so `npm install @ausus/renderer-react` (default
+  dist-tag) returns something installable.
+- Once a stable `1.x.x` is published, `@latest` moves to it and stays
+  there; subsequent pre-releases only update `@next`.
+
+Practical install commands during alpha:
+
+```bash
+# Default — gets the current alpha (because @latest is still the alpha)
+npm install @ausus/renderer-react
+
+# Explicit alpha
+npm install @ausus/renderer-react@next
+```
+
 ## Related {#related}
 
 - [ViewSchema](viewschema.md) — the format this renders.
 - [The HTTP API](../backend/http-api.md) — where ViewSchemas come from.
 - [Packages](../packages/index.md) — the npm package entry.
+- [Release notes v0.2.0-alpha.4](../releases/v0.2.0-alpha.4.md) — full release context.
