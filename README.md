@@ -120,6 +120,68 @@ npm install @ausus/renderer-react react@18 react-dom@18
 
 ---
 
+## Alpha installation requirements
+
+`ausus/*` `v0.2.x` packages are tagged with **alpha** stability on
+Packagist. Consumers must opt into alpha stability at the **root** of
+their `composer.json` for the install to resolve.
+
+### Why this is necessary
+
+Composer does **not** propagate the `@alpha` per-package flag to a
+required package's own transitive dependencies. When
+`ausus/standard-stack ^0.2@alpha` declares `ausus/kernel ^0.2@alpha`,
+that inner constraint is evaluated against the **root**'s
+`minimum-stability` — which defaults to `stable`. Without opting in,
+Composer rejects the alpha chain and falls back to the `v0.1.x` stable
+line.
+
+> This is **standard Composer behaviour**, not specific to AUSUS. It
+> applies identically to every pre-release in the PHP ecosystem
+> (Symfony betas, Laravel previews, Doctrine RCs, …). Documenting it
+> here so AUSUS first-time consumers don't lose the half-hour we lost
+> finding it.
+
+### Two equivalent setups
+
+**Option A — declare in `composer.json` directly:**
+
+```json
+{
+    "minimum-stability": "alpha",
+    "prefer-stable": true
+}
+```
+
+`prefer-stable: true` keeps stable versions preferred when both stable
+and alpha are available for the same package. Without it, Composer
+might pick alpha versions of unrelated non-`ausus/*` dependencies.
+
+**Option B — initialize the project with the stability flag:**
+
+```bash
+composer init -n --type=project --stability=alpha
+```
+
+`composer init --stability=alpha` writes `minimum-stability: alpha`
+into the generated `composer.json`. Then add `"prefer-stable": true`
+manually (or via `composer config prefer-stable true`).
+
+### Validated install procedure
+
+```bash
+composer init -n --type=project --stability=alpha
+composer require ausus/standard-stack:^0.2@alpha
+```
+
+This exact sequence is exercised end-to-end by
+[`scripts/public-install.sh`](scripts/public-install.sh) (CI step
+`11`), which fails the build if anything in the chain — Packagist
+indexing, tarball structure, autoload, or smoke functionality —
+regresses.
+
+---
+
 ## Verified public install
 
 Reproduces the canonical clean-room install of `v0.2.0-alpha.3` end to
@@ -180,6 +242,25 @@ interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
   exception; `ErrorMapper` dispatches on the marker first, with the
   legacy short-name table preserved verbatim as a back-compat
   fallback.
+
+---
+
+## Compatibility matrix
+
+| Version | Status | Packaging | Runtime hardening |
+|---|---|---|---|
+| `v0.1.0` | legacy | broken historical tarballs (monorepo-in-tarball defect) | none |
+| `v0.1.1` | legacy | broken historical tarballs (same defect) | partial |
+| `v0.2.0-alpha.1` | obsolete | broken (same defect) | Phase A + B (declared, undelivered) |
+| `v0.2.0-alpha.2` | fixed packaging | dedicated subtree-split repos active; internal `^0.2@alpha` constraints not yet bumped | Phase A + B + C (server-side) |
+| `v0.2.0-alpha.3` | **current alpha** | fully fixed (subtree-split + Packagist source + internal constraint propagation) | Phase A + B + C (fully distributed) |
+
+`v0.1.x` remains the **recommended line for production** until v0.2.0
+stable ships. Consumers wanting the runtime hardening should install
+the `v0.2.0-alpha.3` line per [Alpha installation
+requirements](#alpha-installation-requirements). Versions marked
+*legacy* / *obsolete* are kept in Packagist's index for historical
+traceability — do not pull them for a new install.
 
 ---
 

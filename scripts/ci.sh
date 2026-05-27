@@ -25,6 +25,11 @@
 #   7. npm run build         renderer/react/dist
 #   8. npm run trace         12 render assertions
 #   9. npm pack --dry-run    publishable tarball gate
+#  10. L4 HTTP integration   live php -S + renderer-react
+#  11. public-install        Packagist clean-room install validation
+#                            (consumes the public registry, not path repos —
+#                            guards against any regression of the v0.1.x
+#                            packaging defect)
 #
 # Usage:   scripts/ci.sh
 #
@@ -167,4 +172,11 @@ grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-integration.log \
     && echo "  ✓ integration-http $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-integration.log | head -1)" \
     || { echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10; }
 
-echo "[ci] DONE — all 10 steps passed"
+# 11
+echo "[ci] step 11 — public-install validation (Packagist clean-room)"
+bash scripts/public-install.sh > /tmp/ausus-ci-publicinstall.log 2>&1
+grep -q "^\[public-install\] OK$" /tmp/ausus-ci-publicinstall.log \
+    && echo "  ✓ public-install reached the OK gate" \
+    || { echo "public-install failed"; tail -50 /tmp/ausus-ci-publicinstall.log; exit 11; }
+
+echo "[ci] DONE — all 11 steps passed"
