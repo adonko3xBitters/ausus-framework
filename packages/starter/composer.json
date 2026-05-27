@@ -4,7 +4,7 @@
     "description": "AUSUS V0 starter template — boots a working HelloInvoice demo on top of the Standard Stack via Ausus\\Application. Installs via `composer create-project ausus/starter myapp`.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "starter", "scaffold"],
-    "homepage": "https://github.com/ausus-framework/ausus",
+    "homepage": "https://github.com/adonko3xBitters/starter",
     "require": {
         "php": ">=8.3",
         "ext-pdo": "*",

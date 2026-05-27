@@ -4,7 +4,7 @@
     "description": "AUSUS L4 — PSR-7/15 HTTP API surface for the metadata graph. Serves RFC-004 ViewSchema fetches, Action invocation, and the kernel exception taxonomy.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "api", "http", "psr-7", "psr-15"],
-    "homepage": "https://github.com/adonko3xBitters/ausus-framework",
+    "homepage": "https://github.com/adonko3xBitters/api-http",
     "require": {
         "php": ">=8.3",
         "psr/http-message": "^1.1 || ^2.0",
