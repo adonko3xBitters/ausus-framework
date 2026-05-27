@@ -1,0 +1,86 @@
+name: npm-publish
+
+on:
+  push:
+    tags:
+      - 'v*.*.*-alpha.*'
+      - 'v*.*.*-beta.*'
+      - 'v*.*.*-rc.*'
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish from (e.g. v0.2.0-alpha.4)'
+        required: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write   # required for npm provenance attestation
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify package.json version matches tag
+        working-directory: renderer/react
+        run: |
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            INPUT="${{ github.event.inputs.tag }}"
+          else
+            INPUT="${GITHUB_REF#refs/tags/}"
+          fi
+          TAG_VERSION="${INPUT#v}"
+          PKG_VERSION=$(jq -r '.version' package.json)
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::package.json version ($PKG_VERSION) ≠ tag ($TAG_VERSION)"
+            exit 1
+          fi
+          echo "TAG_VERSION=$TAG_VERSION" >> "$GITHUB_ENV"
+          echo "Resolved TAG_VERSION=$TAG_VERSION"
+
+      - name: Install deps
+        working-directory: renderer/react
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        working-directory: renderer/react
+        run: npm run build
+
+      - name: Validate built artifacts
+        working-directory: renderer/react
+        run: |
+          [ -f dist/index.js ] || { echo "::error::dist/index.js missing"; exit 1; }
+          [ -f dist/index.d.ts ] || { echo "::error::dist/index.d.ts missing"; exit 1; }
+          echo "  ✓ dist/index.js + dist/index.d.ts present"
+
+      - name: npm publish
+        working-directory: renderer/react
+        run: |
+          if [[ "$TAG_VERSION" == *-alpha.* || "$TAG_VERSION" == *-beta.* || "$TAG_VERSION" == *-rc.* ]]; then
+            DIST_TAG=next
+          else
+            DIST_TAG=latest
+          fi
+          echo "Publishing with dist-tag: $DIST_TAG"
+          npm publish --tag "$DIST_TAG" --access public --provenance
+          if [ "$DIST_TAG" = "next" ]; then
+            HAS_STABLE=$(npm view @ausus/renderer-react versions --json 2>/dev/null \
+              | jq -r '.[]' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -1 || echo "")
+            if [ -z "$HAS_STABLE" ]; then
+              echo "No stable v1+ on npm — promoting $TAG_VERSION to @latest"
+              npm dist-tag add "@ausus/renderer-react@$TAG_VERSION" latest
+            else
+              echo "Stable v1+ exists ($HAS_STABLE) — @latest left untouched"
+            fi
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
