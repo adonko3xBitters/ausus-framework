@@ -107,7 +107,7 @@ What it adds:
 > dependencies transitively) and falls back to the v0.1.x stable line.
 
 ```bash
-composer create-project ausus/starter myapp
+composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
 cd myapp && composer boot
 # → OK — ausus/starter boots cleanly.
 ```
