@@ -121,7 +121,7 @@ echo "[publish] Phase B: tag collision check"
 COLLISION_COUNT=0
 for pkg in "${ALL[@]}"; do
     if git ls-remote --exit-code --tags "rel-$pkg" "refs/tags/$VERSION" > /dev/null 2>&1; then
-        REMOTE_TAG_SHA=$(git ls-remote --tags "rel-$pkg" "refs/tags/$VERSION" | awk '{print $1}')
+        REMOTE_TAG_SHA=$(git ls-remote --tags "rel-$pkg" "refs/tags/$VERSION^{}" | awk '{print $1}')
         LOCAL_SPLIT_SHA=$(git rev-parse "split/$pkg")
         if [ "$REMOTE_TAG_SHA" = "$LOCAL_SPLIT_SHA" ]; then
             echo "  (skip-prep: rel-$pkg already has $VERSION at expected SHA)"
@@ -148,7 +148,7 @@ push_level() {
     for pkg in "${packages[@]}"; do
         # Skip if remote tag already exists at the right SHA (idempotent rerun)
         if git ls-remote --exit-code --tags "rel-$pkg" "refs/tags/$VERSION" > /dev/null 2>&1; then
-            REMOTE_TAG_SHA=$(git ls-remote --tags "rel-$pkg" "refs/tags/$VERSION" | awk '{print $1}')
+            REMOTE_TAG_SHA=$(git ls-remote --tags "rel-$pkg" "refs/tags/$VERSION^{}" | awk '{print $1}')
             LOCAL_SPLIT_SHA=$(git rev-parse "split/$pkg")
             if [ "$REMOTE_TAG_SHA" = "$LOCAL_SPLIT_SHA" ]; then
                 echo "  (skip: rel-$pkg already at $VERSION)"
@@ -169,7 +169,7 @@ push_level() {
         else
             git push "rel-$pkg" "$VERSION"
             # Verify remote tag landed at expected SHA
-            REMOTE_TAG_SHA=$(git ls-remote --tags "rel-$pkg" "refs/tags/$VERSION" | awk '{print $1}')
+            REMOTE_TAG_SHA=$(git ls-remote --tags "rel-$pkg" "refs/tags/$VERSION^{}" | awk '{print $1}')
             LOCAL_SPLIT_SHA=$(git rev-parse "split/$pkg")
             if [ "$REMOTE_TAG_SHA" != "$LOCAL_SPLIT_SHA" ]; then
                 echo "::error::push to rel-$pkg succeeded but tag points to $REMOTE_TAG_SHA (expected $LOCAL_SPLIT_SHA)"
