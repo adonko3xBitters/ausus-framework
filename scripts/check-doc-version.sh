@@ -71,6 +71,8 @@ fi
 
 # Pick the highest version via semver-aware sort (handles pre-release ordering).
 # `semver` CLI sorts ascending; `--pre` opts pre-releases into the result.
+# Note: `semver` strips leading `v` from input on output. Restore it below
+# to match the `v<X.Y.Z>` convention used in CURRENT_VERSION.
 # shellcheck disable=SC2086
 PACKAGIST_LATEST=$(echo "$ALL_VERSIONS" \
     | xargs -n 1 echo \
@@ -81,6 +83,12 @@ if [ -z "$PACKAGIST_LATEST" ]; then
     echo "::error::semver sort produced empty result"
     exit 1
 fi
+
+# Restore the `v` prefix that `semver` stripped — DOC_VERSION carries it.
+case "$PACKAGIST_LATEST" in
+    v*) ;;
+    *) PACKAGIST_LATEST="v${PACKAGIST_LATEST}" ;;
+esac
 
 # Compare
 if [ "$DOC_VERSION" = "$PACKAGIST_LATEST" ]; then
