@@ -27,7 +27,7 @@
 
 set -euo pipefail
 
-EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-alpha.3}"
+EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-alpha.4}"
 TMP_DIR="$(mktemp -d -t ausus-public-install-XXXXXX)"
 SMOKE_DB="${TMP_DIR}/ausus-smoke.sqlite"
 
