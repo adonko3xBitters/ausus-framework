@@ -255,12 +255,19 @@ interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 | `v0.2.0-alpha.2` | fixed packaging | dedicated subtree-split repos active; internal `^0.2@alpha` constraints not yet bumped | Phase A + B + C (server-side) |
 | `v0.2.0-alpha.5` | **current alpha** | fully fixed (subtree-split + Packagist source + internal constraint propagation) | Phase A + B + C (fully distributed) |
 
-`v0.1.x` remains the **recommended line for production** until v0.2.0
-stable ships. Consumers wanting the runtime hardening should install
-the `v0.2.0-alpha.5` line per [Alpha installation
-requirements](#alpha-installation-requirements). Versions marked
-*legacy* / *obsolete* are kept in Packagist's index for historical
-traceability — do not pull them for a new install.
+**AUSUS `v0.1.x` is legacy and superseded by the v0.2 alpha line.** The
+legacy artifacts on Packagist were published from the monorepo and
+should not be pulled for a new install — they will not scaffold a
+working starter and `composer boot` will not be defined. The canonical
+install command until `v1.0.0` ships is:
+
+```bash
+composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+```
+
+Legacy tags remain in Packagist's index for historical traceability;
+they are not deleted. See [Publication Runbook → Legacy v0.1.x line](docs-site/docs/operations/publication-runbook.md#legacy-v01x)
+for the deprecation policy.
 
 ---
 

@@ -86,6 +86,38 @@ There is no true "unpublish":
   `0.1.1`: bump every affected manifest, re-run the phased publication, and
   re-poll Packagist. Budget around 30 minutes.
 
+## Legacy v0.1.x line {#legacy-v01x}
+
+AUSUS `v0.1.x` is **legacy** and superseded by the v0.2 alpha line. The
+`v0.1.0` and `v0.1.1` artifacts on Packagist predate the dedicated
+subtree-split repositories and were published from the monorepo, which
+means a `composer create-project ausus/starter` invocation without
+`--stability=alpha` resolves to those legacy tarballs and scaffolds a
+monorepo-shaped project rather than a starter (see
+[Troubleshooting → monorepo installed instead of the starter](../tutorial/troubleshooting.md#monorepo-installed-as-starter)).
+
+The legacy tags are **not deleted** — they remain in Packagist's index for
+historical traceability and to satisfy any external lockfile that still
+pins them. Manual operator actions during a future release window:
+
+1. Mark `ausus/starter` `v0.1.x` as `abandoned` on packagist.org (with a
+   pointer to the v0.2 alpha line) so users without an explicit
+   `--stability=alpha` flag see a clear deprecation notice. Apply the
+   same `abandoned` marker to the other `ausus/*` `v0.1.x` packages if
+   discoverability becomes a problem.
+2. Do **not** delete or rewrite the `v0.1.x` tags on GitHub. Immutable
+   release history is a documented invariant.
+3. Keep the v0.1.x release notes (`v0.1.0.md`, `v0.1.1.md`) shipped in
+   `docs-site/docs/releases/` and the sidebar — they remain the source
+   of truth for what those legacy artifacts contain.
+
+The canonical install command for every new project, until `v1.0.0`
+stable ships, is:
+
+```bash
+composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+```
+
 ## Related {#related}
 
 - [Release Rehearsal](release-rehearsal.md) — the dry-run that verifies the gates.
