@@ -3,6 +3,45 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [0.2.0-alpha.4] — 2026-05-27
+
+### Release engineering — install stability hotfix
+- **No `Application` / `ApplicationConfig` runtime change.** The
+  bootstrap facade is bit-identical to `v0.2.0-alpha.3`. Consumers
+  using `Application::create(...)` see no behaviour change.
+- **Starter install fixed (BUG #1 from QA report).**
+  `packages/starter/composer.json` now declares
+  `"minimum-stability": "alpha"`. When `composer create-project
+  ausus/starter myapp` scaffolds a user project, the root
+  `composer.json` inherits this and the transitive `ausus/*
+  ^0.2@alpha` chain resolves cleanly. Previously the scaffold inherited
+  `minimum-stability: stable`, which rejected the alpha transitive
+  constraints and broke the official quickstart on every fresh machine.
+- **`post-root-package-install` hook removed from starter.** That hook
+  ran `bin/configure-repo.php` BEFORE dependency resolution; when
+  resolution failed (the v0.2.0-alpha.3 scenario), the user was left
+  with a half-populated `myapp/` and configure-repo side effects
+  already applied. The companion hook `post-create-project-cmd` (which
+  runs `bin/boot.php` AFTER successful install) is preserved.
+- **Packagist alignment.** Each of the 10 `ausus/*` packages now
+  declares its dedicated `rel-*` repository in the `homepage` field
+  (`https://github.com/adonko3xBitters/<package>`). The standard-stack
+  metapackage's `homepage` points at
+  `https://github.com/adonko3xBitters/standard-stack` rather than the
+  monorepo URL, matching the actual subtree-split distribution
+  architecture.
+- **Alpha dependency resolution documented.** Consumers who scaffold
+  manually (not via `composer create-project`) MUST declare alpha
+  stability at their root. See the troubleshooting entry
+  `alpha-resolution-failure` and the
+  `installation.md#alpha-installation-requirements` section in the
+  docs site for the full explanation of why Composer's `@alpha` flag
+  does not propagate to transitive dependencies.
+- **Public install gate.** `scripts/release-gate.sh` live mode runs
+  `composer create-project ausus/starter:$VERSION` from a fresh tmp
+  directory against Packagist on every tag. The previous BUG #1
+  scenario would now fail the gate before tag promotion.
+
 ## [Unreleased] — v0.1.x stabilisation
 
 ### Changed

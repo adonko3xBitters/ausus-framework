@@ -3,6 +3,24 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [0.2.0-alpha.4] — 2026-05-27
+
+### Release engineering
+- **No HTTP contract, route, header, body, or status-code change.**
+  Zero code changes vs `v0.2.0-alpha.3`. The `Router`, `ErrorMapper`,
+  `BadRequest`, marker interfaces dispatch, JSON envelope shape, and
+  PSR-7/15 surface are all bit-identical. Consumers see the exact same
+  wire.
+- **Release validation alignment.** The api-http manifest is now
+  validated by `composer validate --strict` (Composer 2.x — the
+  deprecated `--no-check-version` flag is dropped from the CI gate).
+- **Live install gate.** Every tagged release is exercised by
+  `scripts/release-gate.sh` in live mode, including a real
+  `composer create-project ausus/starter` from Packagist that pulls
+  api-http transitively + verifies the L4 surface is callable.
+  Regression of the wire would now fail the release-gate workflow
+  before any tag promotion.
+
 ## [Unreleased] — v0.1.x stabilisation
 
 ### Documentation
