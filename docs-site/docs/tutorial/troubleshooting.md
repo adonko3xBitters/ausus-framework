@@ -284,9 +284,15 @@ composer config prefer-stable true
 composer update
 ```
 
-Starting at `v0.2.0-alpha.4`, `composer create-project ausus/starter`
-already sets this for you — you only hit this error if you set up the
-project manually.
+If you are using `composer create-project`, request the alpha channel
+explicitly:
+
+```bash
+composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+```
+
+The flag is required for every v0.2.x alpha install until the first stable
+AUSUS release.
 
 See [Alpha installation requirements](../getting-started/installation.md#alpha-installation-requirements)
 for the full explanation.
