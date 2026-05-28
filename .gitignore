@@ -22,6 +22,10 @@ apps/playground/*.sqlite
 *.sqlite
 *.sqlite-journal
 *.log
+# Release evidence logs are intentionally committed (see
+# scripts/archive-release-evidence.sh) so postmortem/replay/audit does not
+# depend on ephemeral CI run retention.
+!artifacts/releases/**/*.log
 
 # ── Editor / OS ──────────────────────────────────────────────────────────
 .DS_Store

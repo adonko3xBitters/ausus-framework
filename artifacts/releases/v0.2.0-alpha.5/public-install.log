@@ -1,0 +1,34 @@
+[public-install] tmp dir=/var/folders/nh/43pg_05j7nd57llcqxxcz8j80000gn/T/ausus-public-install-XXXXXX.2UyQesbMzu
+[public-install] expected version=v0.2.0-alpha.5
+[public-install] step 1 — composer init (alpha stability)
+  ✓ composer.json written (minimum-stability=alpha, prefer-stable=true)
+[public-install] step 2 — composer require ausus/standard-stack:^0.2@alpha
+  ✓ composer require succeeded
+[public-install] step 3 — verify all ausus/* installed at v0.2.0-alpha.5
+  ✓ ausus/kernel                   v0.2.0-alpha.5
+  ✓ ausus/runtime-default          v0.2.0-alpha.5
+  ✓ ausus/persistence-sql          v0.2.0-alpha.5
+  ✓ ausus/api-http                 v0.2.0-alpha.5
+  ✓ ausus/standard-stack           v0.2.0-alpha.5
+[public-install] step 4 — verify no monorepo embedded in vendor/ausus/*
+  ✓ vendor/ausus/kernel                 clean
+  ✓ vendor/ausus/runtime-default        clean
+  ✓ vendor/ausus/persistence-sql        clean
+  ✓ vendor/ausus/api-http               clean
+  ✓ vendor/ausus/standard-stack         clean
+[public-install] step 5 — verify autoload reaches v0.2 public surface
+  ✓ Ausus\Application
+  ✓ Ausus\ApplicationConfig
+  ✓ Ausus\Compiler
+  ✓ Ausus\BuiltinEffect
+  ✓ Ausus\InvocationResult
+  ✓ Ausus\Api\Http\Router
+  ✓ Ausus\Api\Http\ErrorMapper
+  ✓ Ausus\Errors\BadRequestError
+  ✓ Ausus\Errors\ForbiddenError
+  ✓ Ausus\Errors\NotFoundError
+  ✓ Ausus\Errors\ConflictError
+  ✓ Ausus\Errors\InternalError
+[public-install] step 6 — smoke test (Application::create on SQLite)
+  ✓ Application instance created
+[public-install] OK

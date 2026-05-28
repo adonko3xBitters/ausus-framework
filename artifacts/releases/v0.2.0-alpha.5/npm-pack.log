@@ -1,0 +1,35 @@
+npm notice
+npm notice 📦  @ausus/renderer-react@0.2.0-alpha.5
+npm notice Tarball Contents
+npm notice 1.1kB LICENSE
+npm notice 3.1kB README.md
+npm notice 3.0kB dist/components.d.ts
+npm notice 20.0kB dist/components.js
+npm notice 554B dist/context.d.ts
+npm notice 605B dist/context.js
+npm notice 862B dist/hooks.d.ts
+npm notice 3.2kB dist/hooks.js
+npm notice 559B dist/index.d.ts
+npm notice 718B dist/index.js
+npm notice 2.5kB dist/types.d.ts
+npm notice 115B dist/types.js
+npm notice 454B dist/ViewSchemaConsumer.d.ts
+npm notice 1.6kB dist/ViewSchemaConsumer.js
+npm notice 1.4kB package.json
+npm notice 22.0kB src/components.tsx
+npm notice 1.0kB src/context.tsx
+npm notice 3.4kB src/hooks.tsx
+npm notice 861B src/index.ts
+npm notice 2.3kB src/types.ts
+npm notice 1.5kB src/ViewSchemaConsumer.tsx
+npm notice Tarball Details
+npm notice name: @ausus/renderer-react
+npm notice version: 0.2.0-alpha.5
+npm notice filename: ausus-renderer-react-0.2.0-alpha.5.tgz
+npm notice package size: 16.9 kB
+npm notice unpacked size: 70.8 kB
+npm notice shasum: 8b8a1997c6080b7805afd51d3d88e2077c772c73
+npm notice integrity: sha512-CO/dDqK1ujZHy[...]T5U8MGyphj0+w==
+npm notice total files: 21
+npm notice
+ausus-renderer-react-0.2.0-alpha.5.tgz

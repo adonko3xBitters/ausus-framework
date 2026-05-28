@@ -1,0 +1,19 @@
+{
+  "version": "v0.2.0-alpha.5",
+  "tag": "v0.2.0-alpha.5",
+  "commit": "356e26ee188bb183f8301017f0ddcdbbedc8a7ba",
+  "packages": {
+    "ausus/api-http": "v0.2.0-alpha.5",
+    "ausus/audit-database": "v0.2.0-alpha.5",
+    "ausus/auth-bridge": "v0.2.0-alpha.5",
+    "ausus/kernel": "v0.2.0-alpha.5",
+    "ausus/persistence-sql": "v0.2.0-alpha.5",
+    "ausus/presentation-default": "v0.2.0-alpha.5",
+    "ausus/runtime-default": "v0.2.0-alpha.5",
+    "ausus/standard-stack": "v0.2.0-alpha.5",
+    "ausus/starter": "v0.2.0-alpha.5",
+    "ausus/tenancy-row": "v0.2.0-alpha.5",
+    "@ausus/renderer-react": "0.2.0-alpha.5"
+  },
+  "published_at": "2026-05-28T18:39:12Z"
+}
