@@ -216,10 +216,20 @@ echo "[ci] step 9 — npm pack --dry-run"
 
 # 10
 echo "[ci] step 10 — L4 HTTP integration (live php -S + renderer-react)"
-bash scripts/integration-http.sh > /tmp/ausus-ci-integration.log 2>&1
-grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-integration.log \
-    && echo "  ✓ integration-http $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-integration.log | head -1)" \
-    || { echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10; }
+if bash scripts/integration-http.sh > /tmp/ausus-ci-integration.log 2>&1; then
+    INT_TRACE_OK=$(grep -cE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-integration.log || true)
+    INT_FS_OK=$(grep -cE "live filter\+sort: passed=[0-9]+ failed=0" /tmp/ausus-ci-integration.log || true)
+    if [[ "$INT_TRACE_OK" -ge 1 && "$INT_FS_OK" -ge 1 ]]; then
+        TRACE_N=$(grep -oE 'RESULT: passed=[0-9]+' /tmp/ausus-ci-integration.log | head -1)
+        FS_N=$(grep -oE 'live filter\+sort: passed=[0-9]+' /tmp/ausus-ci-integration.log | head -1)
+        echo "  ✓ integration-http live-trace $TRACE_N"
+        echo "  ✓ integration-http $FS_N"
+    else
+        echo "integration-http: missing one of the expected RESULT lines"; tail -50 /tmp/ausus-ci-integration.log; exit 10;
+    fi
+else
+    echo "integration-http failed"; tail -50 /tmp/ausus-ci-integration.log; exit 10
+fi
 
 # 11
 echo "[ci] step 11 — public-install validation (Packagist clean-room)"
