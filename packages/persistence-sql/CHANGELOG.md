@@ -3,6 +3,24 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [0.2.0-alpha.4] — 2026-05-27
+
+### Release engineering
+- **No SQL, schema, or driver change.** Zero code changes vs
+  `v0.2.0-alpha.3`. `SqliteRepository`, `SqliteContext`,
+  `SqliteTransactionHandle`, `SqlitePersistenceDriver`, `SchemaDeriver`,
+  and `DatabaseAuditSink` are bit-identical. No table layout change,
+  no migration, no on-disk format change.
+- **Release validation compatibility.** The package manifest is
+  validated by the repo-level `scripts/release-gate.sh` with
+  `composer validate --strict` (Composer 2.x compliant — the deprecated
+  `--no-check-version` flag is no longer used).
+- **Public install validation.** Each tagged release of this package
+  is now exercised end-to-end by `scripts/release-gate.sh` live mode
+  (CI workflow `packagist-validation.yml`), which runs
+  `composer create-project ausus/starter` against Packagist live and
+  verifies the resulting install reaches the SQLite-backed runtime.
+
 ## [Unreleased] — v0.1.x stabilisation
 
 ### Documentation

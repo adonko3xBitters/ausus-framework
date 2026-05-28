@@ -3,6 +3,29 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [0.2.0-alpha.4] — 2026-05-27
+
+### Release engineering
+- **No runtime, Invoker, or wire change.** Zero code changes vs
+  `v0.2.0-alpha.3`. The runtime continues to emit
+  `schemaVersion: '1.0.0'` in every ViewSchema response, bit-identical
+  to the previous alpha.
+- **ViewSchema compatibility contract formalised.** The renderer
+  (`@ausus/renderer-react@0.2.0-alpha.4`) now declares a
+  `peerSchemaVersion: "^1.0.0"` field that pins the accepted backend
+  `schemaVersion` window. The runtime's emitted `schemaVersion` is
+  asserted to satisfy this range by
+  `scripts/check-renderer-alignment.sh` (CI step in
+  `release-gate.yml`). A backend release that bumps `schemaVersion`
+  must now coordinate a renderer release expanding
+  `peerSchemaVersion` — enforced at PR time, not at deploy.
+- **Renderer alignment enforcement.** The CI gate fails fast on any
+  drift between the runtime's emitted `schemaVersion` and the
+  renderer's declared `peerSchemaVersion`. Extraction is anchored on
+  the literal ProjectionRenderer pattern in `src/runtime.php`
+  (excludes comments, requires correct indent + quote style + trailing
+  comma) — fragile grep patterns from previous tooling are replaced.
+
 ## [Unreleased] — v0.1.x stabilisation
 
 ### Documentation
