@@ -89,8 +89,14 @@ fi
 echo "  ✓ composer boot succeeded"
 
 # ─── Gate E — every ausus/* dependency installed at EXPECTED_VERSION ────────
+#
+# Note: ausus/starter is intentionally excluded from this loop. It IS the
+# root project here (the scaffolded myapp), so `composer show ausus/starter`
+# does not return its own version. Its identity is verified by Gate B
+# (composer.json.name == ausus/starter); its version-correctness is verified
+# by Composer's own resolution against the documented `^0.2@alpha` constraint.
 echo "[clean-room] gate E — installed versions"
-for pkg in ausus/kernel ausus/runtime-default ausus/persistence-sql ausus/api-http ausus/standard-stack ausus/starter; do
+for pkg in ausus/kernel ausus/runtime-default ausus/persistence-sql ausus/api-http ausus/standard-stack; do
     INSTALLED="$(
         composer show "$pkg" 2>/dev/null \
         | awk '/^versions/ { gsub(/[*,]/, ""); for (i=2; i<=NF; i++) { v=$i; if (v != ":" && v != "") { print v; exit } } }'
