@@ -5,6 +5,7 @@ namespace Ausus\Persistence\Sql;
 
 use Ausus\{
     PersistenceDriver, PersistenceContext, Repository, PagedRepository, TransactionHandle,
+    Filter, Sort,
     Tenant, Reference, Version, Entity, MetadataGraph, EntityNode, FieldNode,
     Ulid, NotFound, ConcurrencyConflict, TenantBoundaryViolation
 };
@@ -207,9 +208,11 @@ final class SqliteRepository implements Repository, PagedRepository {
     }
 
     /**
+     * @param list<Filter> $filters
+     * @param list<Sort>   $sort
      * @return array{items: list<Entity>, totalCount: int}
      */
-    public function findPaged(int $limit, int $offset): array {
+    public function findPaged(int $limit, int $offset, array $filters = [], array $sort = []): array {
         // Defensive even though the contract requires the caller to validate.
         // SQLite's LIMIT/OFFSET clauses tolerate non-negative integers only;
         // a stray negative would otherwise hand us a 'malformed SQL' surprise.
@@ -221,29 +224,130 @@ final class SqliteRepository implements Repository, PagedRepository {
         }
         $table = $this->tableName();
 
-        // Two queries inside the same caller-provided transaction (the
-        // PersistenceContext orchestrates that wrapping). LIMIT/OFFSET first
-        // so the row hydration is paginated; COUNT(*) second so the wire
-        // metadata reports the un-windowed total.
-        $stmt = $this->pdo->prepare(
-            "SELECT * FROM \"{$table}\" WHERE tenant_id = :tid ORDER BY id LIMIT :lim OFFSET :off"
-        );
-        $stmt->bindValue(':tid', $this->tenant->value(), \PDO::PARAM_STR);
+        // ─── Build WHERE clause + parameter bag ─────────────────────────────
+        // `tenant_id` is always pinned; user filters land in additional AND
+        // conjuncts. Every column reference is whitelisted against the entity's
+        // declared field list — the renderer/HTTP layer already validates, but
+        // we defence-in-depth here so a misbehaving in-tree caller cannot
+        // smuggle a non-whitelisted column past us either.
+        $whereSql = ['tenant_id = :tid'];
+        $params   = [':tid' => $this->tenant->value()];
+        $paramIdx = 0;
+        foreach ($filters as $filter) {
+            if (!$filter instanceof Filter) {
+                throw new \InvalidArgumentException('findPaged: every filter must be an Ausus\Filter');
+            }
+            $col = $this->resolveColumn($filter->field);
+            switch ($filter->op) {
+                case Filter::OP_EQ:
+                    $placeholder = ':f' . $paramIdx++;
+                    $whereSql[] = "\"{$col}\" = {$placeholder}";
+                    $params[$placeholder] = $filter->value;
+                    break;
+                case Filter::OP_CONTAINS:
+                    $placeholder = ':f' . $paramIdx++;
+                    $whereSql[] = "LOWER(\"{$col}\") LIKE LOWER({$placeholder})";
+                    // Escape SQL LIKE metacharacters so a user-supplied '%foo%'
+                    // does not silently expand to a broader match.
+                    $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], (string) $filter->value);
+                    $params[$placeholder] = '%' . $escaped . '%';
+                    break;
+                case Filter::OP_IN:
+                    $inPlaceholders = [];
+                    foreach ($filter->value as $v) {
+                        $p = ':f' . $paramIdx++;
+                        $inPlaceholders[] = $p;
+                        $params[$p] = $v;
+                    }
+                    $whereSql[] = "\"{$col}\" IN (" . implode(',', $inPlaceholders) . ')';
+                    break;
+            }
+        }
+        $where = implode(' AND ', $whereSql);
+
+        // ─── ORDER BY (whitelisted + deterministic id-asc tail) ─────────────
+        $orderParts  = [];
+        $sortColsSeen = [];
+        foreach ($sort as $s) {
+            if (!$s instanceof Sort) {
+                throw new \InvalidArgumentException('findPaged: every sort entry must be an Ausus\Sort');
+            }
+            $col = $this->resolveColumn($s->field);
+            if (isset($sortColsSeen[$col])) {
+                // A second sort clause on the same column is a programming bug
+                // — reject loudly rather than silently keep the first.
+                throw new \InvalidArgumentException(
+                    "findPaged: duplicate sort column '{$s->field}'"
+                );
+            }
+            $sortColsSeen[$col] = true;
+            $dir = $s->direction === Sort::DIR_DESC ? 'DESC' : 'ASC';
+            $orderParts[] = "\"{$col}\" {$dir}";
+        }
+        // Always tail with `id ASC` so the page boundary is deterministic
+        // even when the caller-supplied sort yields ties.
+        if (!isset($sortColsSeen['id'])) {
+            $orderParts[] = '"id" ASC';
+        }
+        $orderBy = implode(', ', $orderParts);
+
+        // ─── Page select ────────────────────────────────────────────────────
+        $sql = "SELECT * FROM \"{$table}\" WHERE {$where} ORDER BY {$orderBy} LIMIT :lim OFFSET :off";
+        $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':lim', $limit,  \PDO::PARAM_INT);
         $stmt->bindValue(':off', $offset, \PDO::PARAM_INT);
+        foreach ($params as $name => $val) {
+            // Bind by type so SQLite stores ints, strings, bools correctly.
+            $type = match (true) {
+                is_int($val)  => \PDO::PARAM_INT,
+                is_bool($val) => \PDO::PARAM_BOOL,
+                $val === null => \PDO::PARAM_NULL,
+                default       => \PDO::PARAM_STR,
+            };
+            $stmt->bindValue($name, $val, $type);
+        }
         $stmt->execute();
         $items = [];
         foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             $items[] = $this->hydrate($row);
         }
 
-        $countStmt = $this->pdo->prepare(
-            "SELECT COUNT(*) AS n FROM \"{$table}\" WHERE tenant_id = :tid"
-        );
-        $countStmt->execute(['tid' => $this->tenant->value()]);
+        // ─── Total count under the same WHERE (no LIMIT/OFFSET) ─────────────
+        $countSql  = "SELECT COUNT(*) FROM \"{$table}\" WHERE {$where}";
+        $countStmt = $this->pdo->prepare($countSql);
+        foreach ($params as $name => $val) {
+            $type = match (true) {
+                is_int($val)  => \PDO::PARAM_INT,
+                is_bool($val) => \PDO::PARAM_BOOL,
+                $val === null => \PDO::PARAM_NULL,
+                default       => \PDO::PARAM_STR,
+            };
+            $countStmt->bindValue($name, $val, $type);
+        }
+        $countStmt->execute();
         $total = (int) $countStmt->fetchColumn();
 
         return ['items' => $items, 'totalCount' => $total];
+    }
+
+    /**
+     * Defence-in-depth column whitelist: reject any field name that is not
+     * declared on the entity's metadata. The renderer / HTTP layer already
+     * validates against the projection's declared fields, so this only fires
+     * on a programming bug or a misuse.
+     */
+    private function resolveColumn(string $field): string {
+        if ($field === 'id') {
+            return 'id';
+        }
+        foreach ($this->entity->fields as $f) {
+            if ($f->name === $field) {
+                return $field;
+            }
+        }
+        throw new \InvalidArgumentException(
+            "findPaged: unknown column '{$field}' on entity {$this->entity->fqn}"
+        );
     }
 
     private function hydrate(array $row): Entity {
