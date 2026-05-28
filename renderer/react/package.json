@@ -38,10 +38,10 @@
     "typescript":       "^6.0.3"
   },
   "keywords": ["ausus", "react", "renderer", "viewschema"],
-  "homepage": "https://github.com/ausus-framework/ausus",
+  "homepage": "https://github.com/adonko3xBitters/ausus-framework/tree/main/renderer/react",
   "repository": {
     "type": "git",
-    "url":  "https://github.com/ausus-framework/ausus.git",
+    "url":  "https://github.com/adonko3xBitters/ausus-framework.git",
     "directory": "renderer/react"
   },
   "engines": {
