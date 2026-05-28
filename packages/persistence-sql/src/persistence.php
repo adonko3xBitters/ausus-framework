@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Ausus\Persistence\Sql;
 
 use Ausus\{
-    PersistenceDriver, PersistenceContext, Repository, TransactionHandle,
+    PersistenceDriver, PersistenceContext, Repository, PagedRepository, TransactionHandle,
     Tenant, Reference, Version, Entity, MetadataGraph, EntityNode, FieldNode,
     Ulid, NotFound, ConcurrencyConflict, TenantBoundaryViolation
 };
@@ -59,7 +59,7 @@ final class SqliteContext implements PersistenceContext {
  *           signature, and its private SQL emission are intra-package
  *           details. Custom drivers ship their own Repository class.
  */
-final class SqliteRepository implements Repository {
+final class SqliteRepository implements Repository, PagedRepository {
     public function __construct(
         private readonly \PDO $pdo,
         private readonly Tenant $tenant,
@@ -204,6 +204,46 @@ final class SqliteRepository implements Repository {
             $entities[] = $this->hydrate($row);
         }
         return $entities;
+    }
+
+    /**
+     * @return array{items: list<Entity>, totalCount: int}
+     */
+    public function findPaged(int $limit, int $offset): array {
+        // Defensive even though the contract requires the caller to validate.
+        // SQLite's LIMIT/OFFSET clauses tolerate non-negative integers only;
+        // a stray negative would otherwise hand us a 'malformed SQL' surprise.
+        if ($limit < 1) {
+            throw new \InvalidArgumentException("findPaged: limit must be >= 1, got {$limit}");
+        }
+        if ($offset < 0) {
+            throw new \InvalidArgumentException("findPaged: offset must be >= 0, got {$offset}");
+        }
+        $table = $this->tableName();
+
+        // Two queries inside the same caller-provided transaction (the
+        // PersistenceContext orchestrates that wrapping). LIMIT/OFFSET first
+        // so the row hydration is paginated; COUNT(*) second so the wire
+        // metadata reports the un-windowed total.
+        $stmt = $this->pdo->prepare(
+            "SELECT * FROM \"{$table}\" WHERE tenant_id = :tid ORDER BY id LIMIT :lim OFFSET :off"
+        );
+        $stmt->bindValue(':tid', $this->tenant->value(), \PDO::PARAM_STR);
+        $stmt->bindValue(':lim', $limit,  \PDO::PARAM_INT);
+        $stmt->bindValue(':off', $offset, \PDO::PARAM_INT);
+        $stmt->execute();
+        $items = [];
+        foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            $items[] = $this->hydrate($row);
+        }
+
+        $countStmt = $this->pdo->prepare(
+            "SELECT COUNT(*) AS n FROM \"{$table}\" WHERE tenant_id = :tid"
+        );
+        $countStmt->execute(['tid' => $this->tenant->value()]);
+        $total = (int) $countStmt->fetchColumn();
+
+        return ['items' => $items, 'totalCount' => $total];
     }
 
     private function hydrate(array $row): Entity {

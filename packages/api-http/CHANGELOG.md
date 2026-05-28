@@ -3,6 +3,15 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased] — v0.2.0-beta.1 prep
+
+### Added
+- `GET /projections/{fqn}` accepts `?limit=N&offset=M` (list mode only). Both
+  must be non-negative integers; `limit` is clamped to `[1, 1000]`. Invalid
+  input returns `400 BadRequest` with the precise reason rather than coercing
+  silently. Subject-mode (`?subject=…`) ignores both, matching the renderer's
+  detail-view contract.
+
 ## [0.2.0-alpha.5] — 2026-05-28
 
 ### Changed

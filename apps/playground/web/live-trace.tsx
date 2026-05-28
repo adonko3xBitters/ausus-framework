@@ -72,7 +72,7 @@ async function main(): Promise<void> {
   traces.push(frame("01 — GET /api/_health", JSON.stringify(health, null, 2)));
 
   // ── 2. GET summary ────────────────────────────────────────────────────────
-  const summaryUrl = `${API_BASE_URL}/projections/billing.invoice.summary?locale=en-US&renderer=react.web.v1&acceptSchemaVersions=1.0.0`;
+  const summaryUrl = `${API_BASE_URL}/projections/billing.invoice.summary?locale=en-US&renderer=react.web.v1&acceptSchemaVersions=1.1.0`;
   const tSum1Start = performance.now();
   const schema1: ViewSchema = await getJson(summaryUrl);
   tCheck["GET summary (initial)"] = performance.now() - tSum1Start;
@@ -119,7 +119,7 @@ async function main(): Promise<void> {
   );
 
   // ── 8. DetailView for the ISSUED invoice ──────────────────────────────────
-  const detailUrl = `${API_BASE_URL}/projections/billing.invoice.detail?locale=en-US&renderer=react.web.v1&acceptSchemaVersions=1.0.0&subject=${issueRef.identityHandle}`;
+  const detailUrl = `${API_BASE_URL}/projections/billing.invoice.detail?locale=en-US&renderer=react.web.v1&acceptSchemaVersions=1.1.0&subject=${issueRef.identityHandle}`;
   const tDetStart = performance.now();
   const detailSchema: ViewSchema = await getJson(detailUrl);
   tCheck["GET detail"] = performance.now() - tDetStart;
@@ -183,7 +183,7 @@ async function main(): Promise<void> {
 
   console.log("\n── assertions ─────────────────────────────────────────────────────────");
   ok("health 200 + graph hash echoed",            !!health.ok && typeof health.graphHash === "string" && health.graphHash.length > 8);
-  ok("summary schemaVersion = 1.0.0",             schema1.schemaVersion === "1.0.0");
+  ok("summary schemaVersion = 1.1.0",             schema1.schemaVersion === "1.1.0");
   ok("summary contains 2 seeded invoices",        items1.length === 2);
   ok("initial render shows DRAFT for invoice 1",  html1.includes("ausus-badge--gray") && html1.includes(invoice1.id.slice(0,8)));
   ok("issue returns 200 ok",                      issued.status === 200 && issued.json.ok === true);

@@ -336,6 +336,22 @@ final class Application
         return $this->ensureBooted()->renderer;
     }
 
+    /**
+     * Convenience wrapper around {@see ProjectionRenderer::render()}: render
+     * a ViewSchema for the given projection FQN in the current tenant.
+     *
+     * Defaults match the HTTP API surface (limit=50, offset=0) so this method
+     * is byte-equivalent to GET /projections/{fqn} with no query parameters.
+     */
+    public function renderProjection(
+        string $projectionFqn,
+        ?\Ausus\Reference $subject = null,
+        int $limit = 50,
+        int $offset = 0,
+    ): array {
+        return $this->renderer()->render($projectionFqn, $subject, $limit, $offset);
+    }
+
     /** The audit sink the runtime writes through. */
     public function auditSink(): AuditSink
     {

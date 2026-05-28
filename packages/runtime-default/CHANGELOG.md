@@ -3,6 +3,23 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased] — v0.2.0-beta.1 prep
+
+### Added
+- `ProjectionRenderer::render()` accepts optional `$limit` (default 50, max
+  1000) and `$offset` (default 0) parameters. When the underlying repository
+  implements `Ausus\PagedRepository`, the window is pushed into SQL; otherwise
+  an in-memory `array_slice` fallback preserves the same wire output. Negative
+  inputs are defensively clamped to legal values.
+- Wire shape `data.pagination` now carries `limit`, `offset`, `totalCount`,
+  `pageSize`. `nextCursor` is preserved at `null` as the reserved slot for
+  the future cursor-based pagination axis. Additive — consumers reading the
+  old shape continue to work.
+
+### Changed
+- `schemaVersion` bumped to **`1.1.0`**. Renderer `peerSchemaVersion: ^1.0.0`
+  satisfies `1.1.0`, so no coordinated renderer release is required.
+
 ## [0.2.0-alpha.5] — 2026-05-28
 
 ### Changed

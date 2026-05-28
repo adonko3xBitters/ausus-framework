@@ -134,6 +134,13 @@ grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-errors.log \
     && echo "  ✓ error-taxonomy $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-errors.log | head -1)" \
     || { echo "error-taxonomy failed"; tail -50 /tmp/ausus-ci-errors.log; exit 4; }
 
+# 4k
+echo "[ci] step 4k — php apps/playground/pagination-test.php"
+php apps/playground/pagination-test.php > /tmp/ausus-ci-pagination.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-pagination.log \
+    && echo "  ✓ pagination $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-pagination.log | head -1)" \
+    || { echo "pagination failed"; tail -50 /tmp/ausus-ci-pagination.log; exit 4; }
+
 # 5
 echo "[ci] step 5 — composer boot (starter)"
 composer --working-dir=packages/starter boot >/dev/null 2>&1 \

@@ -3,6 +3,15 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [Unreleased] — v0.2.0-beta.1 prep
+
+### Added
+- `SqliteRepository` now implements the new `Ausus\PagedRepository` interface
+  (`findPaged(int $limit, int $offset)`), pushing pagination into a single
+  `SELECT … LIMIT ? OFFSET ?` plus a `COUNT(*)` for the un-windowed total.
+  `findAll()` is unchanged. `LIMIT/OFFSET` are bound as `PDO::PARAM_INT` and
+  defensively re-validated even though the caller is expected to pre-clamp.
+
 ## [0.2.0-alpha.5] — 2026-05-28
 
 ### Changed

@@ -6,7 +6,7 @@ namespace Ausus\Runtime;
 use Ausus\{
     Actor, Auditor, AuditEntry, AuditSink, ActorRef, BuiltinEffect, Context, Decision,
     Effect, EffectContext,
-    Instant, MetadataGraph, NotFound, PersistenceContext, PersistenceDriver, Policy, PolicyDenied,
+    Instant, MetadataGraph, NotFound, PagedRepository, PersistenceContext, PersistenceDriver, Policy, PolicyDenied,
     Reference, Repository, SingleSubject, Subject, Tenant, TransactionHandle, Ulid,
     UnknownAction, PolicySubjectRequired, ActorRequired, TenantContextRequired,
     TenantBoundaryViolation, WorkflowStateMismatch, WorkflowSubjectNotFound,
@@ -394,7 +394,35 @@ final class ProjectionRenderer {
         private readonly Tenant $tenant,
     ) {}
 
-    public function render(string $projectionFqn, ?Reference $subject = null): array {
+    /**
+     * Render a ViewSchema (RFC-004 wire) for the given projection.
+     *
+     * Pagination (list mode only):
+     *   - `$limit` (default 50, max 1000) — items per page.
+     *   - `$offset` (default 0) — items to skip before the page.
+     *   The HTTP API layer is responsible for parsing/clamping these from
+     *   the request; this method assumes pre-validated values and re-asserts
+     *   defensively. Repositories implementing {@see PagedRepository} push
+     *   the window into SQL; others fall back to an in-memory slice.
+     *
+     * Wire shape (schemaVersion 1.1.0):
+     *   data.pagination = {
+     *     limit, offset, totalCount, pageSize,    // added in 1.1
+     *     nextCursor                              // reserved for cursor support
+     *   }
+     */
+    public function render(
+        string $projectionFqn,
+        ?Reference $subject = null,
+        int $limit = 50,
+        int $offset = 0,
+    ): array {
+        // Defensive clamps — also surface a clear failure if a non-HTTP caller
+        // passes garbage values directly into the renderer.
+        if ($limit < 1)    $limit = 1;
+        if ($limit > 1000) $limit = 1000;
+        if ($offset < 0)   $offset = 0;
+
         $proj = $this->graph->projections[$projectionFqn] ?? throw new \RuntimeException("Unknown projection: {$projectionFqn}");
         $entity = $this->graph->entities[$proj->ownerEntityFqn] ?? throw new \RuntimeException("Missing entity for projection");
 
@@ -437,7 +465,18 @@ final class ProjectionRenderer {
                 $found = $repo->find($subject);
                 $data = ['item' => $found?->fields];
             } else {
-                $entities = $repo->findAll();
+                // Push pagination into SQL when the driver supports it; otherwise
+                // hydrate everything and slice in memory. Both branches converge
+                // to the same wire shape, so consumers do not see the difference.
+                if ($repo instanceof PagedRepository) {
+                    $page = $repo->findPaged($limit, $offset);
+                    $entities  = $page['items'];
+                    $totalCount = $page['totalCount'];
+                } else {
+                    $allEntities = $repo->findAll();
+                    $totalCount  = count($allEntities);
+                    $entities    = array_slice($allEntities, $offset, $limit);
+                }
                 $projected = [];
                 foreach ($entities as $row) {
                     $r = [];
@@ -446,7 +485,16 @@ final class ProjectionRenderer {
                     }
                     $projected[] = $r;
                 }
-                $data = ['items' => $projected, 'pagination' => ['nextCursor' => null, 'pageSize' => count($projected)]];
+                $data = [
+                    'items' => $projected,
+                    'pagination' => [
+                        'limit'      => $limit,
+                        'offset'     => $offset,
+                        'totalCount' => $totalCount,
+                        'pageSize'   => count($projected),
+                        'nextCursor' => null,
+                    ],
+                ];
             }
             $this->driver->commit($tx);
         } catch (\Throwable $e) {
@@ -472,7 +520,7 @@ final class ProjectionRenderer {
         }
 
         return [
-            'schemaVersion' => '1.0.0',
+            'schemaVersion' => '1.1.0',
             'targetProfile' => 'react.web.v1',
             'metadata' => [
                 'projection' => $proj->fqn,

@@ -99,7 +99,7 @@ _assert('cross-tenant ref throws TenantBoundaryViolation',
 // ── test 8: projection render ─────────────────────────────────────────────────
 echo "\n── test 8: projection render ─────────────────────────────────\n";
 $summary = $app->render('billing.invoice.summary');
-_assert('viewschema schemaVersion == 1.0.0', ($summary['schemaVersion'] ?? null) === '1.0.0');
+_assert('viewschema schemaVersion == 1.1.0', ($summary['schemaVersion'] ?? null) === '1.1.0');
 _assert('viewschema renders 1 invoice',      count($summary['data']['items'] ?? []) === 1);
 _assert('rendered invoice is CANCELLED',
         ($summary['data']['items'][0]['status'] ?? null) === 'CANCELLED');

@@ -116,8 +116,36 @@ final class Router implements RequestHandlerInterface
             );
         }
 
+        // Pagination — list mode only. Defaults match the renderer's own
+        // defaults; the renderer re-clamps defensively but the API layer is
+        // the authoritative user-facing validator and emits 400s on garbage.
+        $limit  = 50;
+        $offset = 0;
+        if ($subjectRef === null) {
+            if (array_key_exists('limit', $params)) {
+                $rawLimit = $params['limit'];
+                if (!is_string($rawLimit) || !preg_match('/^[0-9]+$/', $rawLimit)) {
+                    return $this->errorJson(400, 'BadRequest', "?limit must be a non-negative integer");
+                }
+                $limit = (int) $rawLimit;
+                if ($limit < 1) {
+                    return $this->errorJson(400, 'BadRequest', "?limit must be >= 1");
+                }
+                if ($limit > 1000) {
+                    return $this->errorJson(400, 'BadRequest', "?limit max is 1000 (got {$limit})");
+                }
+            }
+            if (array_key_exists('offset', $params)) {
+                $rawOffset = $params['offset'];
+                if (!is_string($rawOffset) || !preg_match('/^[0-9]+$/', $rawOffset)) {
+                    return $this->errorJson(400, 'BadRequest', "?offset must be a non-negative integer");
+                }
+                $offset = (int) $rawOffset;
+            }
+        }
+
         $renderer = new ProjectionRenderer($this->graph, $this->driver, $tenant);
-        $schema   = $renderer->render($fqn, $subjectRef);
+        $schema   = $renderer->render($fqn, $subjectRef, $limit, $offset);
 
         return $this->json(200, $schema);
     }
