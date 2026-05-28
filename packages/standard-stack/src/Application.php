@@ -343,13 +343,19 @@ final class Application
      * Defaults match the HTTP API surface (limit=50, offset=0) so this method
      * is byte-equivalent to GET /projections/{fqn} with no query parameters.
      */
+    /**
+     * @param list<\Ausus\Filter> $filters
+     * @param list<\Ausus\Sort>   $sort
+     */
     public function renderProjection(
         string $projectionFqn,
         ?\Ausus\Reference $subject = null,
         int $limit = 50,
         int $offset = 0,
+        array $filters = [],
+        array $sort = [],
     ): array {
-        return $this->renderer()->render($projectionFqn, $subject, $limit, $offset);
+        return $this->renderer()->render($projectionFqn, $subject, $limit, $offset, $filters, $sort);
     }
 
     /** The audit sink the runtime writes through. */

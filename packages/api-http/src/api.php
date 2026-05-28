@@ -12,6 +12,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Ausus\{
     Tenant, TenantId, ActorRef, StubActor, Reference,
     MetadataGraph, PersistenceDriver, AuditSink,
+    Filter,
 };
 use Ausus\Runtime\{
     Invoker, PolicyEngine, WorkflowRuntime, TransitionSetIndex,
@@ -119,8 +120,9 @@ final class Router implements RequestHandlerInterface
         // Pagination — list mode only. Defaults match the renderer's own
         // defaults; the renderer re-clamps defensively but the API layer is
         // the authoritative user-facing validator and emits 400s on garbage.
-        $limit  = 50;
-        $offset = 0;
+        $limit   = 50;
+        $offset  = 0;
+        $filters = [];
         if ($subjectRef === null) {
             if (array_key_exists('limit', $params)) {
                 $rawLimit = $params['limit'];
@@ -142,10 +144,43 @@ final class Router implements RequestHandlerInterface
                 }
                 $offset = (int) $rawOffset;
             }
+
+            // Filtering — parse '?filter.<field>.<op>=<value>' from the raw
+            // query string. We deliberately bypass PSR-7's parse_str-based
+            // getQueryParams() here because PHP's parse_str silently rewrites
+            // '.' to '_' in top-level keys (legacy register_globals semantics),
+            // which would mangle 'filter.status.eq' into 'filter_status_eq'.
+            // Walking the raw query keeps the key shape stable across servers.
+            $rawQuery = $request->getUri()->getQuery();
+            $projectionFields = ['id', ...$projection->fields];
+            try {
+                $pairs = $this->parseFilterPairs($rawQuery);
+            } catch (\InvalidArgumentException $e) {
+                return $this->errorJson(400, 'BadRequest', $e->getMessage());
+            }
+            foreach ($pairs as $parsed) {
+                [$field, $op, $rawVal] = $parsed;
+                if (!in_array($field, $projectionFields, true)) {
+                    return $this->errorJson(400, 'BadRequest',
+                        "filter field '{$field}' is not declared on projection {$fqn}");
+                }
+                if (!in_array($op, Filter::OPS, true)) {
+                    return $this->errorJson(400, 'BadRequest',
+                        "filter operator '{$op}' is not supported (allowed: " . implode(',', Filter::OPS) . ')');
+                }
+                try {
+                    $value = $op === Filter::OP_IN
+                        ? $this->parseInList($rawVal)
+                        : $rawVal;
+                    $filters[] = new Filter($field, $op, $value);
+                } catch (\InvalidArgumentException $e) {
+                    return $this->errorJson(400, 'BadRequest', $e->getMessage());
+                }
+            }
         }
 
         $renderer = new ProjectionRenderer($this->graph, $this->driver, $tenant);
-        $schema   = $renderer->render($fqn, $subjectRef, $limit, $offset);
+        $schema   = $renderer->render($fqn, $subjectRef, $limit, $offset, $filters);
 
         return $this->json(200, $schema);
     }
@@ -259,6 +294,62 @@ final class Router implements RequestHandlerInterface
             ->withHeader('Access-Control-Allow-Headers',
                 'Content-Type, X-Tenant-ID, X-Actor-Id, X-Actor-Roles')
             ->withHeader('Access-Control-Max-Age', '600');
+    }
+
+    /**
+     * Walk the raw query string and pull out `filter.<field>.<op>=<value>`
+     * triples. Returns a list of `[field, op, decoded_value]`.
+     *
+     * Why not getQueryParams(): PHP's parse_str rewrites '.' to '_' in
+     * top-level keys, which would mangle 'filter.status.eq' → 'filter_status_eq'.
+     * Walking the raw URI query keeps the dotted key shape stable.
+     *
+     * @return list<array{0:string,1:string,2:string}>
+     */
+    private function parseFilterPairs(string $rawQuery): array
+    {
+        $out = [];
+        if ($rawQuery === '') {
+            return $out;
+        }
+        foreach (explode('&', $rawQuery) as $pair) {
+            if ($pair === '') continue;
+            [$key, $val] = array_pad(explode('=', $pair, 2), 2, '');
+            $key = urldecode($key);
+            $val = urldecode($val);
+            if (!str_starts_with($key, 'filter.')) continue;
+            // Expected shape: filter.<field>.<op>
+            $segments = explode('.', $key);
+            if (count($segments) !== 3 || $segments[1] === '' || $segments[2] === '') {
+                throw new \InvalidArgumentException(
+                    "malformed filter key '{$key}' (expected 'filter.<field>.<op>')"
+                );
+            }
+            $out[] = [$segments[1], $segments[2], $val];
+        }
+        return $out;
+    }
+
+    /**
+     * Parse a comma-separated `in` list. Empty entries are rejected so
+     * `?filter.status.in=A,,B` does not silently smuggle an empty-string
+     * scalar into the filter.
+     *
+     * @return list<string>
+     */
+    private function parseInList(string $raw): array
+    {
+        if ($raw === '') {
+            throw new \InvalidArgumentException("filter '... in' value list must not be empty");
+        }
+        $out = [];
+        foreach (explode(',', $raw) as $entry) {
+            if ($entry === '') {
+                throw new \InvalidArgumentException("filter '... in' value list contains an empty entry");
+            }
+            $out[] = $entry;
+        }
+        return $out;
     }
 }
 

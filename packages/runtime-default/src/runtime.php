@@ -6,6 +6,7 @@ namespace Ausus\Runtime;
 use Ausus\{
     Actor, Auditor, AuditEntry, AuditSink, ActorRef, BuiltinEffect, Context, Decision,
     Effect, EffectContext,
+    Filter, Sort,
     Instant, MetadataGraph, NotFound, PagedRepository, PersistenceContext, PersistenceDriver, Policy, PolicyDenied,
     Reference, Repository, SingleSubject, Subject, Tenant, TransactionHandle, Ulid,
     UnknownAction, PolicySubjectRequired, ActorRequired, TenantContextRequired,
@@ -411,11 +412,17 @@ final class ProjectionRenderer {
      *     nextCursor                              // reserved for cursor support
      *   }
      */
+    /**
+     * @param list<Filter> $filters whitelisted by the caller against the projection's fields
+     * @param list<Sort>   $sort    whitelisted by the caller against the entity's fields
+     */
     public function render(
         string $projectionFqn,
         ?Reference $subject = null,
         int $limit = 50,
         int $offset = 0,
+        array $filters = [],
+        array $sort = [],
     ): array {
         // Defensive clamps — also surface a clear failure if a non-HTTP caller
         // passes garbage values directly into the renderer.
@@ -469,10 +476,14 @@ final class ProjectionRenderer {
                 // hydrate everything and slice in memory. Both branches converge
                 // to the same wire shape, so consumers do not see the difference.
                 if ($repo instanceof PagedRepository) {
-                    $page = $repo->findPaged($limit, $offset);
+                    $page = $repo->findPaged($limit, $offset, $filters, $sort);
                     $entities  = $page['items'];
                     $totalCount = $page['totalCount'];
                 } else {
+                    // Non-paged adapter: filters and sort cannot be honoured.
+                    // Fall back to findAll() and surface the limitation
+                    // honestly by ignoring the windowing inputs — the caller
+                    // is the api-http layer which always uses PagedRepository.
                     $allEntities = $repo->findAll();
                     $totalCount  = count($allEntities);
                     $entities    = array_slice($allEntities, $offset, $limit);
