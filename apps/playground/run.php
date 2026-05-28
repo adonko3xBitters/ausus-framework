@@ -137,7 +137,7 @@ _assert('stale update raises ConcurrencyConflict',
 echo "\n── test 9: render projection ViewSchema ──────────────────────\n";
 $renderer = $app->renderer();
 $summary = $renderer->render('billing.invoice.summary');
-_assert('viewschema.schemaVersion == 1.1.0',  $summary['schemaVersion'] === '1.1.0');
+_assert('viewschema.schemaVersion == 1.2.0',  $summary['schemaVersion'] === '1.2.0');
 _assert('viewschema.targetProfile == react.web.v1', $summary['targetProfile'] === 'react.web.v1');
 _assert('viewschema.fields has 5 fields',      count($summary['fields']) === 5);
 _assert('viewschema.actions has 2 actions',    count($summary['actions']) === 2);

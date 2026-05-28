@@ -107,7 +107,7 @@ $projReq = $factory->createServerRequest('GET', '/api/projections/billing.invoic
 $projRes = $app->http($projReq);
 $schema  = bodyJson($projRes);
 _assert('projection → 200',                   $projRes->getStatusCode() === 200);
-_assert('schemaVersion 1.1.0',                ($schema['schemaVersion'] ?? null) === '1.1.0');
+_assert('schemaVersion 1.2.0',                ($schema['schemaVersion'] ?? null) === '1.2.0');
 _assert('data.items is an array',             is_array($schema['data']['items'] ?? null));
 _assert('items contain the seeded invoice',   count($schema['data']['items']) >= 1);
 

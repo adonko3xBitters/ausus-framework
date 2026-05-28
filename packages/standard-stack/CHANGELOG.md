@@ -7,10 +7,11 @@ Versioning follows [SemVer](https://semver.org/).
 
 ### Added
 - `Ausus\Application::renderProjection(string $fqn, ?Reference $subject, int
-  $limit = 50, int $offset = 0): array` — convenience wrapper around the
-  underlying `ProjectionRenderer::render()` that mirrors the HTTP API surface
-  defaults. Lets non-HTTP callers paginate without manually grabbing the
-  renderer via `$app->renderer()`.
+  $limit = 50, int $offset = 0, list<Filter> = [], list<Sort> = []): array`
+  — convenience wrapper around the underlying `ProjectionRenderer::render()`
+  that mirrors the HTTP API surface defaults. Lets non-HTTP callers
+  paginate / filter / sort without manually grabbing the renderer via
+  `$app->renderer()`.
 
 ## [0.2.0-alpha.5] — 2026-05-28
 

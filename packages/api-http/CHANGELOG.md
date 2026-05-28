@@ -6,11 +6,20 @@ Versioning follows [SemVer](https://semver.org/).
 ## [Unreleased] — v0.2.0-beta.1 prep
 
 ### Added
-- `GET /projections/{fqn}` accepts `?limit=N&offset=M` (list mode only). Both
-  must be non-negative integers; `limit` is clamped to `[1, 1000]`. Invalid
-  input returns `400 BadRequest` with the precise reason rather than coercing
-  silently. Subject-mode (`?subject=…`) ignores both, matching the renderer's
-  detail-view contract.
+- `GET /projections/{fqn}` accepts five list-mode query parameters:
+  - `?limit=N` (clamped to [1, 1000]) and `?offset=M` (non-negative).
+  - `?filter.<field>.<op>=<value>` for `op ∈ {eq, in, contains}`. In-list
+    values are comma-separated. Walked from the raw URI query to defeat
+    PHP `parse_str`'s `.→_` rewrite. Whitelisted against the projection's
+    declared fields.
+  - `?sort=<field>:<dir>[,<field>:<dir>]` for multi-column ordering.
+    Directions must be exactly `asc` or `desc`; capitalised forms are
+    refused so the SQL adapter's pattern match cannot drift.
+- Every malformed input returns `400 BadRequest` with a precise reason
+  (`'… is not declared on projection …'`, `'allowed: …'`,
+  `'<field>:<asc|desc>'`, `'more than once'`, `'must not be empty'`).
+- Subject mode (`?subject=…`) ignores filter and sort parameters; the
+  detail-view contract has no list-narrowing surface.
 
 ## [0.2.0-alpha.5] — 2026-05-28
 

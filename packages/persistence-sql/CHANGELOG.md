@@ -6,11 +6,25 @@ Versioning follows [SemVer](https://semver.org/).
 ## [Unreleased] — v0.2.0-beta.1 prep
 
 ### Added
-- `SqliteRepository` now implements the new `Ausus\PagedRepository` interface
-  (`findPaged(int $limit, int $offset)`), pushing pagination into a single
-  `SELECT … LIMIT ? OFFSET ?` plus a `COUNT(*)` for the un-windowed total.
-  `findAll()` is unchanged. `LIMIT/OFFSET` are bound as `PDO::PARAM_INT` and
-  defensively re-validated even though the caller is expected to pre-clamp.
+- `SqliteRepository` implements the new `Ausus\PagedRepository` interface
+  with full filtering + sorting pushdown:
+  - **Pagination** — `SELECT … LIMIT ? OFFSET ?` bound as `PDO::PARAM_INT`,
+    plus a separate `COUNT(*)` under the same WHERE for the un-windowed total.
+  - **Filtering** — `eq` / `in` / `contains` translated to parameterised
+    WHERE conjuncts. Every value travels through `bindValue` with explicit
+    PDO type; LIKE metacharacters in `contains` are escaped so a user-
+    supplied `%` cannot widen the match. Three SQL-injection vectors
+    (`'OR 1=1`, `DROP TABLE`, backslash-escape) are pinned by
+    `apps/playground/filtering-test.php`.
+  - **Sorting** — `ORDER BY "col" ASC|DESC` clauses appended in caller order;
+    a deterministic `id ASC` tie-breaker is appended unconditionally when
+    the caller's sort list does not already pin id. Duplicate sort columns
+    in the input are rejected.
+  - **Defence in depth** — `resolveColumn()` rejects any field name not
+    declared on the entity's metadata, even though the HTTP/renderer layer
+    already validates. Errors throw `InvalidArgumentException` with the
+    explicit column name.
+- `findAll()` is unchanged.
 
 ## [0.2.0-alpha.5] — 2026-05-28
 

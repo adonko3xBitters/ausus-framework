@@ -118,7 +118,7 @@ _assert('findAll() entries are Entity instances',
 echo "\n── test 5: ProjectionRenderer renders list (no reflection) ───\n";
 $summary = $app->render('billing.invoice.summary');
 _assert('list view returns items',          count($summary['data']['items'] ?? []) === 2);
-_assert('viewschema schemaVersion 1.1.0',   $summary['schemaVersion'] === '1.1.0');
+_assert('viewschema schemaVersion 1.2.0',   $summary['schemaVersion'] === '1.2.0');
 
 // ── test 6: Application::run() returns a typed InvocationResult ───────────────
 echo "\n── test 6: Application::run() → InvocationResult ─────────────\n";

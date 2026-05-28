@@ -7,18 +7,28 @@ Versioning follows [SemVer](https://semver.org/).
 
 ### Added
 - `ProjectionRenderer::render()` accepts optional `$limit` (default 50, max
-  1000) and `$offset` (default 0) parameters. When the underlying repository
-  implements `Ausus\PagedRepository`, the window is pushed into SQL; otherwise
-  an in-memory `array_slice` fallback preserves the same wire output. Negative
-  inputs are defensively clamped to legal values.
-- Wire shape `data.pagination` now carries `limit`, `offset`, `totalCount`,
+  1000), `$offset` (default 0), `$filters: list<Filter>`, and `$sort: list<Sort>`
+  parameters. When the underlying repository implements `Ausus\PagedRepository`
+  the window + filter + sort are pushed into SQL; otherwise an in-memory
+  `array_slice` fallback preserves the same wire output (filters and sort
+  are no-ops on the non-paged path — only SqliteRepository ships in-tree).
+  Negative limit/offset inputs are defensively clamped to legal values.
+- Wire shape `data.pagination` carries `limit`, `offset`, `totalCount`,
   `pageSize`. `nextCursor` is preserved at `null` as the reserved slot for
   the future cursor-based pagination axis. Additive — consumers reading the
   old shape continue to work.
+- Wire shape gains top-level `sort: list<{field, direction}>` echoing the
+  applied sort entries, and the top-level `filters` slot (previously always
+  `[]`) now echoes the applied filter entries as
+  `list<{field, op, value}>`. Renderers can render breadcrumbs / filter
+  chips without parsing the request URL.
 
 ### Changed
-- `schemaVersion` bumped to **`1.1.0`**. Renderer `peerSchemaVersion: ^1.0.0`
-  satisfies `1.1.0`, so no coordinated renderer release is required.
+- `schemaVersion` bumped to **`1.2.0`**. Renderer `peerSchemaVersion: ^1.0.0`
+  satisfies `1.2.0`, so no coordinated renderer release is required. The
+  bump is additive: the `pagination` object (1.1.0) and the `filters` /
+  `sort` echoes (1.2.0) are independent extensions a 1.0.0 consumer can
+  safely ignore.
 
 ## [0.2.0-alpha.5] — 2026-05-28
 

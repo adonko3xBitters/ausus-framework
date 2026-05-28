@@ -531,7 +531,7 @@ final class ProjectionRenderer {
         }
 
         return [
-            'schemaVersion' => '1.1.0',
+            'schemaVersion' => '1.2.0',
             'targetProfile' => 'react.web.v1',
             'metadata' => [
                 'projection' => $proj->fqn,
@@ -542,7 +542,20 @@ final class ProjectionRenderer {
             ],
             'fields'  => $fields,
             'actions' => $actions,
-            'filters' => [],
+            // Echo the applied query metadata back to the renderer so the UI
+            // can render breadcrumbs / filter chips without having to parse
+            // the request URL itself. Empty lists in list mode mean "no
+            // filtering / no sorting requested"; in subject mode the values
+            // are conceptually undefined but stay as empty lists for shape
+            // stability across the two modes.
+            'filters' => array_map(
+                static fn (Filter $f) => ['field' => $f->field, 'op' => $f->op, 'value' => $f->value],
+                $filters,
+            ),
+            'sort'    => array_map(
+                static fn (Sort $s) => ['field' => $s->field, 'direction' => $s->direction],
+                $sort,
+            ),
             'data'    => $data,
         ];
     }

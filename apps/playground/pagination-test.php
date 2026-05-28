@@ -72,7 +72,7 @@ for ($i = 1; $i <= 7; $i++) {
 
 // ── 1. wire shape — every key present, correct types ─────────────────────────
 $schema = $app->renderProjection('pgn.row.all');
-_assert('wire schemaVersion = 1.1.0', ($schema['schemaVersion'] ?? null) === '1.1.0');
+_assert('wire schemaVersion = 1.2.0', ($schema['schemaVersion'] ?? null) === '1.2.0');
 $pag = $schema['data']['pagination'] ?? null;
 _assert('wire has data.pagination object',           is_array($pag));
 _assert('pagination.limit is int',                   is_int($pag['limit'] ?? null));
