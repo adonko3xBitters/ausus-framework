@@ -193,6 +193,58 @@ is not in v0.1.x:
 - **Multiple entities and cross-entity references.** This tutorial uses a
   single entity; relations between entities are not covered.
 
+## `create-project` installs the monorepo instead of the starter {#monorepo-installed-as-starter}
+
+### Symptoms
+
+After running:
+
+```bash
+composer create-project ausus/starter myapp
+```
+
+the generated directory contains unexpected folders such as:
+
+- `packages/`
+- `apps/`
+- `docs-site/`
+- `renderer/`
+- `scripts/`
+
+and Composer output contains lines similar to:
+
+```text
+Symlinking from packages/kernel
+```
+
+### Cause
+
+Composer defaults to `minimum-stability=stable`. Without explicitly requesting
+the alpha channel, Composer resolves the latest stable `0.1.x` release.
+
+### Resolution
+
+Use the documented alpha installation command:
+
+```bash
+composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+```
+
+## `composer boot` returns `Command "boot" is not defined` {#composer-boot-not-defined}
+
+### Cause
+
+This usually means the project was scaffolded from the legacy stable starter
+instead of the v0.2 alpha channel.
+
+### Resolution
+
+Delete the generated directory and reinstall using:
+
+```bash
+composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+```
+
 ## Alpha resolution failure {#alpha-resolution-failure}
 
 **Symptom:**
