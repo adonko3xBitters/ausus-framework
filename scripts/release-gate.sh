@@ -29,6 +29,7 @@
 #   5 = renderer alignment failure
 #   6 = doc-version coherence failure
 #   7 = npm registry / Packagist indexing failure (live mode)
+#   8 = clean-room starter install failure (live mode)
 
 set -euo pipefail
 
@@ -124,6 +125,7 @@ fi
 
 # ─── live mode only ──────────────────────────────────────────────────────────
 if [ "$LIVE" != "1" ]; then
+    log "clean-room starter install skipped (RELEASE_GATE_LIVE != 1)"
     log "${GREEN}OK${RESET} (local mode)"
     exit 0
 fi
@@ -189,6 +191,17 @@ if [ "$NPM_LATEST" = "$NPM_VERSION" ]; then
 else
     fail "@ausus/renderer-react@$NPM_VERSION NOT on npm (saw: '$NPM_LATEST')"
     exit 7
+fi
+
+# ─── Step 9: clean-room starter install (Packagist quickstart end-to-end) ───
+log "step 9 — clean-room starter install"
+if EXPECTED_VERSION="${RELEASE_GATE_VERSION:-}" \
+        bash scripts/clean-room-install-test.sh > "$TMP_ROOT/clean-room.log" 2>&1; then
+    ok "clean-room starter install green"
+else
+    fail "clean-room starter install failed:"
+    tail -40 "$TMP_ROOT/clean-room.log" >&2
+    exit 8
 fi
 
 log "${GREEN}OK${RESET} (live mode) — $VERSION ready for announce"
