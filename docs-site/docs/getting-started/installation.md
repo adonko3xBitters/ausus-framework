@@ -50,6 +50,18 @@ OK — ausus/starter boots cleanly.
 
 If you used `--no-install`, finish with `composer install && composer boot`.
 
+To serve the same sample plugin over HTTP locally (renderer-ready):
+
+```bash
+composer serve
+# → AUSUS dev server at http://localhost:8000
+# (Ctrl+C to stop)
+```
+
+The dev server is `bin/server.php` shipped with the starter; it routes
+`/api/_health`, `/api/projections/{fqn}`, and `/api/actions/{fqn}` through
+the same `Router → Invoker → kernel` chain used by `composer boot`.
+
 ## Option B — add packages to an existing project {#option-b--add-packages-to-an-existing-project}
 
 Install only the packages you need. The dependency order is bottom-up:

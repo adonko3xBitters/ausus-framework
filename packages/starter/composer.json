@@ -21,7 +21,15 @@
         "post-create-project-cmd": [
             "@php bin/boot.php"
         ],
-        "boot": "@php bin/boot.php"
+        "boot":  "@php bin/boot.php",
+        "serve": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php -S localhost:8000 bin/server.php"
+        ]
+    },
+    "scripts-descriptions": {
+        "boot":  "Bootstrap the starter end-to-end (DRAFT → ISSUED smoke).",
+        "serve": "Start the built-in dev server at http://localhost:8000 (Ctrl+C to stop)."
     },
     "bin": ["bin/boot.php"],
     "extra": {
