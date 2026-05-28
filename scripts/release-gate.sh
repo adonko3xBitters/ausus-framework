@@ -30,6 +30,7 @@
 #   6 = doc-version coherence failure
 #   7 = npm registry / Packagist indexing failure (live mode)
 #   8 = clean-room starter install failure (live mode)
+#   9 = renderer npm provenance metadata failure
 
 set -euo pipefail
 
@@ -121,6 +122,16 @@ else
     fail "renderer alignment failed:"
     cat "$TMP_ROOT/renderer.log" >&2
     exit 5
+fi
+
+# ─── Step 4b: renderer npm provenance metadata pre-check ────────────────────
+log "step 4b — renderer npm provenance metadata"
+if bash scripts/check-renderer-provenance.sh > "$TMP_ROOT/provenance.log" 2>&1; then
+    ok "renderer provenance metadata OK"
+else
+    fail "renderer provenance metadata failed:"
+    cat "$TMP_ROOT/provenance.log" >&2
+    exit 9
 fi
 
 # ─── live mode only ──────────────────────────────────────────────────────────
