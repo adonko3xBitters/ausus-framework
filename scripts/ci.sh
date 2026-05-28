@@ -141,6 +141,13 @@ grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-pagination.log \
     && echo "  ✓ pagination $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-pagination.log | head -1)" \
     || { echo "pagination failed"; tail -50 /tmp/ausus-ci-pagination.log; exit 4; }
 
+# 4l
+echo "[ci] step 4l — php apps/playground/filtering-test.php"
+php apps/playground/filtering-test.php > /tmp/ausus-ci-filtering.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-filtering.log \
+    && echo "  ✓ filtering $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-filtering.log | head -1)" \
+    || { echo "filtering failed"; tail -50 /tmp/ausus-ci-filtering.log; exit 4; }
+
 # 5
 echo "[ci] step 5 — composer boot (starter)"
 composer --working-dir=packages/starter boot >/dev/null 2>&1 \
