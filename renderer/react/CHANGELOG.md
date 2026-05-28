@@ -3,6 +3,13 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [0.2.0-alpha.5] — 2026-05-28
+
+### Fixed
+- Corrected `repository.url` and homepage metadata so npm provenance
+  attestation matches the GitHub Actions publishing repository.
+- Unblocks `npm publish --provenance` for `@ausus/renderer-react`.
+
 ## [0.2.0-alpha.4] — 2026-05-27
 
 ### Added
