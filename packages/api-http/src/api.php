@@ -12,7 +12,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Ausus\{
     Tenant, TenantId, ActorRef, StubActor, Reference,
     MetadataGraph, PersistenceDriver, AuditSink,
-    Filter,
+    Filter, Sort,
 };
 use Ausus\Runtime\{
     Invoker, PolicyEngine, WorkflowRuntime, TransitionSetIndex,
@@ -123,6 +123,7 @@ final class Router implements RequestHandlerInterface
         $limit   = 50;
         $offset  = 0;
         $filters = [];
+        $sort    = [];
         if ($subjectRef === null) {
             if (array_key_exists('limit', $params)) {
                 $rawLimit = $params['limit'];
@@ -177,10 +178,52 @@ final class Router implements RequestHandlerInterface
                     return $this->errorJson(400, 'BadRequest', $e->getMessage());
                 }
             }
+
+            // Sorting — '?sort=<field>:<dir>,<field>:<dir>'. Comma-separated
+            // for multi-column; colon between the field and the direction.
+            // Bare 'field' (no direction) and capitalised directions are
+            // refused — the SQL adapter pattern-matches exactly on 'asc'/'desc'.
+            if (array_key_exists('sort', $params)) {
+                $rawSort = $params['sort'];
+                if (!is_string($rawSort) || $rawSort === '') {
+                    return $this->errorJson(400, 'BadRequest', "?sort must be a non-empty string");
+                }
+                $sortFieldsSeen = [];
+                foreach (explode(',', $rawSort) as $clause) {
+                    if ($clause === '') {
+                        return $this->errorJson(400, 'BadRequest',
+                            "?sort contains an empty clause");
+                    }
+                    $segments = explode(':', $clause, 3);
+                    if (count($segments) !== 2 || $segments[0] === '' || $segments[1] === '') {
+                        return $this->errorJson(400, 'BadRequest',
+                            "?sort clause '{$clause}' is malformed (expected '<field>:<asc|desc>')");
+                    }
+                    [$sortField, $sortDir] = $segments;
+                    if (!in_array($sortField, $projectionFields, true)) {
+                        return $this->errorJson(400, 'BadRequest',
+                            "sort field '{$sortField}' is not declared on projection {$fqn}");
+                    }
+                    if (!in_array($sortDir, Sort::DIRS, true)) {
+                        return $this->errorJson(400, 'BadRequest',
+                            "sort direction '{$sortDir}' is invalid (allowed: " . implode(',', Sort::DIRS) . ')');
+                    }
+                    if (isset($sortFieldsSeen[$sortField])) {
+                        return $this->errorJson(400, 'BadRequest',
+                            "?sort references field '{$sortField}' more than once");
+                    }
+                    $sortFieldsSeen[$sortField] = true;
+                    try {
+                        $sort[] = new Sort($sortField, $sortDir);
+                    } catch (\InvalidArgumentException $e) {
+                        return $this->errorJson(400, 'BadRequest', $e->getMessage());
+                    }
+                }
+            }
         }
 
         $renderer = new ProjectionRenderer($this->graph, $this->driver, $tenant);
-        $schema   = $renderer->render($fqn, $subjectRef, $limit, $offset, $filters);
+        $schema   = $renderer->render($fqn, $subjectRef, $limit, $offset, $filters, $sort);
 
         return $this->json(200, $schema);
     }

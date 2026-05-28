@@ -169,6 +169,13 @@ grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-sortingsql.log \
     && echo "  ✓ sorting-sql $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-sortingsql.log | head -1)" \
     || { echo "sorting-sql failed"; tail -50 /tmp/ausus-ci-sortingsql.log; exit 4; }
 
+# 4p
+echo "[ci] step 4p — php apps/playground/sorting-http-test.php"
+php apps/playground/sorting-http-test.php > /tmp/ausus-ci-sortinghttp.log 2>&1
+grep -qE "RESULT: passed=[0-9]+ failed=0" /tmp/ausus-ci-sortinghttp.log \
+    && echo "  ✓ sorting-http $(grep -oE 'passed=[0-9]+' /tmp/ausus-ci-sortinghttp.log | head -1)" \
+    || { echo "sorting-http failed"; tail -50 /tmp/ausus-ci-sortinghttp.log; exit 4; }
+
 # 5
 echo "[ci] step 5 — composer boot (starter)"
 composer --working-dir=packages/starter boot >/dev/null 2>&1 \
