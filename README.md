@@ -7,7 +7,7 @@
 [![PHP](https://img.shields.io/badge/PHP-%E2%89%A5%208.3-777BB4.svg)](https://www.php.net/)
 [![Node](https://img.shields.io/badge/Node-%E2%89%A5%2018-339933.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18%20%7C%2019-61DAFB.svg)](https://react.dev/)
-[![Version](https://img.shields.io/badge/version-0.2.0--alpha.4-blue.svg)](docs-site/docs/releases/v0.2.0-alpha.4.md)
+[![Version](https://img.shields.io/badge/version-0.2.0--alpha.5-blue.svg)](docs-site/docs/releases/v0.2.0-alpha.5.md)
 
 AUSUS is a PHP framework for building enterprise apps — CRUD platforms,
 ERP workflows, SaaS multi-tenant products, internal tools — from
@@ -18,7 +18,7 @@ substrate: a deterministic, layered, plugin-composable kernel.
 
 ---
 
-## What ships today (v0.2.0-alpha.4)
+## What ships today (v0.2.0-alpha.5)
 
 | Package | Role | Status |
 |---|---|---|
@@ -29,13 +29,13 @@ substrate: a deterministic, layered, plugin-composable kernel.
 | [`ausus/starter`](packages/starter)            | project template — `composer create-project`     | implemented |
 | [`ausus/standard-stack`](packages/standard-stack) | metapackage pinning the V0 set                | implemented |
 | [`@ausus/renderer-react`](renderer/react)      | React 18+ renderer for the RFC-004 ViewSchema    | implemented |
-| `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, tagged at v0.2.0-alpha.4 (no code yet) |
+| `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, tagged at v0.2.0-alpha.5 (no code yet) |
 
-Current alpha: [`RELEASE-NOTES-v0.2.0-alpha.4.md`](RELEASE-NOTES-v0.2.0-alpha.4.md). Last stable: [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md). The v0.1.0 release-candidate notes remain available at [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md).
+Current alpha: [`RELEASE-NOTES-v0.2.0-alpha.5.md`](RELEASE-NOTES-v0.2.0-alpha.5.md). Last stable: [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md). The v0.1.0 release-candidate notes remain available at [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md).
 
 ---
 
-## Current status (v0.2.0-alpha.4)
+## Current status (v0.2.0-alpha.5)
 
 - **Public packaging.** The historical Packagist packaging defect that
   shipped the entire monorepo inside each `vendor/ausus/<package>`
@@ -44,7 +44,7 @@ Current alpha: [`RELEASE-NOTES-v0.2.0-alpha.4.md`](RELEASE-NOTES-v0.2.0-alpha.4.
   [`github.com/adonko3xBitters/<package>`](https://github.com/adonko3xBitters);
   Packagist pulls from those dedicated repos, not from the monorepo.
 - **Install works without workaround.** `composer require
-  ausus/standard-stack:^0.2@alpha` resolves cleanly to `v0.2.0-alpha.4`
+  ausus/standard-stack:^0.2@alpha` resolves cleanly to `v0.2.0-alpha.5`
   for the entire chain (`kernel`, `runtime-default`, `persistence-sql`,
   `api-http`, `standard-stack`). No manual autoload, no custom
   classmap, no monorepo extraction required. PSR-15 transitive deps
@@ -64,7 +64,7 @@ Current alpha: [`RELEASE-NOTES-v0.2.0-alpha.4.md`](RELEASE-NOTES-v0.2.0-alpha.4.
 
 ## Runtime hardening (v0.2 alpha)
 
-`v0.2.0-alpha.4` (current alpha) is a **stabilization line**, not yet
+`v0.2.0-alpha.5` (current alpha) is a **stabilization line**, not yet
 stable. It is purely additive on top of `v0.1.1` — no public API
 rename, no wire-format change, no `schemaVersion` bump. The recommended
 line for production remains `v0.1.1`.
@@ -184,7 +184,7 @@ regresses.
 
 ## Verified public install
 
-Reproduces the canonical clean-room install of `v0.2.0-alpha.4` end to
+Reproduces the canonical clean-room install of `v0.2.0-alpha.5` end to
 end. No local monorepo, no path repositories, no symlinks — exactly
 what an external consumer sees from Packagist.
 
@@ -214,7 +214,7 @@ var_dump($app instanceof Application);
 ```
 
 The same procedure pulls every kernel, runtime, persistence and HTTP
-class at `v0.2.0-alpha.4`, including the five `Ausus\Errors\*` marker
+class at `v0.2.0-alpha.5`, including the five `Ausus\Errors\*` marker
 interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 
 ---
@@ -253,11 +253,11 @@ interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 | `v0.1.1` | legacy | broken historical tarballs (same defect) | partial |
 | `v0.2.0-alpha.1` | obsolete | broken (same defect) | Phase A + B (declared, undelivered) |
 | `v0.2.0-alpha.2` | fixed packaging | dedicated subtree-split repos active; internal `^0.2@alpha` constraints not yet bumped | Phase A + B + C (server-side) |
-| `v0.2.0-alpha.4` | **current alpha** | fully fixed (subtree-split + Packagist source + internal constraint propagation) | Phase A + B + C (fully distributed) |
+| `v0.2.0-alpha.5` | **current alpha** | fully fixed (subtree-split + Packagist source + internal constraint propagation) | Phase A + B + C (fully distributed) |
 
 `v0.1.x` remains the **recommended line for production** until v0.2.0
 stable ships. Consumers wanting the runtime hardening should install
-the `v0.2.0-alpha.4` line per [Alpha installation
+the `v0.2.0-alpha.5` line per [Alpha installation
 requirements](#alpha-installation-requirements). Versions marked
 *legacy* / *obsolete* are kept in Packagist's index for historical
 traceability — do not pull them for a new install.
@@ -287,7 +287,7 @@ deterministic, content-addressable `MetadataGraph`.
 
 | Document | What it covers |
 |---|---|
-| [`RELEASE-NOTES-v0.2.0-alpha.4.md`](RELEASE-NOTES-v0.2.0-alpha.4.md) | current alpha — public Packagist packaging fix, internal `^0.2@alpha` constraint bumps, full Phase A+B+C runtime hardening distributed |
+| [`RELEASE-NOTES-v0.2.0-alpha.5.md`](RELEASE-NOTES-v0.2.0-alpha.5.md) | current alpha — public Packagist packaging fix, internal `^0.2@alpha` constraint bumps, full Phase A+B+C runtime hardening distributed |
 | [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md) | last stable — v0.1.x stabilisation, breaking changes, migration |
 | [`CHANGELOG.md`](CHANGELOG.md) | consolidated changelog (Keep a Changelog) |
 | [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md) | initial release-candidate notes (v0.1.0) — packages, compatibility, publish order, rollback |
