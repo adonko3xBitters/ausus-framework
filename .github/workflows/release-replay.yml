@@ -1,0 +1,105 @@
+name: release-replay
+
+# Manually replay the release-gate (LIVE mode) against an already-published
+# tag — no push, no npm publish, no git tag create. Used for after-the-fact
+# audit and to catch post-publish regressions (Packagist re-index, npm
+# deprecate, GitHub URL drift).
+#
+# Inputs:
+#   tag              — annotated release tag to replay (e.g. v0.2.0-alpha.5)
+#   expected_version — version string asserted by the clean-room gate. Defaults
+#                      to {tag} when omitted.
+#
+# Invariants (enforced by the workflow):
+#   - no `git push` of any kind;
+#   - no `npm publish`;
+#   - no `git tag` creation or deletion;
+#   - read-only on origin (`actions/checkout` only, no `git config user`).
+#
+# Exit:
+#   - workflow green if release-gate.sh exit 0 in live mode;
+#   - workflow red otherwise; rerun is safe.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to replay (e.g. v0.2.0-alpha.5)'
+        required: true
+        type: string
+      expected_version:
+        description: 'Override expected version (default: tag)'
+        required: false
+        type: string
+
+concurrency:
+  group: release-replay-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  replay:
+    name: replay ${{ inputs.tag }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    permissions:
+      # Read-only on the source tree. NO id-token, no contents:write.
+      contents: read
+    steps:
+      - name: Checkout the release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+          fetch-depth: 0
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo, pdo_sqlite, mbstring, intl
+          tools: composer:v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Composer install
+        run: composer install --no-interaction --prefer-dist
+
+      - name: npm install
+        run: npm ci --no-audit --no-fund
+
+      - name: Assert workflow runs against a tag-ish ref
+        run: |
+          if ! git describe --tags --exact-match HEAD >/dev/null 2>&1; then
+              echo "::error::HEAD is not on a tag — release-replay must run against an annotated release tag"
+              exit 1
+          fi
+          echo "HEAD tag: $(git describe --tags --exact-match HEAD)"
+
+      - name: Assert no publish-side write tools are reachable
+        # Sanity check that prevents this workflow from accidentally publishing
+        # in case anyone edits release-gate.sh later. NPM_TOKEN is never set
+        # by this workflow; surfacing it here would fail loudly during PR review.
+        run: |
+          if [ -n "${NPM_TOKEN:-}" ]; then
+              echo "::error::NPM_TOKEN is set; release-replay must NOT carry publish credentials"
+              exit 1
+          fi
+          echo "  ✓ no NPM_TOKEN in env"
+
+      - name: Replay release-gate (LIVE mode, read-only)
+        run: bash scripts/release-gate.sh
+        env:
+          RELEASE_GATE_LIVE: '1'
+          RELEASE_GATE_VERSION: ${{ inputs.tag }}
+          EXPECTED_VERSION: ${{ inputs.expected_version || inputs.tag }}
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-replay-${{ inputs.tag }}
+          path: |
+            /tmp/ausus-release-gate-*/
+          retention-days: 30
