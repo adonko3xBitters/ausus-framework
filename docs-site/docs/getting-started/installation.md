@@ -31,7 +31,7 @@ The fastest path. `ausus/starter` is a ready-to-run project that already wires
 the kernel, persistence, runtime, and a sample domain together.
 
 ```bash
-composer create-project ausus/starter myapp
+composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
 cd myapp
 composer boot
 ```
@@ -116,9 +116,13 @@ no bundled dependencies and no CSS file — see
 
 ## Alpha installation requirements {#alpha-installation-requirements}
 
-AUSUS v0.2.x is currently in **alpha**. `composer create-project ausus/starter`
-handles this for you automatically — the scaffolded `composer.json` declares
-`"minimum-stability": "alpha"`. **Nothing to do** in the common case.
+AUSUS v0.2.x is currently in **alpha**. Because Composer defaults to
+`minimum-stability=stable`, the alpha channel must currently be requested
+explicitly during `create-project`:
+
+```bash
+composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+```
 
 If you set up the project manually instead of using `create-project`, you
 must declare alpha stability at the root of YOUR `composer.json`:
@@ -151,7 +155,7 @@ identically to every pre-release in the PHP ecosystem.
 When AUSUS ships `v1.0.0` stable:
 - `minimum-stability: alpha` can be dropped.
 - `^0.2@alpha` becomes `^1.0`.
-- `composer create-project ausus/starter` continues to work without flags.
+- `composer create-project ausus/starter` no longer requires `--stability=alpha`.
 
 ## Next {#next}
 
