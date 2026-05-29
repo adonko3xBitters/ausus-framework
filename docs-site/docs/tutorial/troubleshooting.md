@@ -227,7 +227,7 @@ the alpha channel, Composer resolves the latest stable `0.1.x` release.
 Use the documented alpha installation command:
 
 ```bash
-composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+composer create-project "ausus/starter:^0.2@beta" myapp --stability=beta
 ```
 
 ## `composer boot` returns `Command "boot" is not defined` {#composer-boot-not-defined}
@@ -242,7 +242,7 @@ instead of the v0.2 alpha channel.
 Delete the generated directory and reinstall using:
 
 ```bash
-composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+composer create-project "ausus/starter:^0.2@beta" myapp --stability=beta
 ```
 
 ## Alpha resolution failure {#alpha-resolution-failure}
@@ -288,7 +288,7 @@ If you are using `composer create-project`, request the alpha channel
 explicitly:
 
 ```bash
-composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+composer create-project "ausus/starter:^0.2@beta" myapp --stability=beta
 ```
 
 The flag is required for every v0.2.x alpha install until the first stable
