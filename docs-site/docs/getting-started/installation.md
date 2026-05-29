@@ -31,7 +31,7 @@ The fastest path. `ausus/starter` is a ready-to-run project that already wires
 the kernel, persistence, runtime, and a sample domain together.
 
 ```bash
-composer create-project "ausus/starter:^0.2@beta" myapp --stability=beta
+composer create-project ausus/starter myapp
 cd myapp
 composer boot
 ```
@@ -126,48 +126,37 @@ no bundled dependencies and no CSS file — see
   `presentation-default`) are **not installable as working code** — they are
   name reservations. See [Packages](../packages/index.md).
 
-## Alpha installation requirements {#alpha-installation-requirements}
+## Migrating from a v0.2 pre-release {#migrating-from-v0-2-prerelease}
 
-AUSUS v0.2.x is currently in **alpha**. Because Composer defaults to
-`minimum-stability=stable`, the alpha channel must currently be requested
-explicitly during `create-project`:
+`v1.0.0` is on Packagist with **stable** stability — `composer
+create-project` and `composer require` no longer need a stability
+flag. Existing alpha / beta / rc consumers receive `v1.0.0`
+automatically on `composer update` (Composer's `@alpha` / `@beta` /
+`@rc` per-package flags all accept stable).
 
-```bash
-composer create-project "ausus/starter:^0.2@beta" myapp --stability=beta
+To lock onto the v1.0 stable line cleanly, two small edits to the
+root `composer.json` of an existing pre-release project:
+
+```diff
+- "minimum-stability": "alpha",
+- "prefer-stable": true,
+  "require": {
+-     "ausus/standard-stack": "^0.2@alpha"
++     "ausus/standard-stack": "^1.0"
+  }
 ```
 
-If you set up the project manually instead of using `create-project`, you
-must declare alpha stability at the root of YOUR `composer.json`:
+If your project was created from `composer create-project
+ausus/starter` (any pre-release line), the scaffold's own
+`minimum-stability` declaration is already harmless after the
+update — it just becomes redundant.
 
-```json
-{
-    "minimum-stability": "alpha",
-    "prefer-stable": true,
-    "require": {
-        "ausus/standard-stack": "^0.2@alpha"
-    }
-}
-```
-
-### Why this is required
-
-Composer's `@alpha` per-package flag does **not** propagate to a required
-package's own transitive dependencies. When `ausus/standard-stack ^0.2@alpha`
-declares `ausus/kernel ^0.2@alpha`, that inner constraint is evaluated
-against the **root**'s `minimum-stability` — which defaults to `stable`.
-Without opting in, Composer rejects the alpha chain and falls back to the
-v0.1.x stable line (which has the historical packaging defect described in
-the release notes).
-
-This is **standard Composer behaviour**, not specific to AUSUS. It applies
-identically to every pre-release in the PHP ecosystem.
-
-### What changes at v1.0 stable
-
-When AUSUS ships `v1.0.0` stable:
-- `minimum-stability: alpha` can be dropped.
-- `^0.2@alpha` becomes `^1.0`.
-- `composer create-project ausus/starter` no longer requires `--stability=alpha`.
+The full pre-release alpha / beta / rc setup procedure (declaring
+the stability flag in a root `composer.json`, manual two-command
+init) remains documented in the
+[v0.2.0-alpha.5 release notes](../releases/v0.2.0-alpha.5.md) for
+projects that need to install a specific pre-release version for
+historical reasons.
 
 ## Next {#next}
 

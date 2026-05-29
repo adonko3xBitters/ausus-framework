@@ -3,6 +3,18 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.0.0] — 2026-05-29
+
+### Released
+- First stable release. Bit-identical to `0.2.0-rc.1`. `SqliteRepository`
+  implements `Ausus\Repository` + `Ausus\PagedRepository`; WHERE /
+  ORDER BY translation, LIKE-meta escape, and column whitelist are
+  frozen as stable public surface.
+
+### Changed
+- Package metadata: `ausus/kernel` require constraint moves from
+  `^0.2@alpha` to `^1.0`.
+
 ## [0.2.0-rc.1] — 2026-05-29
 
 ### Changed

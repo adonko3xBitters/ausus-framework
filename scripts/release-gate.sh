@@ -73,12 +73,20 @@ for f in composer.json packages/*/composer.json; do
     fi
 done
 
-# starter MUST have minimum-stability=alpha while AUSUS is alpha
+# starter's minimum-stability must be one of the documented values. During
+# the v0.2 pre-release cycle it was pinned to 'alpha' so the scaffolded
+# project inherited the pre-release resolution chain. At v1.0 stable it
+# drops to 'stable' (the Composer default). Accepting either keeps the
+# gate green across both worlds; anything else (e.g. an accidental
+# 'minimum-stability: dev') still fails loud.
 STARTER_STAB=$(jq -r '."minimum-stability" // "stable"' packages/starter/composer.json)
-if [ "$STARTER_STAB" != "alpha" ]; then
-    fail "packages/starter/composer.json minimum-stability='$STARTER_STAB' (expected 'alpha')"
-    fail_count=$((fail_count + 1))
-fi
+case "$STARTER_STAB" in
+    alpha|beta|rc|stable) ;;
+    *)
+        fail "packages/starter/composer.json minimum-stability='$STARTER_STAB' (expected alpha|beta|rc|stable)"
+        fail_count=$((fail_count + 1))
+        ;;
+esac
 
 # all packages MUST have a homepage field
 for f in packages/*/composer.json; do

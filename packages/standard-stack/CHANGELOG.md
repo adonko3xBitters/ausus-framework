@@ -3,6 +3,19 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.0.0] — 2026-05-29
+
+### Released
+- First stable release. Bit-identical to `0.2.0-rc.1`. The
+  `Ausus\Application` facade and its
+  `create → register → boot → invoke / http / renderProjection`
+  lifecycle is frozen as the stable public entry point for v1.
+
+### Changed
+- Package metadata: `ausus/kernel`, `ausus/runtime-default`,
+  `ausus/persistence-sql`, and `ausus/api-http` require constraints
+  all move from `^0.2@alpha` to `^1.0`.
+
 ## [0.2.0-rc.1] — 2026-05-29
 
 ### Changed

@@ -7,7 +7,7 @@
     "homepage": "https://github.com/adonko3xBitters/runtime-default",
     "require": {
         "php": ">=8.3",
-        "ausus/kernel": "^0.2@alpha"
+        "ausus/kernel": "^1.0"
     },
     "autoload": {
         "classmap": ["src/"]

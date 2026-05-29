@@ -7,7 +7,7 @@
 [![PHP](https://img.shields.io/badge/PHP-%E2%89%A5%208.3-777BB4.svg)](https://www.php.net/)
 [![Node](https://img.shields.io/badge/Node-%E2%89%A5%2018-339933.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18%20%7C%2019-61DAFB.svg)](https://react.dev/)
-[![Version](https://img.shields.io/badge/version-0.2.0--rc.1-blue.svg)](docs-site/docs/releases/v0.2.0-rc.1.md)
+[![Version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg)](docs-site/docs/releases/v1.0.0.md)
 
 AUSUS is a PHP framework for building enterprise apps — CRUD platforms,
 ERP workflows, SaaS multi-tenant products, internal tools — from
@@ -18,7 +18,7 @@ substrate: a deterministic, layered, plugin-composable kernel.
 
 ---
 
-## What ships today (v0.2.0-rc.1)
+## What ships today (v1.0.0)
 
 | Package | Role | Status |
 |---|---|---|
@@ -29,13 +29,13 @@ substrate: a deterministic, layered, plugin-composable kernel.
 | [`ausus/starter`](packages/starter)            | project template — `composer create-project`     | implemented |
 | [`ausus/standard-stack`](packages/standard-stack) | metapackage pinning the V0 set                | implemented |
 | [`@ausus/renderer-react`](renderer/react)      | React 18+ renderer for the RFC-004 ViewSchema    | implemented |
-| `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, tagged at v0.2.0-rc.1 (no code yet) |
+| `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, tagged at v1.0.0 (no code yet) |
 
-Current release candidate: [`v0.2.0-rc.1`](docs-site/docs/releases/v0.2.0-rc.1.md). Last beta: [`v0.2.0-beta.1`](docs-site/docs/releases/v0.2.0-beta.1.md). Last alpha: [`v0.2.0-alpha.5`](docs-site/docs/releases/v0.2.0-alpha.5.md). Last stable: [`v0.1.1`](docs-site/docs/releases/v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md).
+**Current stable: [`v1.0.0`](docs-site/docs/releases/v1.0.0.md).** Last rc: [`v0.2.0-rc.1`](docs-site/docs/releases/v0.2.0-rc.1.md). Last beta: [`v0.2.0-beta.1`](docs-site/docs/releases/v0.2.0-beta.1.md). Legacy line: [`v0.1.1`](docs-site/docs/releases/v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
-## Current status (v0.2.0-rc.1)
+## Current status (v1.0.0)
 
 - **Public packaging.** The historical Packagist packaging defect that
   shipped the entire monorepo inside each `vendor/ausus/<package>`
@@ -44,7 +44,7 @@ Current release candidate: [`v0.2.0-rc.1`](docs-site/docs/releases/v0.2.0-rc.1.m
   [`github.com/adonko3xBitters/<package>`](https://github.com/adonko3xBitters);
   Packagist pulls from those dedicated repos, not from the monorepo.
 - **Install works without workaround.** `composer require
-  ausus/standard-stack:^0.2@beta` resolves cleanly to `v0.2.0-rc.1`
+  ausus/standard-stack` resolves cleanly to `v1.0.0`
   for the entire chain (`kernel`, `runtime-default`, `persistence-sql`,
   `api-http`, `standard-stack`). No manual autoload, no custom
   classmap, no monorepo extraction required. PSR-15 transitive deps
@@ -64,10 +64,10 @@ Current release candidate: [`v0.2.0-rc.1`](docs-site/docs/releases/v0.2.0-rc.1.m
 
 ## Runtime hardening (v0.2)
 
-`v0.2.0-rc.1` (current rc) is a **stabilization + pre-1.0 feature
-line**. It is additive on top of `v0.1.1` plus the new query surface
-(pagination + filtering + sorting, ViewSchema `1.2.0`). The recommended
-line for production remains `v0.1.1` until `v1.0.0` ships.
+`v1.0.0` (current stable) is the **GA release** of the v0.2
+stabilization + feature line. It is additive on top of `v0.1.1`
+plus the query surface (pagination + filtering + sorting, ViewSchema
+`1.2.0`). The public API surface is frozen for the `1.x` line.
 
 What it adds:
 
@@ -93,24 +93,23 @@ What it adds:
 
 ## 30-second quickstart
 
-> **IMPORTANT.** AUSUS v0.2.x is currently in **rc** (release candidate).
-> Consumers must declare an `rc` (or lower) minimum stability in their
-> `composer.json` until the first stable release:
->
-> ```json
-> "minimum-stability": "beta",
-> "prefer-stable": true
-> ```
->
-> Without this flag, Composer refuses to resolve the v0.2 beta chain
-> (because the inter-package `^0.2@beta` constraints expose beta
-> dependencies transitively) and falls back to the v0.1.x stable line.
+`v1.0.0` is on Packagist with **stable** stability — no `--stability`
+flag is required for new projects:
 
 ```bash
-composer create-project "ausus/starter:^0.2@beta" myapp --stability=beta
+composer create-project ausus/starter myapp
 cd myapp && composer boot
 # → OK — ausus/starter boots cleanly.
 ```
+
+To run the bundled dev HTTP server (renderer-ready):
+
+```bash
+cd myapp && composer serve
+# → AUSUS dev server at http://localhost:8000
+```
+
+The React renderer ships separately on npm:
 
 ```bash
 mkdir consumer && cd consumer
@@ -120,61 +119,25 @@ npm install @ausus/renderer-react react@18 react-dom@18
 
 ---
 
-## Beta installation requirements
+## Migrating from a v0.2 pre-release
 
-`ausus/*` `v0.2.x` packages are tagged with **alpha** stability on
-Packagist. Consumers must opt into alpha stability at the **root** of
-their `composer.json` for the install to resolve.
+Existing alpha / beta / rc consumers receive `v1.0.0` automatically
+on `composer update`: Composer's `@alpha` / `@beta` / `@rc`
+per-package flags all accept stable releases. To lock onto the
+v1.0 stable line cleanly, drop the pre-release stability flag from
+your root `composer.json` and bump constraints from
+`^0.2@alpha` (or `@beta` / `@rc`) to `^1.0`:
 
-### Why this is necessary
-
-Composer does **not** propagate the per-package stability flag
-(`@beta`, `@alpha`, etc.) to a required package's own transitive
-dependencies. When `ausus/standard-stack ^0.2@beta` declares
-`ausus/kernel ^0.2@beta`, that inner constraint is evaluated against
-the **root**'s `minimum-stability` — which defaults to `stable`.
-Without opting in, Composer rejects the pre-release chain and falls
-back to the `v0.1.x` stable line.
-
-> This is **standard Composer behaviour**, not specific to AUSUS. It
-> applies identically to every pre-release in the PHP ecosystem
-> (Symfony betas, Laravel previews, Doctrine RCs, …). Documenting it
-> here so AUSUS first-time consumers don't lose the half-hour we lost
-> finding it.
-
-### Two equivalent setups
-
-**Option A — declare in `composer.json` directly:**
-
-```json
-{
-    "minimum-stability": "alpha",
-    "prefer-stable": true
-}
+```diff
+- "minimum-stability": "alpha",
+- "prefer-stable": true,
+  "require": {
+-     "ausus/standard-stack": "^0.2@alpha"
++     "ausus/standard-stack": "^1.0"
+  }
 ```
 
-`prefer-stable: true` keeps stable versions preferred when both stable
-and alpha are available for the same package. Without it, Composer
-might pick alpha versions of unrelated non-`ausus/*` dependencies.
-
-**Option B — initialize the project with the stability flag:**
-
-```bash
-composer init -n --type=project --stability=beta
-```
-
-`composer init --stability=beta` writes `minimum-stability: beta`
-into the generated `composer.json`. Then add `"prefer-stable": true`
-manually (or via `composer config prefer-stable true`).
-
-### Validated install procedure
-
-```bash
-composer init -n --type=project --stability=beta
-composer require ausus/standard-stack:^0.2@beta
-```
-
-This exact sequence is exercised end-to-end by
+The validated public install procedure is exercised end-to-end by
 [`scripts/public-install.sh`](scripts/public-install.sh) (CI step
 `11`), which fails the build if anything in the chain — Packagist
 indexing, tarball structure, autoload, or smoke functionality —
@@ -184,13 +147,13 @@ regresses.
 
 ## Verified public install
 
-Reproduces the canonical clean-room install of `v0.2.0-rc.1` end to
+Reproduces the canonical clean-room install of `v1.0.0` end to
 end. No local monorepo, no path repositories, no symlinks — exactly
 what an external consumer sees from Packagist.
 
 ```bash
 composer init -n
-composer require ausus/standard-stack:^0.2@beta
+composer require ausus/standard-stack
 ```
 
 Sanity smoke (creates a working `Application` against SQLite):
@@ -214,7 +177,7 @@ var_dump($app instanceof Application);
 ```
 
 The same procedure pulls every kernel, runtime, persistence and HTTP
-class at `v0.2.0-rc.1`, including the five `Ausus\Errors\*` marker
+class at `v1.0.0`, including the five `Ausus\Errors\*` marker
 interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 
 ---
@@ -255,16 +218,17 @@ interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 | `v0.2.0-alpha.2` | fixed packaging | dedicated subtree-split repos active; internal `^0.2@alpha` constraints not yet bumped | Phase A + B + C (server-side) |
 | `v0.2.0-alpha.5` | superseded | fully fixed (subtree-split + Packagist source + internal constraint propagation); replaced by beta.1 | Phase A + B + C (fully distributed) |
 | `v0.2.0-beta.1` | superseded | pagination + filtering + sorting + ViewSchema 1.2.0 + matrix CI 8.3 / 8.4; replaced by rc.1 | Phase A + B + C (fully distributed) |
-| `v0.2.0-rc.1` | **current rc** | bit-identical to beta.1 runtime; documentation + audit-evidence backfill cleanup only | Phase A + B + C (fully distributed) |
+| `v0.2.0-rc.1` | superseded | bit-identical to beta.1 runtime; documentation + audit-evidence backfill cleanup only; replaced by 1.0.0 | Phase A + B + C (fully distributed) |
+| **`v1.0.0`** | **current stable (GA)** | bit-identical to rc.1 runtime; inter-package constraints bumped to `^1.0`, `minimum-stability` no longer required | Phase A + B + C (fully distributed) |
 
 **AUSUS `v0.1.x` is legacy and superseded by the v0.2 line.** The
 legacy artifacts on Packagist were published from the monorepo and
 should not be pulled for a new install — they will not scaffold a
 working starter and `composer boot` will not be defined. The canonical
-install command until `v1.0.0` ships is:
+install command for the current stable line is:
 
 ```bash
-composer create-project "ausus/starter:^0.2@beta" myapp --stability=beta
+composer create-project ausus/starter myapp
 ```
 
 Legacy tags remain in Packagist's index for historical traceability;
@@ -296,7 +260,8 @@ deterministic, content-addressable `MetadataGraph`.
 
 | Document | What it covers |
 |---|---|
-| [`docs-site/docs/releases/v0.2.0-rc.1.md`](docs-site/docs/releases/v0.2.0-rc.1.md) | current rc — bit-identical to beta.1 runtime; documentation + audit-evidence backfill cleanup only |
+| [`docs-site/docs/releases/v1.0.0.md`](docs-site/docs/releases/v1.0.0.md) | **current stable (GA)** — bit-identical to rc.1 runtime; inter-package constraints bumped to `^1.0`, `minimum-stability` no longer required |
+| [`docs-site/docs/releases/v0.2.0-rc.1.md`](docs-site/docs/releases/v0.2.0-rc.1.md) | last rc — bit-identical to beta.1 runtime; documentation + audit-evidence backfill cleanup only |
 | [`docs-site/docs/releases/v0.2.0-beta.1.md`](docs-site/docs/releases/v0.2.0-beta.1.md) | last beta — pagination + filtering + sorting, ViewSchema 1.2.0, `composer serve` DX, replay-validated release engineering |
 | [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md) | last stable — v0.1.x stabilisation, breaking changes, migration |
 | [`CHANGELOG.md`](CHANGELOG.md) | consolidated changelog (Keep a Changelog) |

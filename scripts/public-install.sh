@@ -7,7 +7,7 @@
 # vendor. Exactly what an external consumer sees from the public registry.
 #
 # Validates:
-#   1. composer require ausus/standard-stack:^0.2@alpha resolves
+#   1. composer require ausus/standard-stack:^1.0 resolves
 #   2. all ausus/* installed at the expected alpha version
 #   3. vendor/ausus/* tarballs do NOT contain the monorepo (no packages/,
 #      apps/, docs-site/, renderer/, scripts/, .github/)
@@ -26,7 +26,9 @@
 # Usage:   scripts/public-install.sh
 # Env:     KEEP=1                       keep the tmp dir for inspection
 #          EXPECTED_VERSION=...         override the version to assert against
-#                                       (default: v0.2.0-rc.1)
+#                                       (default: v0.2.0-rc.1 during the v1.0
+#                                        prep window; bumped to v1.0.0
+#                                        post-publish)
 #          EXPECTED_SCHEMA_VERSION=...  override the wire schemaVersion
 #                                       (default derived from EXPECTED_VERSION:
 #                                        v0.1.* / v0.2.0-alpha.[1-5] → 1.0.0;
@@ -47,9 +49,10 @@ EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-rc.1}"
 
 # Wire-shape pin per release version. v0.1.* and v0.2.0-alpha.[1-5] all ship
 # the 1.0.0 ViewSchema (pagination shape was {nextCursor, pageSize}); every
-# release from v0.2.0-alpha.6 / v0.2.0-beta.* / v0.2.0-rc.* onward ships
-# 1.2.0 (pagination extended with {limit, offset, totalCount} plus top-level
-# sort echo).
+# release from v0.2.0-alpha.6 / v0.2.0-beta.* / v0.2.0-rc.* / v1.* onward
+# ships 1.2.0 (pagination extended with {limit, offset, totalCount} plus
+# top-level sort echo). Note: the 'schemaVersion' string '1.2.0' is unrelated
+# to the package version '1.0.0' — the wire is on its own SemVer.
 case "${EXPECTED_VERSION}" in
     v0.1.*|v0.2.0-alpha.[1-5])
         DEFAULT_SCHEMA_VERSION="1.0.0"
@@ -91,16 +94,16 @@ cat > composer.json <<'JSON'
     "description": "Synthetic consumer used by scripts/public-install.sh to verify Packagist distribution end-to-end.",
     "type": "project",
     "license": "MIT",
-    "minimum-stability": "beta",
+    "minimum-stability": "rc",
     "prefer-stable": true,
     "require": {}
 }
 JSON
-echo "  ✓ composer.json written (minimum-stability=beta, prefer-stable=true)"
+echo "  ✓ composer.json written (minimum-stability=rc during v1.0 prep window)"
 
 # ─── step 2 — composer require from Packagist (no local source) ──────────────
-echo "[public-install] step 2 — composer require ausus/standard-stack:^0.2@beta"
-if ! composer require "ausus/standard-stack:^0.2@beta" \
+echo "[public-install] step 2 — composer require ausus/standard-stack:^0.2@rc"
+if ! composer require "ausus/standard-stack:^0.2@rc" \
         --no-interaction --no-cache > "${TMP_DIR}/composer.log" 2>&1; then
     echo "  ✗ composer require failed:"
     tail -30 "${TMP_DIR}/composer.log" | sed 's/^/    /'
