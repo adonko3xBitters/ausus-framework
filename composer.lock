@@ -4,19 +4,19 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1640d8b8d3056d4a4e3defb0470dd5cc",
+    "content-hash": "b38f1216f452e81c3ef6e256545bd59e",
     "packages": [
         {
             "name": "ausus/api-http",
-            "version": "0.2.999",
+            "version": "1.0.999",
             "dist": {
                 "type": "path",
                 "url": "packages/api-http",
-                "reference": "05f117128a94c284776379cc956e3a81e1d3607f"
+                "reference": "2037368510250cdaaa2440853e017c3b2d0b8ce2"
             },
             "require": {
-                "ausus/kernel": "^0.2@alpha",
-                "ausus/runtime-default": "^0.2@alpha",
+                "ausus/kernel": "^1.0",
+                "ausus/runtime-default": "^1.0",
                 "php": ">=8.3",
                 "psr/http-factory": "^1.0",
                 "psr/http-message": "^1.1 || ^2.0",
@@ -39,7 +39,7 @@
                 "MIT"
             ],
             "description": "AUSUS L4 — PSR-7/15 HTTP API surface for the metadata graph. Serves RFC-004 ViewSchema fetches, Action invocation, and the kernel exception taxonomy.",
-            "homepage": "https://github.com/adonko3xBitters/ausus-framework",
+            "homepage": "https://github.com/adonko3xBitters/api-http",
             "keywords": [
                 "api",
                 "ausus",
@@ -55,11 +55,11 @@
         },
         {
             "name": "ausus/kernel",
-            "version": "0.2.999",
+            "version": "1.0.999",
             "dist": {
                 "type": "path",
                 "url": "packages/kernel",
-                "reference": "e1a70d864b4b01d9019af36a57e3cac28e654cac"
+                "reference": "165bff0edcd3ccccb2f6370798585cb55bc1efac"
             },
             "require": {
                 "php": ">=8.3"
@@ -85,7 +85,7 @@
                 "MIT"
             ],
             "description": "AUSUS Kernel — contracts, value objects, DSL facade. RFC-001 + contract surfaces of RFC-005 §2, RFC-013 §2, RFC-014 §2.",
-            "homepage": "https://github.com/ausus-framework/ausus",
+            "homepage": "https://github.com/adonko3xBitters/kernel",
             "keywords": [
                 "ausus",
                 "framework",
@@ -99,14 +99,14 @@
         },
         {
             "name": "ausus/persistence-sql",
-            "version": "0.2.999",
+            "version": "1.0.999",
             "dist": {
                 "type": "path",
                 "url": "packages/persistence-sql",
-                "reference": "52605571fddf334f12201f181ca0bcca47f84ee2"
+                "reference": "c14fb4ee1615f96d64c64aba885d61c08b26205b"
             },
             "require": {
-                "ausus/kernel": "^0.2@alpha",
+                "ausus/kernel": "^1.0",
                 "ext-pdo": "*",
                 "php": ">=8.3"
             },
@@ -136,7 +136,7 @@
                 "MIT"
             ],
             "description": "L3 PersistenceDriver — SQL implementation of RFC-002 via PDO (SQLite/MySQL/Postgres). Includes SchemaDeriver + DatabaseAuditSink.",
-            "homepage": "https://github.com/ausus-framework/ausus",
+            "homepage": "https://github.com/adonko3xBitters/persistence-sql",
             "keywords": [
                 "ausus",
                 "framework",
@@ -151,14 +151,14 @@
         },
         {
             "name": "ausus/runtime-default",
-            "version": "0.2.999",
+            "version": "1.0.999",
             "dist": {
                 "type": "path",
                 "url": "packages/runtime-default",
-                "reference": "d2df592abd5a252703e19f431c23292805cc61c2"
+                "reference": "5deddf356d99d3905c236cecfd7034b042fc96f8"
             },
             "require": {
-                "ausus/kernel": "^0.2@alpha",
+                "ausus/kernel": "^1.0",
                 "php": ">=8.3"
             },
             "type": "library",
@@ -182,7 +182,7 @@
                 "MIT"
             ],
             "description": "L2 Runtime — Invoker, Policy Engine, Workflow runtime, Effect dispatch. Implements RFC-005 §3–§13, RFC-006, RFC-001 §A-1.4 §8.2.1, and the de facto ActionEffect dispatch of RFC-013.",
-            "homepage": "https://github.com/ausus-framework/ausus",
+            "homepage": "https://github.com/adonko3xBitters/runtime-default",
             "keywords": [
                 "ausus",
                 "framework",
@@ -197,17 +197,17 @@
         },
         {
             "name": "ausus/standard-stack",
-            "version": "0.2.999",
+            "version": "1.0.999",
             "dist": {
                 "type": "path",
                 "url": "packages/standard-stack",
-                "reference": "66f19a3ec5f96dd78d55832e8b34a2d610a24fec"
+                "reference": "d548db624e13157c5c7fd35df21b80c40a3b7c72"
             },
             "require": {
-                "ausus/api-http": "^0.2@alpha",
-                "ausus/kernel": "^0.2@alpha",
-                "ausus/persistence-sql": "^0.2@alpha",
-                "ausus/runtime-default": "^0.2@alpha",
+                "ausus/api-http": "^1.0",
+                "ausus/kernel": "^1.0",
+                "ausus/persistence-sql": "^1.0",
+                "ausus/runtime-default": "^1.0",
                 "php": ">=8.3"
             },
             "type": "library",
@@ -232,7 +232,7 @@
                 "MIT"
             ],
             "description": "AUSUS — the V0 Standard Stack: bundles kernel + persistence-sql + runtime-default + api-http and ships the high-level Ausus\\Application bootstrap facade. Skeleton packages (tenancy-row, audit-database, auth-bridge, presentation-default) will be added as their RFC-12 §16 implementations land.",
-            "homepage": "https://github.com/adonko3xBitters/ausus-framework",
+            "homepage": "https://github.com/adonko3xBitters/standard-stack",
             "keywords": [
                 "application",
                 "ausus",
@@ -247,17 +247,17 @@
         },
         {
             "name": "ausus/starter",
-            "version": "0.2.999",
+            "version": "1.0.999",
             "dist": {
                 "type": "path",
                 "url": "packages/starter",
-                "reference": "d41ee07c27f6b638c8848ee3724d45cd52262338"
+                "reference": "5505c08d0fdb4058a7e504291ffb205b94a3692d"
             },
             "require": {
-                "ausus/kernel": "^0.2@alpha",
-                "ausus/persistence-sql": "^0.2@alpha",
-                "ausus/runtime-default": "^0.2@alpha",
-                "ausus/standard-stack": "^0.2@alpha",
+                "ausus/kernel": "^1.0",
+                "ausus/persistence-sql": "^1.0",
+                "ausus/runtime-default": "^1.0",
+                "ausus/standard-stack": "^1.0",
                 "ext-pdo": "*",
                 "ext-pdo_sqlite": "*",
                 "php": ">=8.3"
@@ -278,21 +278,22 @@
                 ]
             },
             "scripts": {
-                "post-root-package-install": [
-                    "@php bin/configure-repo.php"
-                ],
                 "post-create-project-cmd": [
                     "@php bin/boot.php"
                 ],
                 "boot": [
                     "@php bin/boot.php"
+                ],
+                "serve": [
+                    "Composer\\Config::disableProcessTimeout",
+                    "@php -S localhost:8000 bin/server.php"
                 ]
             },
             "license": [
                 "MIT"
             ],
             "description": "AUSUS V0 starter template — boots a working HelloInvoice demo on top of the Standard Stack via Ausus\\Application. Installs via `composer create-project ausus/starter myapp`.",
-            "homepage": "https://github.com/ausus-framework/ausus",
+            "homepage": "https://github.com/adonko3xBitters/starter",
             "keywords": [
                 "ausus",
                 "framework",
@@ -673,14 +674,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "ausus/api-http": 15,
-        "ausus/kernel": 15,
-        "ausus/persistence-sql": 15,
-        "ausus/runtime-default": 15,
-        "ausus/standard-stack": 15,
-        "ausus/starter": 15
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
