@@ -3,6 +3,17 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.0.0] — 2026-05-29
+
+### Released
+- First stable release. Bit-identical to `0.2.0-rc.1` runtime, build,
+  bundle shape, and peer-dependency surface.
+- ViewSchema wire stays at `schemaVersion 1.2.0`; `peerSchemaVersion`
+  stays at `^1.0.0`. A 1.0 backend continues to be consumable by any
+  renderer in the `1.x` line.
+- `latest` dist-tag on npm now points at this release. The `next`
+  tag stays in step with the pre-1.0 line for back-compat reference.
+
 ## [0.2.0-rc.1] — 2026-05-29
 
 ### Changed

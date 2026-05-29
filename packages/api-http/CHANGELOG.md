@@ -3,6 +3,19 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.0.0] — 2026-05-29
+
+### Released
+- First stable release. Bit-identical to `0.2.0-rc.1`. `Router`,
+  `Emitter`, `ErrorMapper`, the three HTTP routes (`GET /_health`,
+  `GET /projections/{fqn}`, `POST /actions/{fqn}`), and the
+  `?limit` / `?offset` / `?filter.<field>.<op>` / `?sort=` query
+  parameter contracts are frozen as stable public surface.
+
+### Changed
+- Package metadata: `ausus/kernel` and `ausus/runtime-default`
+  require constraints move from `^0.2@alpha` to `^1.0`.
+
 ## [0.2.0-rc.1] — 2026-05-29
 
 ### Changed

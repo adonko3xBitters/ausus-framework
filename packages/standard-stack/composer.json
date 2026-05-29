@@ -7,10 +7,10 @@
     "homepage": "https://github.com/adonko3xBitters/standard-stack",
     "require": {
         "php": ">=8.3",
-        "ausus/kernel":           "^0.2@alpha",
-        "ausus/runtime-default":  "^0.2@alpha",
-        "ausus/persistence-sql":  "^0.2@alpha",
-        "ausus/api-http":         "^0.2@alpha"
+        "ausus/kernel":           "^1.0",
+        "ausus/runtime-default":  "^1.0",
+        "ausus/persistence-sql":  "^1.0",
+        "ausus/api-http":         "^1.0"
     },
     "autoload": {
         "classmap": ["src/"]
