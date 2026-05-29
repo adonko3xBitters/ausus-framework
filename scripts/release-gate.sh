@@ -164,11 +164,16 @@ fi
 #     avoids the heuristic throttle that some no-UA pings hit.
 log "step 5 — homepage URLs reachable"
 fail_count=0
+# Temporarily relax errexit: curl-substitution failures inside the loop must
+# be caught by the rc check that follows, not by `set -e` abandoning the
+# script. The loop's own per-URL failure tracking + the post-loop fail_count
+# gate provides the actual abort semantics.
+set +e
 for f in packages/*/composer.json; do
     URL=$(jq -r '.homepage' "$f")
     STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-        --connect-timeout 5 -m 10 \
-        --retry 1 --retry-delay 1 \
+        --connect-timeout 5 -m 15 \
+        --retry 2 --retry-delay 2 --retry-all-errors \
         -A "ausus-release-gate/1.0 (+homepage-check)" \
         "$URL")
     rc=$?
@@ -181,8 +186,9 @@ for f in packages/*/composer.json; do
         fail "$f homepage $URL → $STATUS"
         fail_count=$((fail_count + 1))
     fi
-    sleep 0.3
+    sleep 0.6
 done
+set -e
 if [ "$fail_count" -ne 0 ]; then
     exit 4
 fi
