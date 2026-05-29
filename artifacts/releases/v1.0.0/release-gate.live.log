@@ -1,0 +1,32 @@
+[release-gate] mode=LIVE  version=v1.0.0  tmp=/var/folders/nh/43pg_05j7nd57llcqxxcz8j80000gn/T/ausus-release-gate-XXXXXX.iKFW2MjJzH
+[release-gate] step 1 — composer.json structural validation
+  ✓ all composer.json structurally valid
+[release-gate] step 2 — scripts/ci.sh
+  ✓ scripts/ci.sh green
+[release-gate] step 3 — doc-version coherence
+  ✓ doc-version aligned
+[release-gate] step 4 — renderer / backend ViewSchema alignment
+  ✓ renderer alignment OK
+[release-gate] step 4b — renderer npm provenance metadata
+  ✓ renderer provenance metadata OK
+[release-gate] step 5 — homepage URLs reachable
+  ✓ https://github.com/adonko3xBitters/api-http → 200
+  ✓ https://github.com/adonko3xBitters/audit-database → 200
+  ✓ https://github.com/adonko3xBitters/auth-bridge → 200
+  ✓ https://github.com/adonko3xBitters/kernel → 200
+  ✓ https://github.com/adonko3xBitters/persistence-sql → 200
+  ✓ https://github.com/adonko3xBitters/presentation-default → 200
+  ✓ https://github.com/adonko3xBitters/runtime-default → 200
+  ✓ https://github.com/adonko3xBitters/standard-stack → 200
+  ✓ https://github.com/adonko3xBitters/starter → 200
+  ✓ https://github.com/adonko3xBitters/tenancy-row → 200
+[release-gate] step 6 — composer create-project (Packagist live)
+  ✓ create-project succeeded
+  ✓ scaffolded project structure valid
+[release-gate] step 7 — smoke test installed scaffold
+  ✓ composer boot succeeded
+[release-gate] step 8 — npm registry has @ausus/renderer-react@1.0.0
+  ✓ @ausus/renderer-react@1.0.0 published
+[release-gate] step 9 — clean-room starter install
+  ✓ clean-room starter install green
+[release-gate] OK (live mode) — v1.0.0 ready for announce

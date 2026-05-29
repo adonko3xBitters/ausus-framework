@@ -1,0 +1,19 @@
+{
+  "version": "v1.0.0",
+  "tag": "v1.0.0",
+  "commit": "9075fbece8be929644487441f24b98eaee07ddc4",
+  "packages": {
+    "ausus/api-http": "v1.0.0",
+    "ausus/audit-database": "v1.0.0",
+    "ausus/auth-bridge": "v1.0.0",
+    "ausus/kernel": "v1.0.0",
+    "ausus/persistence-sql": "v1.0.0",
+    "ausus/presentation-default": "v1.0.0",
+    "ausus/runtime-default": "v1.0.0",
+    "ausus/standard-stack": "v1.0.0",
+    "ausus/starter": "v1.0.0",
+    "ausus/tenancy-row": "v1.0.0",
+    "@ausus/renderer-react": "1.0.0"
+  },
+  "published_at": "2026-05-29T15:46:20Z"
+}

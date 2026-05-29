@@ -1,0 +1,13 @@
+{
+  "ausus/api-http": "v1.0.0",
+  "ausus/audit-database": "v1.0.0",
+  "ausus/auth-bridge": "v1.0.0",
+  "ausus/kernel": "v1.0.0",
+  "ausus/persistence-sql": "v1.0.0",
+  "ausus/presentation-default": "v1.0.0",
+  "ausus/runtime-default": "v1.0.0",
+  "ausus/standard-stack": "v1.0.0",
+  "ausus/starter": "v1.0.0",
+  "ausus/tenancy-row": "v1.0.0",
+  "@ausus/renderer-react": "1.0.0"
+}
