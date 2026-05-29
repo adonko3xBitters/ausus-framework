@@ -3,6 +3,33 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.0.1] — 2026-05-29
+
+### Fixed
+- **`composer serve` fatal `Class "Nyholm\Psr7\Factory\Psr17Factory" not
+  found` on every fresh `composer create-project ausus/starter myapp`
+  install.** `bin/server.php` imports `Nyholm\Psr7\Factory\Psr17Factory`
+  + `Nyholm\Psr7Server\ServerRequestCreator` but the starter's
+  `composer.json` declared neither `nyholm/psr7` nor
+  `nyholm/psr7-server` in `require`. `ausus/api-http` only requires
+  the PSR-7 interfaces (`psr/http-message`, `psr/http-factory`,
+  `psr/http-server-handler`, `psr/http-server-middleware`) — no
+  concrete implementation transitively. Monorepo dev and CI silently
+  masked the gap because the monorepo root `composer.json` declares
+  both Nyholm packages explicitly.
+- Adds `nyholm/psr7: ^1.8` and `nyholm/psr7-server: ^1.1` to the
+  starter's `require`. The documented `composer create-project
+  ausus/starter myapp` → `composer boot` → `composer serve` quickstart
+  now works out-of-the-box without a manual `composer require` step.
+- Anti-regression: `scripts/clean-room-install-test.sh` Gate F now
+  boots the scaffolded `bin/server.php` and asserts
+  `GET /api/_health` returns `200` with the expected JSON envelope.
+  The gate auto-skips with a notice on pre-fix scaffolds where
+  `nyholm/psr7` is absent (the v1.0.0 line on Packagist).
+
+Closes
+[`adonko3xBitters/starter#1`](https://github.com/adonko3xBitters/starter/issues/1).
+
 ## [Unreleased] — v0.1.x stabilisation
 
 ### Changed

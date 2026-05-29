@@ -107,4 +107,67 @@ for pkg in ausus/kernel ausus/runtime-default ausus/persistence-sql ausus/api-ht
     printf "  ✓ %-30s %s\n" "$pkg" "$INSTALLED"
 done
 
+# ─── Gate F — `composer serve` smoke (regression guard for starter#1) ───────
+#
+# Boots the documented dev server on a free port, polls /api/_health, and
+# asserts a 200 + JSON envelope. Without this gate, the `composer serve`
+# DX promise can silently break — `composer create-project ausus/starter`
+# may resolve cleanly but the dev server fatals on the first Nyholm class
+# load if the starter's `require` ever loses `nyholm/psr7` /
+# `nyholm/psr7-server` again (cf. adonko3xBitters/starter#1).
+#
+# Conditional execution: the gate ONLY runs when the scaffolded vendor/
+# tree contains `nyholm/psr7`. The pre-fix starter (v1.0.0) does not
+# install Nyholm via its require chain, so testing the documented
+# `composer serve` against a v1.0.0 scaffold would deterministically
+# fatal. Once v1.0.1+ is the floor on Packagist, the skip never fires
+# and the gate becomes the permanent anti-regression guard.
+if ! composer show nyholm/psr7 >/dev/null 2>&1; then
+    echo "[clean-room] gate F — skipped (nyholm/psr7 absent from scaffold; pre-fix starter line)"
+    echo "[clean-room] OK — quickstart works end to end"
+    exit 0
+fi
+echo "[clean-room] gate F — composer serve + /api/_health"
+SERVE_PORT=$(( (RANDOM % 1000) + 9000 ))
+SERVE_LOG="$(mktemp -t ausus-clean-room-serve-XXXXXX.log)"
+AUSUS_DB_PATH="$(pwd)/ausus-serve-smoke.sqlite" \
+    php -S "127.0.0.1:${SERVE_PORT}" bin/server.php > "$SERVE_LOG" 2>&1 &
+SERVE_PID=$!
+# Poll for up to ~3 s; abort cleanly on any failure.
+SERVE_OK=0
+for i in 1 2 3 4 5 6 7 8 9 10; do
+    if ! kill -0 "$SERVE_PID" 2>/dev/null; then
+        echo "::error::dev server died during boot — log:"
+        sed 's/^/    /' "$SERVE_LOG"
+        rm -f "$SERVE_LOG"
+        exit 1
+    fi
+    HTTP_CODE=$(curl -s -o "$SERVE_LOG.body" -w '%{http_code}' \
+        --max-time 2 "http://127.0.0.1:${SERVE_PORT}/api/_health" 2>/dev/null || echo "000")
+    if [ "$HTTP_CODE" = "200" ]; then
+        if grep -q '"ok":true' "$SERVE_LOG.body" 2>/dev/null \
+                && grep -q '"service":"ausus/api-http"' "$SERVE_LOG.body" 2>/dev/null \
+                && grep -q '"graphHash"' "$SERVE_LOG.body" 2>/dev/null; then
+            SERVE_OK=1
+            break
+        fi
+    fi
+    sleep 0.3
+done
+kill "$SERVE_PID" 2>/dev/null || true
+sleep 0.2
+kill -9 "$SERVE_PID" 2>/dev/null || true
+if [ "$SERVE_OK" -ne 1 ]; then
+    echo "::error::/api/_health did not return the expected 200 + envelope"
+    echo "  last HTTP code: ${HTTP_CODE}"
+    echo "  body:"
+    sed 's/^/    /' "$SERVE_LOG.body" 2>/dev/null || echo "    (empty)"
+    echo "  server log:"
+    sed 's/^/    /' "$SERVE_LOG"
+    rm -f "$SERVE_LOG" "$SERVE_LOG.body"
+    exit 1
+fi
+rm -f "$SERVE_LOG" "$SERVE_LOG.body"
+echo "  ✓ /api/_health → 200 with expected JSON envelope"
+
 echo "[clean-room] OK — quickstart works end to end"

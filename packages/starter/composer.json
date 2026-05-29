@@ -12,7 +12,9 @@
         "ausus/kernel":           "^1.0",
         "ausus/persistence-sql":  "^1.0",
         "ausus/runtime-default":  "^1.0",
-        "ausus/standard-stack":   "^1.0"
+        "ausus/standard-stack":   "^1.0",
+        "nyholm/psr7":            "^1.8",
+        "nyholm/psr7-server":     "^1.1"
     },
     "autoload": {
         "classmap": ["src/"]
