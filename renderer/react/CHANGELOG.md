@@ -3,6 +3,19 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [0.2.0-rc.1] — 2026-05-29
+
+### Changed
+- Version aligned with backend `ausus/*` v0.2.0-rc.1 per the documented
+  release alignment policy. No runtime, build, peer-dependency, or
+  bundle-shape change vs `0.2.0-beta.1`.
+- ViewSchema wire stays at `schemaVersion 1.2.0`; `peerSchemaVersion`
+  stays at `^1.0.0`.
+
+### Notes
+- RC.1 is a release-candidate cut of beta.1 — promoted after the
+  beta.1 readiness audit closed all blockers. No new features.
+
 ## [0.2.0-beta.1] — 2026-05-29
 
 ### Changed

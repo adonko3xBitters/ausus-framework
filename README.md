@@ -7,7 +7,7 @@
 [![PHP](https://img.shields.io/badge/PHP-%E2%89%A5%208.3-777BB4.svg)](https://www.php.net/)
 [![Node](https://img.shields.io/badge/Node-%E2%89%A5%2018-339933.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18%20%7C%2019-61DAFB.svg)](https://react.dev/)
-[![Version](https://img.shields.io/badge/version-0.2.0--beta.1-blue.svg)](docs-site/docs/releases/v0.2.0-beta.1.md)
+[![Version](https://img.shields.io/badge/version-0.2.0--rc.1-blue.svg)](docs-site/docs/releases/v0.2.0-rc.1.md)
 
 AUSUS is a PHP framework for building enterprise apps — CRUD platforms,
 ERP workflows, SaaS multi-tenant products, internal tools — from
@@ -18,7 +18,7 @@ substrate: a deterministic, layered, plugin-composable kernel.
 
 ---
 
-## What ships today (v0.2.0-beta.1)
+## What ships today (v0.2.0-rc.1)
 
 | Package | Role | Status |
 |---|---|---|
@@ -29,13 +29,13 @@ substrate: a deterministic, layered, plugin-composable kernel.
 | [`ausus/starter`](packages/starter)            | project template — `composer create-project`     | implemented |
 | [`ausus/standard-stack`](packages/standard-stack) | metapackage pinning the V0 set                | implemented |
 | [`@ausus/renderer-react`](renderer/react)      | React 18+ renderer for the RFC-004 ViewSchema    | implemented |
-| `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, tagged at v0.2.0-beta.1 (no code yet) |
+| `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, tagged at v0.2.0-rc.1 (no code yet) |
 
-Current beta: [`v0.2.0-beta.1`](docs-site/docs/releases/v0.2.0-beta.1.md). Last alpha: [`v0.2.0-alpha.5`](docs-site/docs/releases/v0.2.0-alpha.5.md). Last stable: [`v0.1.1`](docs-site/docs/releases/v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md).
+Current release candidate: [`v0.2.0-rc.1`](docs-site/docs/releases/v0.2.0-rc.1.md). Last beta: [`v0.2.0-beta.1`](docs-site/docs/releases/v0.2.0-beta.1.md). Last alpha: [`v0.2.0-alpha.5`](docs-site/docs/releases/v0.2.0-alpha.5.md). Last stable: [`v0.1.1`](docs-site/docs/releases/v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
-## Current status (v0.2.0-beta.1)
+## Current status (v0.2.0-rc.1)
 
 - **Public packaging.** The historical Packagist packaging defect that
   shipped the entire monorepo inside each `vendor/ausus/<package>`
@@ -44,7 +44,7 @@ Current beta: [`v0.2.0-beta.1`](docs-site/docs/releases/v0.2.0-beta.1.md). Last 
   [`github.com/adonko3xBitters/<package>`](https://github.com/adonko3xBitters);
   Packagist pulls from those dedicated repos, not from the monorepo.
 - **Install works without workaround.** `composer require
-  ausus/standard-stack:^0.2@beta` resolves cleanly to `v0.2.0-beta.1`
+  ausus/standard-stack:^0.2@beta` resolves cleanly to `v0.2.0-rc.1`
   for the entire chain (`kernel`, `runtime-default`, `persistence-sql`,
   `api-http`, `standard-stack`). No manual autoload, no custom
   classmap, no monorepo extraction required. PSR-15 transitive deps
@@ -64,7 +64,7 @@ Current beta: [`v0.2.0-beta.1`](docs-site/docs/releases/v0.2.0-beta.1.md). Last 
 
 ## Runtime hardening (v0.2)
 
-`v0.2.0-beta.1` (current beta) is a **stabilization + pre-1.0 feature
+`v0.2.0-rc.1` (current rc) is a **stabilization + pre-1.0 feature
 line**. It is additive on top of `v0.1.1` plus the new query surface
 (pagination + filtering + sorting, ViewSchema `1.2.0`). The recommended
 line for production remains `v0.1.1` until `v1.0.0` ships.
@@ -93,9 +93,9 @@ What it adds:
 
 ## 30-second quickstart
 
-> **IMPORTANT.** AUSUS v0.2.x is currently in **beta**. Consumers must
-> declare a `beta` (or lower) minimum stability in their `composer.json`
-> until the first stable release:
+> **IMPORTANT.** AUSUS v0.2.x is currently in **rc** (release candidate).
+> Consumers must declare an `rc` (or lower) minimum stability in their
+> `composer.json` until the first stable release:
 >
 > ```json
 > "minimum-stability": "beta",
@@ -184,7 +184,7 @@ regresses.
 
 ## Verified public install
 
-Reproduces the canonical clean-room install of `v0.2.0-beta.1` end to
+Reproduces the canonical clean-room install of `v0.2.0-rc.1` end to
 end. No local monorepo, no path repositories, no symlinks — exactly
 what an external consumer sees from Packagist.
 
@@ -214,7 +214,7 @@ var_dump($app instanceof Application);
 ```
 
 The same procedure pulls every kernel, runtime, persistence and HTTP
-class at `v0.2.0-beta.1`, including the five `Ausus\Errors\*` marker
+class at `v0.2.0-rc.1`, including the five `Ausus\Errors\*` marker
 interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 
 ---
@@ -254,7 +254,8 @@ interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 | `v0.2.0-alpha.1` | obsolete | broken (same defect) | Phase A + B (declared, undelivered) |
 | `v0.2.0-alpha.2` | fixed packaging | dedicated subtree-split repos active; internal `^0.2@alpha` constraints not yet bumped | Phase A + B + C (server-side) |
 | `v0.2.0-alpha.5` | superseded | fully fixed (subtree-split + Packagist source + internal constraint propagation); replaced by beta.1 | Phase A + B + C (fully distributed) |
-| `v0.2.0-beta.1` | **current beta** | fully fixed + pagination/filtering/sorting + ViewSchema 1.2.0 + matrix CI 8.3 / 8.4 | Phase A + B + C (fully distributed) |
+| `v0.2.0-beta.1` | superseded | pagination + filtering + sorting + ViewSchema 1.2.0 + matrix CI 8.3 / 8.4; replaced by rc.1 | Phase A + B + C (fully distributed) |
+| `v0.2.0-rc.1` | **current rc** | bit-identical to beta.1 runtime; documentation + audit-evidence backfill cleanup only | Phase A + B + C (fully distributed) |
 
 **AUSUS `v0.1.x` is legacy and superseded by the v0.2 line.** The
 legacy artifacts on Packagist were published from the monorepo and
@@ -295,7 +296,8 @@ deterministic, content-addressable `MetadataGraph`.
 
 | Document | What it covers |
 |---|---|
-| [`docs-site/docs/releases/v0.2.0-beta.1.md`](docs-site/docs/releases/v0.2.0-beta.1.md) | current beta — pagination + filtering + sorting, ViewSchema 1.2.0, `composer serve` DX, replay-validated release engineering |
+| [`docs-site/docs/releases/v0.2.0-rc.1.md`](docs-site/docs/releases/v0.2.0-rc.1.md) | current rc — bit-identical to beta.1 runtime; documentation + audit-evidence backfill cleanup only |
+| [`docs-site/docs/releases/v0.2.0-beta.1.md`](docs-site/docs/releases/v0.2.0-beta.1.md) | last beta — pagination + filtering + sorting, ViewSchema 1.2.0, `composer serve` DX, replay-validated release engineering |
 | [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md) | last stable — v0.1.x stabilisation, breaking changes, migration |
 | [`CHANGELOG.md`](CHANGELOG.md) | consolidated changelog (Keep a Changelog) |
 | [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md) | initial release-candidate notes (v0.1.0) — packages, compatibility, publish order, rollback |
