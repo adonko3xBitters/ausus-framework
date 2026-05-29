@@ -1,0 +1,5 @@
+  ✓ repository.url matches publishing repo (https://github.com/adonko3xBitters/ausus-framework.git)
+  ✓ homepage under expected org (https://github.com/adonko3xBitters/ausus-framework/tree/main/renderer/react)
+  ✓ version 0.2.0-beta.1 matches CHANGELOG topmost section
+  ✓ npm pack --dry-run green (version=0.2.0-beta.1, files=21)
+[renderer-provenance] OK
