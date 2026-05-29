@@ -31,7 +31,7 @@ The fastest path. `ausus/starter` is a ready-to-run project that already wires
 the kernel, persistence, runtime, and a sample domain together.
 
 ```bash
-composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+composer create-project "ausus/starter:^0.2@beta" myapp --stability=beta
 cd myapp
 composer boot
 ```
@@ -133,7 +133,7 @@ AUSUS v0.2.x is currently in **alpha**. Because Composer defaults to
 explicitly during `create-project`:
 
 ```bash
-composer create-project "ausus/starter:^0.2@alpha" myapp --stability=alpha
+composer create-project "ausus/starter:^0.2@beta" myapp --stability=beta
 ```
 
 If you set up the project manually instead of using `create-project`, you

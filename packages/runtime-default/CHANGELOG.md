@@ -3,7 +3,7 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
-## [Unreleased] — v0.2.0-beta.1 prep
+## [0.2.0-beta.1] — 2026-05-29
 
 ### Added
 - `ProjectionRenderer::render()` accepts optional `$limit` (default 50, max

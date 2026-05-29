@@ -3,6 +3,21 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [0.2.0-beta.1] — 2026-05-29
+
+### Changed
+- Version aligned with backend `ausus/*` v0.2.0-beta.1 per the
+  documented release alignment policy.
+- ViewSchema backend now emits `schemaVersion 1.2.0` (additive over
+  1.0.0): `data.pagination` carries `limit`, `offset`, `totalCount`,
+  `pageSize`, `nextCursor`, plus top-level `filters` and `sort` echoes.
+  `peerSchemaVersion` stays at `^1.0.0` — every backend release in the
+  `1.x` range remains consumable by this renderer.
+
+### Notes
+- No runtime, build, or peer-dependency change. Bundle shape and
+  exports identical to `0.2.0-alpha.5`.
+
 ## [0.2.0-alpha.5] — 2026-05-28
 
 ### Fixed
