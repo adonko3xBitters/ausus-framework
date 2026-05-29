@@ -3,6 +3,14 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [0.2.0-rc.1] — 2026-05-29
+
+### Changed
+- Release-candidate cut of v0.2.0-beta.1 with zero runtime change.
+  `ProjectionRenderer::render()` signature, `schemaVersion` (`1.2.0`),
+  and the wire echo of `filters[]` + `sort[]` stay bit-identical to
+  beta.1.
+
 ## [0.2.0-beta.1] — 2026-05-29
 
 ### Added

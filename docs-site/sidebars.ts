@@ -92,6 +92,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Release Notes',
       items: [
+        'releases/v0.2.0-rc.1',
         'releases/v0.2.0-beta.1',
         'releases/v0.2.0-alpha.5',
         'releases/v0.2.0-alpha.4',
