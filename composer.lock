@@ -251,7 +251,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/starter",
-                "reference": "5505c08d0fdb4058a7e504291ffb205b94a3692d"
+                "reference": "7f8fbbd1bfdde375e32a818bcb05d29fc01b2e9e"
             },
             "require": {
                 "ausus/kernel": "^1.0",
@@ -260,6 +260,8 @@
                 "ausus/standard-stack": "^1.0",
                 "ext-pdo": "*",
                 "ext-pdo_sqlite": "*",
+                "nyholm/psr7": "^1.8",
+                "nyholm/psr7-server": "^1.1",
                 "php": ">=8.3"
             },
             "bin": [

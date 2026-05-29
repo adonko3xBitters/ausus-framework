@@ -7,7 +7,7 @@
 [![PHP](https://img.shields.io/badge/PHP-%E2%89%A5%208.3-777BB4.svg)](https://www.php.net/)
 [![Node](https://img.shields.io/badge/Node-%E2%89%A5%2018-339933.svg)](https://nodejs.org/)
 [![React](https://img.shields.io/badge/React-18%20%7C%2019-61DAFB.svg)](https://react.dev/)
-[![Version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg)](docs-site/docs/releases/v1.0.0.md)
+[![Version](https://img.shields.io/badge/version-1.0.1-brightgreen.svg)](docs-site/docs/releases/v1.0.1.md)
 
 AUSUS is a PHP framework for building enterprise apps — CRUD platforms,
 ERP workflows, SaaS multi-tenant products, internal tools — from
@@ -18,7 +18,7 @@ substrate: a deterministic, layered, plugin-composable kernel.
 
 ---
 
-## What ships today (v1.0.0)
+## What ships today (v1.0.1)
 
 | Package | Role | Status |
 |---|---|---|
@@ -29,13 +29,13 @@ substrate: a deterministic, layered, plugin-composable kernel.
 | [`ausus/starter`](packages/starter)            | project template — `composer create-project`     | implemented |
 | [`ausus/standard-stack`](packages/standard-stack) | metapackage pinning the V0 set                | implemented |
 | [`@ausus/renderer-react`](renderer/react)      | React 18+ renderer for the RFC-004 ViewSchema    | implemented |
-| `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, tagged at v1.0.0 (no code yet) |
+| `ausus/tenancy-row`, `ausus/audit-database`, `ausus/auth-bridge`, `ausus/presentation-default` | dedicated drivers / plugins | name-reserved, tagged at v1.0.1 (no code yet) |
 
-**Current stable: [`v1.0.0`](docs-site/docs/releases/v1.0.0.md).** Last rc: [`v0.2.0-rc.1`](docs-site/docs/releases/v0.2.0-rc.1.md). Last beta: [`v0.2.0-beta.1`](docs-site/docs/releases/v0.2.0-beta.1.md). Legacy line: [`v0.1.1`](docs-site/docs/releases/v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md).
+**Current stable: [`v1.0.1`](docs-site/docs/releases/v1.0.1.md).** Previous: [`v1.0.0`](docs-site/docs/releases/v1.0.0.md). Last rc: [`v0.2.0-rc.1`](docs-site/docs/releases/v0.2.0-rc.1.md). Legacy line: [`v0.1.1`](docs-site/docs/releases/v0.1.1.md). Consolidated history: [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
-## Current status (v1.0.0)
+## Current status (v1.0.1)
 
 - **Public packaging.** The historical Packagist packaging defect that
   shipped the entire monorepo inside each `vendor/ausus/<package>`
@@ -44,7 +44,7 @@ substrate: a deterministic, layered, plugin-composable kernel.
   [`github.com/adonko3xBitters/<package>`](https://github.com/adonko3xBitters);
   Packagist pulls from those dedicated repos, not from the monorepo.
 - **Install works without workaround.** `composer require
-  ausus/standard-stack` resolves cleanly to `v1.0.0`
+  ausus/standard-stack` resolves cleanly to `v1.0.1`
   for the entire chain (`kernel`, `runtime-default`, `persistence-sql`,
   `api-http`, `standard-stack`). No manual autoload, no custom
   classmap, no monorepo extraction required. PSR-15 transitive deps
@@ -64,7 +64,7 @@ substrate: a deterministic, layered, plugin-composable kernel.
 
 ## Runtime hardening (v0.2)
 
-`v1.0.0` (current stable) is the **GA release** of the v0.2
+`v1.0.1` (current stable) is the **GA release** of the v0.2
 stabilization + feature line. It is additive on top of `v0.1.1`
 plus the query surface (pagination + filtering + sorting, ViewSchema
 `1.2.0`). The public API surface is frozen for the `1.x` line.
@@ -93,7 +93,7 @@ What it adds:
 
 ## 30-second quickstart
 
-`v1.0.0` is on Packagist with **stable** stability — no `--stability`
+`v1.0.1` is on Packagist with **stable** stability — no `--stability`
 flag is required for new projects:
 
 ```bash
@@ -121,7 +121,7 @@ npm install @ausus/renderer-react react@18 react-dom@18
 
 ## Migrating from a v0.2 pre-release
 
-Existing alpha / beta / rc consumers receive `v1.0.0` automatically
+Existing alpha / beta / rc consumers receive `v1.0.1` automatically
 on `composer update`: Composer's `@alpha` / `@beta` / `@rc`
 per-package flags all accept stable releases. To lock onto the
 v1.0 stable line cleanly, drop the pre-release stability flag from
@@ -147,7 +147,7 @@ regresses.
 
 ## Verified public install
 
-Reproduces the canonical clean-room install of `v1.0.0` end to
+Reproduces the canonical clean-room install of `v1.0.1` end to
 end. No local monorepo, no path repositories, no symlinks — exactly
 what an external consumer sees from Packagist.
 
@@ -177,7 +177,7 @@ var_dump($app instanceof Application);
 ```
 
 The same procedure pulls every kernel, runtime, persistence and HTTP
-class at `v1.0.0`, including the five `Ausus\Errors\*` marker
+class at `v1.0.1`, including the five `Ausus\Errors\*` marker
 interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 
 ---
@@ -219,7 +219,8 @@ interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 | `v0.2.0-alpha.5` | superseded | fully fixed (subtree-split + Packagist source + internal constraint propagation); replaced by beta.1 | Phase A + B + C (fully distributed) |
 | `v0.2.0-beta.1` | superseded | pagination + filtering + sorting + ViewSchema 1.2.0 + matrix CI 8.3 / 8.4; replaced by rc.1 | Phase A + B + C (fully distributed) |
 | `v0.2.0-rc.1` | superseded | bit-identical to beta.1 runtime; documentation + audit-evidence backfill cleanup only; replaced by 1.0.0 | Phase A + B + C (fully distributed) |
-| **`v1.0.0`** | **current stable (GA)** | bit-identical to rc.1 runtime; inter-package constraints bumped to `^1.0`, `minimum-stability` no longer required | Phase A + B + C (fully distributed) |
+| `v1.0.0` | superseded | first stable cut of the v0.2 line; replaced by v1.0.1 (starter quickstart hotfix) | Phase A + B + C (fully distributed) |
+| **`v1.0.1`** | **current stable** | starter `require` adds `nyholm/psr7` + `nyholm/psr7-server` so `composer serve` works out-of-the-box (closes adonko3xBitters/starter#1); no runtime, API, or wire change vs 1.0.0 | Phase A + B + C (fully distributed) |
 
 **AUSUS `v0.1.x` is legacy and superseded by the v0.2 line.** The
 legacy artifacts on Packagist were published from the monorepo and
@@ -260,7 +261,8 @@ deterministic, content-addressable `MetadataGraph`.
 
 | Document | What it covers |
 |---|---|
-| [`docs-site/docs/releases/v1.0.0.md`](docs-site/docs/releases/v1.0.0.md) | **current stable (GA)** — bit-identical to rc.1 runtime; inter-package constraints bumped to `^1.0`, `minimum-stability` no longer required |
+| [`docs-site/docs/releases/v1.0.1.md`](docs-site/docs/releases/v1.0.1.md) | **current stable** — starter `require` hotfix; closes `composer serve` quickstart fatal on fresh installs |
+| [`docs-site/docs/releases/v1.0.0.md`](docs-site/docs/releases/v1.0.0.md) | first stable cut — bit-identical to rc.1 runtime; inter-package constraints bumped to `^1.0` |
 | [`docs-site/docs/releases/v0.2.0-rc.1.md`](docs-site/docs/releases/v0.2.0-rc.1.md) | last rc — bit-identical to beta.1 runtime; documentation + audit-evidence backfill cleanup only |
 | [`docs-site/docs/releases/v0.2.0-beta.1.md`](docs-site/docs/releases/v0.2.0-beta.1.md) | last beta — pagination + filtering + sorting, ViewSchema 1.2.0, `composer serve` DX, replay-validated release engineering |
 | [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md) | last stable — v0.1.x stabilisation, breaking changes, migration |
