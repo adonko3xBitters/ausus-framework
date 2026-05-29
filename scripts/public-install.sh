@@ -43,7 +43,7 @@
 
 set -euo pipefail
 
-EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-alpha.5}"
+EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-beta.1}"
 
 # Wire-shape pin per release version. v0.1.* and v0.2.0-alpha.[1-5] all ship
 # the 1.0.0 ViewSchema (pagination shape was {nextCursor, pageSize}); every
@@ -90,16 +90,16 @@ cat > composer.json <<'JSON'
     "description": "Synthetic consumer used by scripts/public-install.sh to verify Packagist distribution end-to-end.",
     "type": "project",
     "license": "MIT",
-    "minimum-stability": "alpha",
+    "minimum-stability": "beta",
     "prefer-stable": true,
     "require": {}
 }
 JSON
-echo "  ✓ composer.json written (minimum-stability=alpha, prefer-stable=true)"
+echo "  ✓ composer.json written (minimum-stability=beta, prefer-stable=true)"
 
 # ─── step 2 — composer require from Packagist (no local source) ──────────────
-echo "[public-install] step 2 — composer require ausus/standard-stack:^0.2@alpha"
-if ! composer require "ausus/standard-stack:^0.2@alpha" \
+echo "[public-install] step 2 — composer require ausus/standard-stack:^0.2@beta"
+if ! composer require "ausus/standard-stack:^0.2@beta" \
         --no-interaction --no-cache > "${TMP_DIR}/composer.log" 2>&1; then
     echo "  ✗ composer require failed:"
     tail -30 "${TMP_DIR}/composer.log" | sed 's/^/    /'

@@ -25,7 +25,7 @@
 
 set -euo pipefail
 
-EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-alpha.5}"
+EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-beta.1}"
 TMP="$(mktemp -d -t ausus-clean-room-XXXXXX)"
 
 cleanup() {
@@ -44,9 +44,9 @@ echo "[clean-room] expected_version=$EXPECTED_VERSION"
 cd "$TMP"
 
 # ─── Quickstart: the exact documented command ───────────────────────────────
-echo "[clean-room] running: composer create-project ausus/starter:^0.2@alpha myapp --stability=alpha"
-composer create-project "ausus/starter:^0.2@alpha" myapp \
-    --stability=alpha \
+echo "[clean-room] running: composer create-project ausus/starter:^0.2@beta myapp --stability=beta"
+composer create-project "ausus/starter:^0.2@beta" myapp \
+    --stability=beta \
     --no-interaction \
     --no-cache
 
