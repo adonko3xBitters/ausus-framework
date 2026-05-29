@@ -1,0 +1,79 @@
+[clean-room] tmp=/var/folders/nh/43pg_05j7nd57llcqxxcz8j80000gn/T/ausus-clean-room-XXXXXX.be0oGXbTCP
+[clean-room] expected_version=v0.2.0-rc.1
+[clean-room] running: composer create-project ausus/starter:^0.2@beta myapp --stability=beta
+Creating a "ausus/starter:^0.2@beta" project at "./myapp"
+Installing ausus/starter (v0.2.0-rc.1)
+  - Downloading ausus/starter (v0.2.0-rc.1)
+  - Installing ausus/starter (v0.2.0-rc.1): Extracting archive
+Created project in /private/var/folders/nh/43pg_05j7nd57llcqxxcz8j80000gn/T/ausus-clean-room-XXXXXX.be0oGXbTCP/myapp
+Loading composer repositories with package information
+Updating dependencies
+Lock file operations: 9 installs, 0 updates, 0 removals
+  - Locking ausus/api-http (v0.2.0-rc.1)
+  - Locking ausus/kernel (v0.2.0-rc.1)
+  - Locking ausus/persistence-sql (v0.2.0-rc.1)
+  - Locking ausus/runtime-default (v0.2.0-rc.1)
+  - Locking ausus/standard-stack (v0.2.0-rc.1)
+  - Locking psr/http-factory (1.1.0)
+  - Locking psr/http-message (2.0)
+  - Locking psr/http-server-handler (1.0.2)
+  - Locking psr/http-server-middleware (1.0.2)
+Writing lock file
+Installing dependencies from lock file (including require-dev)
+Package operations: 9 installs, 0 updates, 0 removals
+  - Downloading ausus/kernel (v0.2.0-rc.1)
+  - Downloading ausus/runtime-default (v0.2.0-rc.1)
+  - Downloading ausus/persistence-sql (v0.2.0-rc.1)
+  - Downloading psr/http-message (2.0)
+  - Downloading psr/http-server-handler (1.0.2)
+  - Downloading psr/http-server-middleware (1.0.2)
+  - Downloading psr/http-factory (1.1.0)
+  - Downloading ausus/api-http (v0.2.0-rc.1)
+  - Downloading ausus/standard-stack (v0.2.0-rc.1)
+ 0/9 [>---------------------------]   0%
+ 2/9 [======>---------------------]  22%
+ 7/9 [=====================>------]  77%
+ 9/9 [============================] 100%
+  - Installing ausus/kernel (v0.2.0-rc.1): Extracting archive
+  - Installing ausus/runtime-default (v0.2.0-rc.1): Extracting archive
+  - Installing ausus/persistence-sql (v0.2.0-rc.1): Extracting archive
+  - Installing psr/http-message (2.0): Extracting archive
+  - Installing psr/http-server-handler (1.0.2): Extracting archive
+  - Installing psr/http-server-middleware (1.0.2): Extracting archive
+  - Installing psr/http-factory (1.1.0): Extracting archive
+  - Installing ausus/api-http (v0.2.0-rc.1): Extracting archive
+  - Installing ausus/standard-stack (v0.2.0-rc.1): Extracting archive
+ 0/9 [>---------------------------]   0%
+ 9/9 [============================] 100%
+Generating autoload files
+No security vulnerability advisories found.
+> @php bin/boot.php
+ausus/starter boot
+  ✓ compiled graph (hash 3701c198107b…)
+  ✓ schema applied
+  ✓ created invoice id=01KST0J1J3SGHYP121SAW7ZD5W
+  ✓ issued invoice (DRAFT → ISSUED)
+  ✓ rendered summary projection (items=1)
+OK — ausus/starter boots cleanly.
+[clean-room] gate A — no forbidden monorepo directories
+  ✓ no monorepo directories
+[clean-room] gate B — composer.json.name == ausus/starter
+  ✓ composer.json.name = ausus/starter
+[clean-room] gate C — composer.json has no repositories[]
+  ✓ no repositories[] entry
+[clean-room] gate D — composer boot
+ausus/starter boot
+  ✓ compiled graph (hash 3701c198107b…)
+  ✓ schema applied
+  ✓ created invoice id=01KST0J1RFDR6SFCJZ8HT3TFN8
+  ✓ issued invoice (DRAFT → ISSUED)
+  ✓ rendered summary projection (items=1)
+OK — ausus/starter boots cleanly.
+  ✓ composer boot succeeded
+[clean-room] gate E — installed versions
+  ✓ ausus/kernel                   v0.2.0-rc.1
+  ✓ ausus/runtime-default          v0.2.0-rc.1
+  ✓ ausus/persistence-sql          v0.2.0-rc.1
+  ✓ ausus/api-http                 v0.2.0-rc.1
+  ✓ ausus/standard-stack           v0.2.0-rc.1
+[clean-room] OK — quickstart works end to end
