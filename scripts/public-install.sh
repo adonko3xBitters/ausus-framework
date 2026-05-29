@@ -26,7 +26,7 @@
 # Usage:   scripts/public-install.sh
 # Env:     KEEP=1                       keep the tmp dir for inspection
 #          EXPECTED_VERSION=...         override the version to assert against
-#                                       (default: v0.2.0-alpha.5)
+#                                       (default: v0.2.0-beta.1)
 #          EXPECTED_SCHEMA_VERSION=...  override the wire schemaVersion
 #                                       (default derived from EXPECTED_VERSION:
 #                                        v0.1.* / v0.2.0-alpha.[1-5] → 1.0.0;

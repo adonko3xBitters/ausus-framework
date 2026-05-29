@@ -44,7 +44,7 @@ Current beta: [`v0.2.0-beta.1`](docs-site/docs/releases/v0.2.0-beta.1.md). Last 
   [`github.com/adonko3xBitters/<package>`](https://github.com/adonko3xBitters);
   Packagist pulls from those dedicated repos, not from the monorepo.
 - **Install works without workaround.** `composer require
-  ausus/standard-stack:^0.2@alpha` resolves cleanly to `v0.2.0-beta.1`
+  ausus/standard-stack:^0.2@beta` resolves cleanly to `v0.2.0-beta.1`
   for the entire chain (`kernel`, `runtime-default`, `persistence-sql`,
   `api-http`, `standard-stack`). No manual autoload, no custom
   classmap, no monorepo extraction required. PSR-15 transitive deps
@@ -128,13 +128,13 @@ their `composer.json` for the install to resolve.
 
 ### Why this is necessary
 
-Composer does **not** propagate the `@alpha` per-package flag to a
-required package's own transitive dependencies. When
-`ausus/standard-stack ^0.2@alpha` declares `ausus/kernel ^0.2@alpha`,
-that inner constraint is evaluated against the **root**'s
-`minimum-stability` — which defaults to `stable`. Without opting in,
-Composer rejects the alpha chain and falls back to the `v0.1.x` stable
-line.
+Composer does **not** propagate the per-package stability flag
+(`@beta`, `@alpha`, etc.) to a required package's own transitive
+dependencies. When `ausus/standard-stack ^0.2@beta` declares
+`ausus/kernel ^0.2@beta`, that inner constraint is evaluated against
+the **root**'s `minimum-stability` — which defaults to `stable`.
+Without opting in, Composer rejects the pre-release chain and falls
+back to the `v0.1.x` stable line.
 
 > This is **standard Composer behaviour**, not specific to AUSUS. It
 > applies identically to every pre-release in the PHP ecosystem
@@ -160,18 +160,18 @@ might pick alpha versions of unrelated non-`ausus/*` dependencies.
 **Option B — initialize the project with the stability flag:**
 
 ```bash
-composer init -n --type=project --stability=alpha
+composer init -n --type=project --stability=beta
 ```
 
-`composer init --stability=alpha` writes `minimum-stability: alpha`
+`composer init --stability=beta` writes `minimum-stability: beta`
 into the generated `composer.json`. Then add `"prefer-stable": true`
 manually (or via `composer config prefer-stable true`).
 
 ### Validated install procedure
 
 ```bash
-composer init -n --type=project --stability=alpha
-composer require ausus/standard-stack:^0.2@alpha
+composer init -n --type=project --stability=beta
+composer require ausus/standard-stack:^0.2@beta
 ```
 
 This exact sequence is exercised end-to-end by
@@ -190,7 +190,7 @@ what an external consumer sees from Packagist.
 
 ```bash
 composer init -n
-composer require ausus/standard-stack:^0.2@alpha
+composer require ausus/standard-stack:^0.2@beta
 ```
 
 Sanity smoke (creates a working `Application` against SQLite):
@@ -253,9 +253,10 @@ interfaces and the marker-first `Ausus\Api\Http\ErrorMapper`.
 | `v0.1.1` | legacy | broken historical tarballs (same defect) | partial |
 | `v0.2.0-alpha.1` | obsolete | broken (same defect) | Phase A + B (declared, undelivered) |
 | `v0.2.0-alpha.2` | fixed packaging | dedicated subtree-split repos active; internal `^0.2@alpha` constraints not yet bumped | Phase A + B + C (server-side) |
-| `v0.2.0-beta.1` | **current alpha** | fully fixed (subtree-split + Packagist source + internal constraint propagation) | Phase A + B + C (fully distributed) |
+| `v0.2.0-alpha.5` | superseded | fully fixed (subtree-split + Packagist source + internal constraint propagation); replaced by beta.1 | Phase A + B + C (fully distributed) |
+| `v0.2.0-beta.1` | **current beta** | fully fixed + pagination/filtering/sorting + ViewSchema 1.2.0 + matrix CI 8.3 / 8.4 | Phase A + B + C (fully distributed) |
 
-**AUSUS `v0.1.x` is legacy and superseded by the v0.2 alpha line.** The
+**AUSUS `v0.1.x` is legacy and superseded by the v0.2 line.** The
 legacy artifacts on Packagist were published from the monorepo and
 should not be pulled for a new install — they will not scaffold a
 working starter and `composer boot` will not be defined. The canonical
@@ -294,7 +295,7 @@ deterministic, content-addressable `MetadataGraph`.
 
 | Document | What it covers |
 |---|---|
-| [`RELEASE-NOTES-v0.2.0-beta.1.md`](RELEASE-NOTES-v0.2.0-beta.1.md) | current alpha — public Packagist packaging fix, internal `^0.2@alpha` constraint bumps, full Phase A+B+C runtime hardening distributed |
+| [`docs-site/docs/releases/v0.2.0-beta.1.md`](docs-site/docs/releases/v0.2.0-beta.1.md) | current beta — pagination + filtering + sorting, ViewSchema 1.2.0, `composer serve` DX, replay-validated release engineering |
 | [`RELEASE-NOTES-v0.1.1.md`](RELEASE-NOTES-v0.1.1.md) | last stable — v0.1.x stabilisation, breaking changes, migration |
 | [`CHANGELOG.md`](CHANGELOG.md) | consolidated changelog (Keep a Changelog) |
 | [`RELEASE-NOTES-v0.1.0.md`](RELEASE-NOTES-v0.1.0.md) | initial release-candidate notes (v0.1.0) — packages, compatibility, publish order, rollback |
@@ -319,7 +320,7 @@ git clone https://github.com/adonko3xBitters/ausus-framework.git
 cd ausus-framework
 composer install     # workspace install via path repositories
 npm install          # workspace install
-bash scripts/ci.sh   # 9-step validation gate
+bash scripts/ci.sh   # 11-step validation gate
 ```
 
 ---

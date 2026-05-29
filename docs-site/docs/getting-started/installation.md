@@ -94,10 +94,10 @@ npm install           # workspace install
 bash scripts/ci.sh    # full validation gate
 ```
 
-`scripts/ci.sh` runs a 10-step gate and ends with:
+`scripts/ci.sh` runs an 11-step gate and ends with:
 
 ```
-[ci] DONE — all 10 steps passed
+[ci] DONE — all 11 steps passed
 ```
 
 ## The React renderer {#the-react-renderer}

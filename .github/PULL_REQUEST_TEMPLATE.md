@@ -2,7 +2,7 @@
 Thanks for contributing to AUSUS!
 
 Before submitting, please ensure:
-  - [ ] `bash scripts/ci.sh` passes locally (9/9 steps)
+  - [ ] `bash scripts/ci.sh` passes locally (11/11 steps)
   - [ ] Commits follow Conventional Commits (see CONTRIBUTING.md §3)
   - [ ] Any new public API has a doc/RFC reference
 -->
@@ -35,7 +35,7 @@ Describe the validation steps you ran. At minimum, list the output of:
 ```
 $ bash scripts/ci.sh
 ...
-[ci] DONE — all 9 steps passed
+[ci] DONE — all 11 steps passed
 ```
 
 ## Breaking changes

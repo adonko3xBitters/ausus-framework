@@ -21,7 +21,7 @@
 # Standalone or driven from scripts/release-gate.sh (Step 9).
 #
 # Usage:   bash scripts/clean-room-install-test.sh
-# Env:     EXPECTED_VERSION   target version of ausus/* (default v0.2.0-alpha.5)
+# Env:     EXPECTED_VERSION   target version of ausus/* (default v0.2.0-beta.1)
 
 set -euo pipefail
 
