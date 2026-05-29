@@ -26,7 +26,7 @@
 # Usage:   scripts/public-install.sh
 # Env:     KEEP=1                       keep the tmp dir for inspection
 #          EXPECTED_VERSION=...         override the version to assert against
-#                                       (default: v0.2.0-beta.1)
+#                                       (default: v0.2.0-rc.1)
 #          EXPECTED_SCHEMA_VERSION=...  override the wire schemaVersion
 #                                       (default derived from EXPECTED_VERSION:
 #                                        v0.1.* / v0.2.0-alpha.[1-5] → 1.0.0;
@@ -43,12 +43,13 @@
 
 set -euo pipefail
 
-EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-beta.1}"
+EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-rc.1}"
 
 # Wire-shape pin per release version. v0.1.* and v0.2.0-alpha.[1-5] all ship
 # the 1.0.0 ViewSchema (pagination shape was {nextCursor, pageSize}); every
-# release from v0.2.0-alpha.6 / v0.2.0-beta.* onward ships 1.2.0 (pagination
-# extended with {limit, offset, totalCount} plus top-level sort echo).
+# release from v0.2.0-alpha.6 / v0.2.0-beta.* / v0.2.0-rc.* onward ships
+# 1.2.0 (pagination extended with {limit, offset, totalCount} plus top-level
+# sort echo).
 case "${EXPECTED_VERSION}" in
     v0.1.*|v0.2.0-alpha.[1-5])
         DEFAULT_SCHEMA_VERSION="1.0.0"
