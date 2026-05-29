@@ -186,7 +186,7 @@ for f in packages/*/composer.json; do
         fail "$f homepage $URL → $STATUS"
         fail_count=$((fail_count + 1))
     fi
-    sleep 0.6
+    sleep 1.2
 done
 set -e
 if [ "$fail_count" -ne 0 ]; then
