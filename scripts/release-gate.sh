@@ -147,17 +147,41 @@ if [ -z "$VERSION" ]; then
 fi
 
 # ─── Step 5: homepage URLs HTTP 200 ──────────────────────────────────────────
+# Resolves the 10 declared homepage URLs against GitHub. Two implementation
+# notes pin the contract against the previous transient-failure pattern:
+#
+#   - Status capture is decoupled from curl's exit code. The earlier form
+#     `STATUS=$(curl ... || echo "000")` concatenated curl's own emitted
+#     `%{http_code}` with the fallback string when curl exited non-zero
+#     after partially writing — producing impossible status values like
+#     `200000` or `000000`. Capturing the rc separately keeps STATUS as a
+#     single, well-formed HTTP code (or `000` on hard failure).
+#
+#   - A 0.3 s pause + a single `--retry 1 --retry-delay 1` budget per URL
+#     defuses GitHub's HEAD-burst rate limiter for the 10 sibling repos
+#     without ever crossing into infinite-retry territory. An explicit
+#     User-Agent string surfaces this gate clearly in GitHub's logs and
+#     avoids the heuristic throttle that some no-UA pings hit.
 log "step 5 — homepage URLs reachable"
 fail_count=0
 for f in packages/*/composer.json; do
     URL=$(jq -r '.homepage' "$f")
-    STATUS=$(curl -s -o /dev/null -w "%{http_code}" -m 10 "$URL" || echo "000")
+    STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+        --connect-timeout 5 -m 10 \
+        --retry 1 --retry-delay 1 \
+        -A "ausus-release-gate/1.0 (+homepage-check)" \
+        "$URL")
+    rc=$?
+    if [ "$rc" -ne 0 ]; then
+        STATUS="000"
+    fi
     if [ "$STATUS" = "200" ] || [ "$STATUS" = "301" ] || [ "$STATUS" = "302" ]; then
         ok "$URL → $STATUS"
     else
         fail "$f homepage $URL → $STATUS"
         fail_count=$((fail_count + 1))
     fi
+    sleep 0.3
 done
 if [ "$fail_count" -ne 0 ]; then
     exit 4
