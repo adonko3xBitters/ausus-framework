@@ -26,9 +26,7 @@
 # Usage:   scripts/public-install.sh
 # Env:     KEEP=1                       keep the tmp dir for inspection
 #          EXPECTED_VERSION=...         override the version to assert against
-#                                       (default: v0.2.0-rc.1 during the v1.0
-#                                        prep window; bumped to v1.0.0
-#                                        post-publish)
+#                                       (default: v1.0.0)
 #          EXPECTED_SCHEMA_VERSION=...  override the wire schemaVersion
 #                                       (default derived from EXPECTED_VERSION:
 #                                        v0.1.* / v0.2.0-alpha.[1-5] → 1.0.0;
@@ -45,7 +43,7 @@
 
 set -euo pipefail
 
-EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-rc.1}"
+EXPECTED_VERSION="${EXPECTED_VERSION:-v1.0.0}"
 
 # Wire-shape pin per release version. v0.1.* and v0.2.0-alpha.[1-5] all ship
 # the 1.0.0 ViewSchema (pagination shape was {nextCursor, pageSize}); every
@@ -94,16 +92,14 @@ cat > composer.json <<'JSON'
     "description": "Synthetic consumer used by scripts/public-install.sh to verify Packagist distribution end-to-end.",
     "type": "project",
     "license": "MIT",
-    "minimum-stability": "rc",
-    "prefer-stable": true,
     "require": {}
 }
 JSON
-echo "  ✓ composer.json written (minimum-stability=rc during v1.0 prep window)"
+echo "  ✓ composer.json written (stable defaults — no minimum-stability flag)"
 
 # ─── step 2 — composer require from Packagist (no local source) ──────────────
-echo "[public-install] step 2 — composer require ausus/standard-stack:^0.2@rc"
-if ! composer require "ausus/standard-stack:^0.2@rc" \
+echo "[public-install] step 2 — composer require ausus/standard-stack:^1.0"
+if ! composer require "ausus/standard-stack:^1.0" \
         --no-interaction --no-cache > "${TMP_DIR}/composer.log" 2>&1; then
     echo "  ✗ composer require failed:"
     tail -30 "${TMP_DIR}/composer.log" | sed 's/^/    /'

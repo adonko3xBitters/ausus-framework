@@ -21,13 +21,11 @@
 # Standalone or driven from scripts/release-gate.sh (Step 9).
 #
 # Usage:   bash scripts/clean-room-install-test.sh
-# Env:     EXPECTED_VERSION   target version of ausus/* (default v0.2.0-rc.1
-#                             during the v1.0 prep window; bumped to v1.0.0
-#                             post-publish)
+# Env:     EXPECTED_VERSION   target version of ausus/* (default v1.0.0)
 
 set -euo pipefail
 
-EXPECTED_VERSION="${EXPECTED_VERSION:-v0.2.0-rc.1}"
+EXPECTED_VERSION="${EXPECTED_VERSION:-v1.0.0}"
 TMP="$(mktemp -d -t ausus-clean-room-XXXXXX)"
 
 cleanup() {
@@ -46,9 +44,8 @@ echo "[clean-room] expected_version=$EXPECTED_VERSION"
 cd "$TMP"
 
 # ─── Quickstart: the exact documented command ───────────────────────────────
-echo "[clean-room] running: composer create-project ausus/starter:^0.2@rc myapp --stability=rc"
-composer create-project "ausus/starter:^0.2@rc" myapp \
-    --stability=rc \
+echo "[clean-room] running: composer create-project ausus/starter myapp"
+composer create-project "ausus/starter" myapp \
     --no-interaction \
     --no-cache
 
