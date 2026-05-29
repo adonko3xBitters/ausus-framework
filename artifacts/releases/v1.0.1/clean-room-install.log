@@ -1,0 +1,93 @@
+[clean-room] tmp=/var/folders/nh/43pg_05j7nd57llcqxxcz8j80000gn/T/ausus-clean-room-XXXXXX.SlzuJVkcYn
+[clean-room] expected_version=v1.0.1
+[clean-room] running: composer create-project ausus/starter myapp
+Creating a "ausus/starter" project at "./myapp"
+Installing ausus/starter (v1.0.1)
+  - Downloading ausus/starter (v1.0.1)
+  - Installing ausus/starter (v1.0.1): Extracting archive
+Created project in /private/var/folders/nh/43pg_05j7nd57llcqxxcz8j80000gn/T/ausus-clean-room-XXXXXX.SlzuJVkcYn/myapp
+Loading composer repositories with package information
+Updating dependencies
+Lock file operations: 11 installs, 0 updates, 0 removals
+  - Locking ausus/api-http (v1.0.1)
+  - Locking ausus/kernel (v1.0.1)
+  - Locking ausus/persistence-sql (v1.0.1)
+  - Locking ausus/runtime-default (v1.0.1)
+  - Locking ausus/standard-stack (v1.0.1)
+  - Locking nyholm/psr7 (1.8.2)
+  - Locking nyholm/psr7-server (1.1.0)
+  - Locking psr/http-factory (1.1.0)
+  - Locking psr/http-message (2.0)
+  - Locking psr/http-server-handler (1.0.2)
+  - Locking psr/http-server-middleware (1.0.2)
+Writing lock file
+Installing dependencies from lock file (including require-dev)
+Package operations: 11 installs, 0 updates, 0 removals
+  - Downloading ausus/kernel (v1.0.1)
+  - Downloading ausus/runtime-default (v1.0.1)
+  - Downloading ausus/persistence-sql (v1.0.1)
+  - Downloading psr/http-message (2.0)
+  - Downloading psr/http-server-handler (1.0.2)
+  - Downloading psr/http-server-middleware (1.0.2)
+  - Downloading psr/http-factory (1.1.0)
+  - Downloading ausus/api-http (v1.0.1)
+  - Downloading ausus/standard-stack (v1.0.1)
+  - Downloading nyholm/psr7 (1.8.2)
+  - Downloading nyholm/psr7-server (1.1.0)
+  0/11 [>---------------------------]   0%
+  1/11 [==>-------------------------]   9%
+  2/11 [=====>----------------------]  18%
+  4/11 [==========>-----------------]  36%
+  6/11 [===============>------------]  54%
+ 10/11 [=========================>--]  90%
+ 11/11 [============================] 100%
+  - Installing ausus/kernel (v1.0.1): Extracting archive
+  - Installing ausus/runtime-default (v1.0.1): Extracting archive
+  - Installing ausus/persistence-sql (v1.0.1): Extracting archive
+  - Installing psr/http-message (2.0): Extracting archive
+  - Installing psr/http-server-handler (1.0.2): Extracting archive
+  - Installing psr/http-server-middleware (1.0.2): Extracting archive
+  - Installing psr/http-factory (1.1.0): Extracting archive
+  - Installing ausus/api-http (v1.0.1): Extracting archive
+  - Installing ausus/standard-stack (v1.0.1): Extracting archive
+  - Installing nyholm/psr7 (1.8.2): Extracting archive
+  - Installing nyholm/psr7-server (1.1.0): Extracting archive
+  0/11 [>---------------------------]   0%
+ 11/11 [============================] 100%
+Generating autoload files
+2 packages you are using are looking for funding.
+Use the `composer fund` command to find out more!
+No security vulnerability advisories found.
+> @php bin/boot.php
+ausus/starter boot
+  ✓ compiled graph (hash 3701c198107b…)
+  ✓ schema applied
+  ✓ created invoice id=01KSTHFNAWMGYT5FP4ZB57D2D7
+  ✓ issued invoice (DRAFT → ISSUED)
+  ✓ rendered summary projection (items=1)
+OK — ausus/starter boots cleanly.
+[clean-room] gate A — no forbidden monorepo directories
+  ✓ no monorepo directories
+[clean-room] gate B — composer.json.name == ausus/starter
+  ✓ composer.json.name = ausus/starter
+[clean-room] gate C — composer.json has no repositories[]
+  ✓ no repositories[] entry
+[clean-room] gate D — composer boot
+ausus/starter boot
+  ✓ compiled graph (hash 3701c198107b…)
+  ✓ schema applied
+  ✓ created invoice id=01KSTHFNHAQH505VAG4PATK4QB
+  ✓ issued invoice (DRAFT → ISSUED)
+  ✓ rendered summary projection (items=1)
+OK — ausus/starter boots cleanly.
+  ✓ composer boot succeeded
+[clean-room] gate E — installed versions
+  ✓ ausus/kernel                   v1.0.1
+  ✓ ausus/runtime-default          v1.0.1
+  ✓ ausus/persistence-sql          v1.0.1
+  ✓ ausus/api-http                 v1.0.1
+  ✓ ausus/standard-stack           v1.0.1
+[clean-room] gate F — composer serve + /api/_health
+scripts/clean-room-install-test.sh: line 158: 16816 Terminated: 15          AUSUS_DB_PATH="$(pwd)/ausus-serve-smoke.sqlite" php -S "127.0.0.1:${SERVE_PORT}" bin/server.php > "$SERVE_LOG" 2>&1
+  ✓ /api/_health → 200 with expected JSON envelope
+[clean-room] OK — quickstart works end to end
