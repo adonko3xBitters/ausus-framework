@@ -1,5 +1,15 @@
 # Changelog — ausus/tenancy-row
 
+## [1.1.0] — 2026-06-12
+
+### Changed
+- Version alignment release. No package-specific code changes.
+
+### Note
+- This package was previously released as part of the coordinated 1.0.x
+  distribution but those alignment releases were not recorded in this
+  changelog. This entry restores changelog/version alignment.
+
 ## [0.1.0] — 2026-05-19
 
 **Name reservation release.** No source code shipped.

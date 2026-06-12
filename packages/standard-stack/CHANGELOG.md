@@ -3,6 +3,12 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.1.0] — 2026-06-12
+
+### Added
+- **RFC-018.** `actorAttributes` config key + `ApplicationConfig::actorAttributes()`
+  seed the built-in `StubActor` with default scalar attributes.
+
 ## [1.0.1] — 2026-05-29
 
 ### Changed

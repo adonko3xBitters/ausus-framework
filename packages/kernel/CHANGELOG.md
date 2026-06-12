@@ -3,6 +3,22 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.1.0] — 2026-06-12
+
+### Added
+- **RFC-015 (relations).** `Reference`/`Subject` unification via `class_alias`;
+  `Field::reference()` with compile-time `DanglingRelation` validation;
+  `ProjectionNode.expand`; `ReferentialIntegrityViolation` (BadRequest).
+- **RFC-018 (guard kernel).** Data-aware authorization contracts: `Provenance`,
+  `FactRef`, `Fact`, `FactSet`, `Cond`, `Guard`; `ActionBuilder::requireThat()`;
+  `Compiler::validateGuardClosure()` + `DanglingFactReference`; carried fields
+  `ActionNode.guards`, `MetadataGraph.actorAttributes`, `AuditEntry.decisionBasis`.
+- Enforcement boundary: `UndeclaredActionInput`, `ProjectionNode.role`.
+
+### Changed
+- `Actor` interface gains `attribute()` (RFC-018 R-2). The sole implementor
+  `StubActor` is updated; additive for consumers, every new field is defaulted.
+
 ## [1.0.1] — 2026-05-29
 
 ### Changed

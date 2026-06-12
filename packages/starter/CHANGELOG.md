@@ -3,6 +3,11 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.1.0] — 2026-06-12
+
+### Changed
+- Version alignment release. No package-specific code changes.
+
 ## [1.0.1] — 2026-05-29
 
 ### Fixed

@@ -3,6 +3,17 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.1.0] — 2026-06-12
+
+### Added
+- **RFC-015.** `ProjectionRenderer` relation expansion (`expand`): folds a
+  `{refField}_label` into each rendered row from the target entity's display
+  field, in-transaction.
+- **RFC-018.** Guard runtime — `ImmutableFactSet`, `CondEvaluator`, `CondGuard`,
+  `FactResolver`, `GuardComposer`; in-transaction data-aware guard evaluation in
+  the `Invoker` (deny → `PolicyDenied` → rollback), with `decisionBasis` captured.
+- Enforcement boundary: undeclared-input preflight in the `Invoker`.
+
 ## [1.0.1] — 2026-05-29
 
 ### Changed

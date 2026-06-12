@@ -3,6 +3,14 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.1.0] — 2026-06-12
+
+### Added
+- **RFC-018.** `X-Actor-Attributes` request header parsed (fail-safe, scalar-only)
+  into the resolved `StubActor`.
+- Enforcement boundary: `getProjection` enforces the projection's declared
+  read-role (`ProjectionNode.role`) before rendering.
+
 ## [1.0.1] — 2026-05-29
 
 ### Changed

@@ -3,6 +3,14 @@
 All notable changes documented per [Keep a Changelog](https://keepachangelog.com/).
 Versioning follows [SemVer](https://semver.org/).
 
+## [1.1.0] — 2026-06-12
+
+### Added
+- **RFC-015.** Write-time referential integrity (`assertReferenceExists`): a
+  `reference` field pointing at a non-existent or cross-tenant row raises
+  `Ausus\ReferentialIntegrityViolation`. Tenant-scoped — references never cross
+  tenant boundaries.
+
 ## [1.0.1] — 2026-05-29
 
 ### Changed
