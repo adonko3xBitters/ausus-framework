@@ -9,11 +9,180 @@ use Ausus\{
     Filter, Sort,
     Instant, MetadataGraph, NotFound, PagedRepository, PersistenceContext, PersistenceDriver, Policy, PolicyDenied,
     Reference, Repository, SingleSubject, Subject, Tenant, TransactionHandle, Ulid,
-    UnknownAction, PolicySubjectRequired, ActorRequired, TenantContextRequired,
+    UnknownAction, PolicySubjectRequired, UndeclaredActionInput, ActorRequired, TenantContextRequired,
     TenantBoundaryViolation, WorkflowStateMismatch, WorkflowSubjectNotFound,
     WorkflowGuardDenied, EffectFailed, AuditEmissionFailed,
-    ActionNode, WorkflowNode, TransitionNode, PolicyNode
+    ActionNode, WorkflowNode, TransitionNode, PolicyNode,
+    Provenance, Fact, FactRef, FactSet, Cond, Guard, Entity
 };
+
+// =============================================================================
+// RFC-018 — GUARD RUNTIME (Phase 4: first real guard execution)
+//
+// Scope: Actor / SubjectField / SubjectIdentity / OperationInput / Context only.
+// No Relation / Aggregate / History / External provenance. No VisibilityRule /
+// CompletionGate / ApprovalChain. Pure, in-transaction, deny-overrides.
+// =============================================================================
+
+/** Immutable {@see FactSet} with O(1) get()/has(). No mutation after construction. */
+final class ImmutableFactSet implements FactSet {
+    /** @var array<string,int|string|float|bool|null> */
+    private readonly array $index;
+    /** @var list<Fact> */
+    private readonly array $facts;
+    /** @param list<Fact> $facts */
+    public function __construct(array $facts) {
+        $idx = [];
+        foreach ($facts as $f) { $idx[$f->provenance->value . '|' . $f->key] = $f->value; }
+        $this->index = $idx;
+        $this->facts = array_values($facts);
+    }
+    public function get(Provenance $p, string $key): int|string|float|bool|null {
+        return $this->index[$p->value . '|' . $key] ?? null;
+    }
+    public function has(Provenance $p, string $key): bool {
+        return array_key_exists($p->value . '|' . $key, $this->index);
+    }
+    /** @return list<Fact> */
+    public function all(): array { return $this->facts; }
+}
+
+/**
+ * Pure evaluator for the {@see Cond} predicate DSL. Supports exactly:
+ * eq, ne, lt, lte, gt, gte, in, not, and, or, mul. `mul(operand, scalar)` yields
+ * an intermediate numeric value usable as a comparison operand.
+ */
+final class CondEvaluator {
+    public static function eval(Cond $cond, FactSet $facts): bool {
+        return self::truth($cond, $facts);
+    }
+    /** Resolve a FactRef/Cond/scalar operand to a value. */
+    private static function operand(mixed $node, FactSet $facts): mixed {
+        if ($node instanceof FactRef) { return $facts->get($node->provenance, $node->key); }
+        if ($node instanceof Cond)    { return self::value($node, $facts); }
+        return $node; // scalar literal (or array for `in`)
+    }
+    /** mul → numeric intermediate; any other Cond → its boolean truth. */
+    private static function value(Cond $cond, FactSet $facts): mixed {
+        if ($cond->op === 'mul') {
+            $a = self::num(self::operand($cond->args[0], $facts));
+            $k = (float) $cond->args[1];
+            return $a === null ? null : $a * $k;
+        }
+        return self::truth($cond, $facts);
+    }
+    private static function truth(Cond $cond, FactSet $facts): bool {
+        $args = $cond->args;
+        switch ($cond->op) {
+            case 'and': foreach ($args as $c) { if (!self::truth($c, $facts)) { return false; } } return true;
+            case 'or':  foreach ($args as $c) { if (self::truth($c, $facts))  { return true; } }  return false;
+            case 'not': return !self::truth($args[0], $facts);
+            case 'in':
+                $a = self::operand($args[0], $facts);
+                return in_array($a, $args[1], true);
+            case 'mul':
+                return (bool) self::value($cond, $facts);
+            default:
+                return self::compare($cond->op, self::operand($args[0], $facts), self::operand($args[1], $facts));
+        }
+    }
+    private static function num(mixed $v): ?float {
+        return (is_int($v) || is_float($v) || (is_string($v) && is_numeric($v))) ? (float) $v : null;
+    }
+    private static function compare(string $op, mixed $a, mixed $b): bool {
+        $eq = ($a === $b) || (self::num($a) !== null && self::num($b) !== null && self::num($a) === self::num($b));
+        if ($op === 'eq') { return $eq; }
+        if ($op === 'ne') { return !$eq; }
+        $x = self::num($a); $y = self::num($b);
+        if ($x === null || $y === null) { return false; }   // fail-closed for non-numeric ordering
+        return match ($op) { 'lt' => $x < $y, 'lte' => $x <= $y, 'gt' => $x > $y, 'gte' => $x >= $y, default => false };
+    }
+}
+
+/** A {@see Guard} over a {@see Cond}: true → Permit, false → Deny. Never Abstain. */
+final class CondGuard implements Guard {
+    public function __construct(private readonly Cond $cond) {}
+    /** @return list<FactRef> */
+    public function reads(): array { return $this->cond->factRefs(); }
+    public function decide(FactSet $facts): Decision {
+        return CondEvaluator::eval($this->cond, $facts) ? Decision::Permit : Decision::Deny;
+    }
+}
+
+/**
+ * Resolves declared {@see FactRef}s into an immutable {@see FactSet}. Phase 4
+ * provenances only: Actor / SubjectIdentity / SubjectField / OperationInput /
+ * Context. No external calls, no aggregates, no relations, no history. Fail-safe:
+ * an unresolvable fact yields null.
+ */
+final class FactResolver {
+    /**
+     * @param list<FactRef>       $refs
+     * @param array<string,mixed> $inputs
+     */
+    public function resolve(array $refs, Actor $actor, ?Reference $subject, array $inputs, Context $context, PersistenceContext $persistence): FactSet {
+        $needsSubject = false;
+        foreach ($refs as $r) { if ($r->provenance === Provenance::SubjectField) { $needsSubject = true; break; } }
+        $entity = ($needsSubject && $subject !== null)
+            ? $persistence->repository($subject->entityFqn)->find($subject)
+            : null;
+
+        $facts = []; $seen = [];
+        foreach ($refs as $r) {
+            $k = $r->provenance->value . '|' . $r->key;
+            if (isset($seen[$k])) { continue; }
+            $seen[$k] = true;
+            $facts[] = new Fact($r->provenance, $r->key, $this->resolveOne($r, $actor, $subject, $entity, $inputs, $context));
+        }
+        return new ImmutableFactSet($facts);
+    }
+    private function resolveOne(FactRef $r, Actor $actor, ?Reference $subject, ?Entity $entity, array $inputs, Context $context): int|string|float|bool|null {
+        switch ($r->provenance) {
+            case Provenance::Actor:
+                return match ($r->key) {
+                    'id'          => $actor->ref()->id,
+                    'roles'       => implode(',', $actor->roles()),
+                    'permissions' => implode(',', $actor->permissions()),
+                    default       => $this->scalarize($actor->attribute($r->key)),
+                };
+            case Provenance::SubjectIdentity:
+                if ($subject === null) { return null; }
+                return match ($r->key) {
+                    'id'     => $subject->identityHandle,
+                    'type'   => $subject->entityFqn,
+                    'tenant' => $subject->tenantId,
+                    default  => null,
+                };
+            case Provenance::SubjectField:
+                return $entity !== null ? $this->scalarize($entity->field($r->key)) : null;
+            case Provenance::OperationInput:
+                return array_key_exists($r->key, $inputs) ? $this->scalarize($inputs[$r->key]) : null;
+            case Provenance::Context:
+                return match ($r->key) {
+                    'now'    => $context->clock->toRfc3339(),
+                    'tenant' => $context->tenant->value(),
+                    'actor'  => $actor->ref()->id,
+                    default  => null,
+                };
+            default:
+                return null; // unreachable — validateGuardClosure rejects other provenances
+        }
+    }
+    private function scalarize(mixed $v): int|string|float|bool|null {
+        return ($v === null || is_int($v) || is_string($v) || is_float($v) || is_bool($v)) ? $v : null;
+    }
+}
+
+/** Composes guard decisions: deny-overrides, abstain-neutral. No positive Permit required. */
+final class GuardComposer {
+    /** @param list<Guard> $guards */
+    public function compose(array $guards, FactSet $facts): Decision {
+        foreach ($guards as $g) {
+            if ($g->decide($facts) === Decision::Deny) { return Decision::Deny; }
+        }
+        return Decision::Permit;
+    }
+}
 
 // =============================================================================
 // EFFECT CONTEXT IMPLEMENTATION
@@ -301,6 +470,9 @@ final class Invoker {
         private readonly SequenceCounter $sequence,
         private readonly Tenant $activeTenant,         // V0 — single Tenant per process
         private readonly Actor $actor,                  // V0 — single Actor
+        // RFC-018 (Phase 4) — defaulted so the existing construction site is unchanged.
+        private readonly FactResolver $factResolver = new FactResolver(),
+        private readonly GuardComposer $guardComposer = new GuardComposer(),
     ) {}
 
     public function invoke(string $actionFqn, ?Reference $subject, array $inputs = []): array {
@@ -312,6 +484,24 @@ final class Invoker {
         }
         if ($subject !== null && $subject->tenantId !== $this->activeTenant->value()) {
             throw new TenantBoundaryViolation("subject tenant != active tenant");
+        }
+
+        // Enforce the action-input contract uniformly: reject any input the
+        // action did not declare. UpdateEffect already rejects undeclared
+        // fields (the `not patchable by this action` check); create/transition
+        // did not — which let a caller smuggle entity fields (e.g. the workflow
+        // state) past the declared inputs, bypassing role/workflow guards. The
+        // allowed set is the already-compiled $action->inputs (FieldNode[]).
+        $declaredInputs = [];
+        foreach ($action->inputs as $declaredField) {
+            $declaredInputs[$declaredField->name] = true;
+        }
+        foreach ($inputs as $inputName => $_inputValue) {
+            if (!isset($declaredInputs[$inputName])) {
+                throw new UndeclaredActionInput(
+                    "input '{$inputName}' is not declared by action {$actionFqn}"
+                );
+            }
         }
 
         $correlationId = Ulid::generate();
@@ -329,6 +519,24 @@ final class Invoker {
         $committed = false;
         try {
             $persistence = $this->driver->context($this->activeTenant, $tx);
+
+            // RFC-018 (Phase 4) — data-aware guard evaluation, IN-TRANSACTION,
+            // after the (pre-transaction) role policy and before the workflow
+            // guard. Actions without guards skip this block entirely and follow
+            // the exact historical path. Deny → PolicyDenied → rollback (403).
+            $decisionBasis = [];
+            if ($action->guards !== []) {
+                $refs = [];
+                foreach ($action->guards as $cond) {
+                    $refs = array_merge($refs, $cond->factRefs());
+                }
+                $facts  = $this->factResolver->resolve($refs, $this->actor, $subject, $inputs, $context, $persistence);
+                $guards = array_map(static fn(Cond $c) => new CondGuard($c), $action->guards);
+                if ($this->guardComposer->compose($guards, $facts) !== Decision::Permit) {
+                    throw new PolicyDenied("Policy denied action {$actionFqn}: data-aware guard");
+                }
+                $decisionBasis = $facts->all();
+            }
 
             // Step 3: Workflow guard
             $this->workflow->evaluate($action, $subject, $persistence);
@@ -361,6 +569,7 @@ final class Invoker {
                 traceId: null,
                 invocationClass: $action->kind === 'maintenance' ? 'Maintenance' : 'Standard',
                 emitterVersion: '1.0.0',
+                decisionBasis: $decisionBasis,
             );
             $this->auditor->emit($entry, $tx);
 
@@ -446,6 +655,54 @@ final class ProjectionRenderer {
             ];
         }
 
+        // RFC-015 — relation expansion plan. Validate the projection's `expand`
+        // map and append a derived `{refField}_label` descriptor for each
+        // expanded reference. Values are folded into the data rows below, inside
+        // the transaction. Each expanded reference must (a) be a declared
+        // reference field, (b) be selected in the projection's fields, and
+        // (c) name a display field that exists on the target entity.
+        $expandPlan = [];   // refField => ['target'=>fqn, 'display'=>field]
+        foreach ($proj->expand as $refField => $displayField) {
+            $rf = $entity->field($refField);
+            if ($rf === null || $rf->type !== 'reference') {
+                throw new \RuntimeException(
+                    "ProjectionExpandInvalid: projection {$projectionFqn} expands '{$refField}', "
+                    . "which is not a declared reference field on {$entity->fqn}."
+                );
+            }
+            if (!in_array($refField, $proj->fields, true)) {
+                throw new \RuntimeException(
+                    "ProjectionExpandInvalid: projection {$projectionFqn} expands '{$refField}' but does not "
+                    . "select it; add '{$refField}' to the projection fields to expand it."
+                );
+            }
+            $target = $rf->typeOptions['targetEntityFqn'] ?? null;
+            $targetEntity = $target !== null ? ($this->graph->entities[$target] ?? null) : null;
+            if ($targetEntity === null) {
+                throw new \RuntimeException(
+                    "ProjectionExpandInvalid: reference '{$refField}' on {$entity->fqn} has no resolvable target entity."
+                );
+            }
+            if ($targetEntity->field($displayField) === null) {
+                throw new \RuntimeException(
+                    "ProjectionExpandInvalid: target entity '{$target}' has no field '{$displayField}' "
+                    . "to expand for '{$refField}' in projection {$projectionFqn}."
+                );
+            }
+            $header = ucfirst(str_replace('_', ' ', (string) preg_replace('/_id$/', '', $refField)));
+            $expandPlan[$refField] = ['target' => $target, 'display' => $displayField];
+            $fields[] = [
+                'name'        => $refField . '_label',
+                'type'        => 'string',
+                'label'       => $header,
+                'typeOptions' => [
+                    'expandedFrom'    => $refField,
+                    'targetEntityFqn' => $target,
+                    'displayField'    => $displayField,
+                ],
+            ];
+        }
+
         // Build actions block. Each action carries its declared input fields
         // (with required / default / nullable hints) so the renderer can
         // generate a working create or update form from the metadata alone.
@@ -507,6 +764,38 @@ final class ProjectionRenderer {
                     ],
                 ];
             }
+            // RFC-015 — fold expanded reference labels into the rows. One read
+            // per expanded reference (no N+1): the target table is loaded once
+            // through the Repository contract and indexed by id, then every row
+            // reads its label from the map. Runs in the same transaction as the
+            // primary read for a consistent snapshot.
+            if ($expandPlan !== []) {
+                $maps = [];
+                foreach ($expandPlan as $refField => $plan) {
+                    $idToLabel = [];
+                    foreach ($context->repository($plan['target'])->findAll() as $trow) {
+                        $idToLabel[$trow->reference->identityHandle] = $trow->fields[$plan['display']] ?? null;
+                    }
+                    $maps[$refField] = $idToLabel;
+                }
+                if (is_array($data['item'] ?? null)) {
+                    foreach ($expandPlan as $refField => $_plan) {
+                        $refVal = $data['item'][$refField] ?? null;
+                        $data['item'][$refField . '_label'] =
+                            $refVal !== null ? ($maps[$refField][$refVal] ?? null) : null;
+                    }
+                }
+                if (isset($data['items']) && is_array($data['items'])) {
+                    foreach ($data['items'] as $i => $row) {
+                        foreach ($expandPlan as $refField => $_plan) {
+                            $refVal = $row[$refField] ?? null;
+                            $data['items'][$i][$refField . '_label'] =
+                                $refVal !== null ? ($maps[$refField][$refVal] ?? null) : null;
+                        }
+                    }
+                }
+            }
+
             $this->driver->commit($tx);
         } catch (\Throwable $e) {
             $this->driver->rollback($tx);

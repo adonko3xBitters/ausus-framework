@@ -107,6 +107,14 @@ final class SqliteRepository implements Repository, PagedRepository {
             }
         }
 
+        // RFC-015 — enforce referential integrity before the INSERT. A non-null
+        // reference value must resolve to an existing target row in this tenant.
+        foreach ($this->entity->fields as $f) {
+            if ($f->type === 'reference' && array_key_exists($f->name, $row)) {
+                $this->assertReferenceExists($f, $row[$f->name]);
+            }
+        }
+
         $columns = array_keys($row);
         $placeholders = array_map(fn($c) => ':' . $c, $columns);
         $sql = sprintf(
@@ -135,8 +143,14 @@ final class SqliteRepository implements Repository, PagedRepository {
         foreach ($patch as $k => $v) {
             $field = $this->entity->field($k);
             if ($field === null) throw new \RuntimeException("UnknownField: {$this->entity->fqn}.{$k}");
+            $serialized = $this->serializeField($field, $v);
+            // RFC-015 — re-validate referential integrity when a reference field
+            // is repointed by a patch.
+            if ($field->type === 'reference') {
+                $this->assertReferenceExists($field, $serialized);
+            }
             $sets[] = "\"{$k}\" = :{$k}";
-            $params[$k] = $this->serializeField($field, $v);
+            $params[$k] = $serialized;
         }
         $params['id']     = $ref->identityHandle;
         $params['tid']    = $this->tenant->value();
@@ -164,6 +178,44 @@ final class SqliteRepository implements Repository, PagedRepository {
         $reread = $this->find($ref);
         if ($reread === null) throw new \RuntimeException("PostUpdateMissingRow: {$ref->identityHandle}");
         return $reread;
+    }
+
+    /**
+     * RFC-015 — referential-integrity enforcement.
+     *
+     * A non-null `reference` value MUST resolve to an existing row of the target
+     * entity within the active tenant. The lookup runs on the same PDO
+     * connection (and therefore the same transaction) as the surrounding write,
+     * so it observes parents created earlier in the same Invoker action. The
+     * target table always exists: the Compiler's `DanglingRelation` check
+     * guarantees the target entity is registered, so the SchemaDeriver created
+     * its table at boot.
+     *
+     * References never cross tenant boundaries — the `tenant_id` predicate makes
+     * a parent in another tenant indistinguishable from a non-existent one.
+     */
+    private function assertReferenceExists(FieldNode $f, mixed $value): void {
+        if ($value === null) {
+            return;
+        }
+        $target = $f->typeOptions['targetEntityFqn'] ?? null;
+        if ($target === null || $target === '') {
+            return; // Compiler guarantees a target FQN; defensive no-op.
+        }
+        $targetTable = str_replace('.', '_', $target);
+        $stmt = $this->pdo->prepare(
+            "SELECT 1 FROM \"{$targetTable}\" WHERE id = :id AND tenant_id = :tid LIMIT 1"
+        );
+        $stmt->execute(['id' => (string) $value, 'tid' => $this->tenant->value()]);
+        if ($stmt->fetchColumn() === false) {
+            throw new \Ausus\ReferentialIntegrityViolation(
+                $this->entity->fqn,
+                $f->name,
+                $target,
+                (string) $value,
+                $this->tenant->value(),
+            );
+        }
     }
 
     private function serializeField(FieldNode $f, mixed $value): mixed {

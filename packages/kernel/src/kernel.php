@@ -30,23 +30,160 @@ final readonly class Reference {
         public string $entityFqn,
         public string $identityHandle,
     ) {}
-}
 
-final readonly class Subject {
-    public function __construct(
-        public string $tenantId,
-        public string $entityFqn,
-        public string $identityHandle,
-    ) {}
-    public static function fromReference(Reference $r): self {
-        return new self($r->tenantId, $r->entityFqn, $r->identityHandle);
+    /**
+     * Backward-compatibility shim (RFC-015).
+     *
+     * `Subject` was historically a byte-identical twin of `Reference` used only
+     * at the Policy boundary; `Subject::fromReference()` copied a Reference into
+     * a Subject. RFC-015 unifies the two into one canonical identity value
+     * object: `Ausus\Subject` is now a `class_alias` of `Ausus\Reference`
+     * (declared just below). With a single class this copy is the identity
+     * function — it returns the same value object. Retained so existing
+     * `Subject::fromReference($ref)` call sites keep compiling unchanged.
+     */
+    public static function fromReference(self $r): self {
+        return $r;
     }
 }
+
+/**
+ * RFC-015 — Reference / Subject unification.
+ *
+ * `Subject` used to be a distinct, byte-identical readonly class referenced only
+ * by the Policy contract (`Policy::evaluate(..., ?Subject $subject, ...)`).
+ * Maintaining two value objects of identical shape was a standing contradiction:
+ * it forced a `Subject::fromReference()` copy on every Policy evaluation and
+ * split the single "instance identity" concept into two types. RFC-015 makes
+ * `Reference` the one canonical identity value object and exposes `Ausus\Subject`
+ * as an alias of it.
+ *
+ * This is fully backward-compatible — because the alias resolves to the *same*
+ * class, every existing usage keeps working unchanged:
+ *   - `new Subject($t, $e, $h)`         constructs a Reference (identical ctor);
+ *   - `Subject::fromReference($ref)`     returns the Reference (shim above);
+ *   - `?Subject` parameter / return types accept a Reference;
+ *   - `instanceof Subject`               is true for any Reference.
+ *
+ * New code SHOULD use `Reference`; `Subject` is retained as a deprecated alias.
+ */
+class_alias(\Ausus\Reference::class, 'Ausus\\Subject');
 
 enum Decision: string {
     case Permit = 'permit';
     case Deny = 'deny';
     case Abstain = 'abstain';
+}
+
+// =============================================================================
+// RFC-018 — GUARD KERNEL (Phase 1: contracts only — no runtime, no behavior)
+//
+// A Guard is ⟨operation, declared facts, predicate⟩ → permit | deny | abstain.
+// Phase 1 introduces ONLY the kernel-level value/contract types; the runtime
+// (FactResolver / GuardComposer / CondGuard) and the Invoker wiring land in a
+// later phase. These types are additive and reference only other kernel
+// symbols (Decision above) — there is NO kernel → dsl dependency (R-1).
+// =============================================================================
+
+/** Open set of fact origins (R-1 §invariant 2 — extensible). */
+enum Provenance: string {
+    case Actor           = 'actor';          // roles / permissions / server-resolved attributes
+    case SubjectIdentity = 'subject.id';     // tenantId / entityFqn / identityHandle
+    case SubjectField    = 'subject.field';  // the subject's own declared fields
+    case OperationInput  = 'op.input';       // the affect-operation's proposed inputs
+    case Context         = 'context';        // clock / tenant / correlationId
+}
+
+/** A declared reference to a fact ⟨provenance, key⟩ — the unit of closure. */
+final readonly class FactRef {
+    public function __construct(
+        public Provenance $provenance,
+        public string $key,
+    ) {}
+}
+
+/**
+ * An observed fact ⟨provenance, key, value⟩. Values are SCALAR (pure,
+ * serializable). Static factories return a {@see FactRef} for the predicate
+ * DSL — the value ctor is used by the runtime FactResolver in a later phase.
+ */
+final readonly class Fact {
+    public function __construct(
+        public Provenance $provenance,
+        public string $key,
+        public int|string|float|bool|null $value,
+    ) {}
+
+    public static function subject(string $key): FactRef { return new FactRef(Provenance::SubjectField, $key); }
+    public static function actor(string $key): FactRef   { return new FactRef(Provenance::Actor, $key); }
+    public static function input(string $key): FactRef   { return new FactRef(Provenance::OperationInput, $key); }
+}
+
+/** Immutable, runtime-supplied snapshot read by a pure Guard predicate. */
+interface FactSet {
+    public function get(Provenance $p, string $key): int|string|float|bool|null;
+    public function has(Provenance $p, string $key): bool;
+    /** @return list<Fact> the captured decision basis */
+    public function all(): array;
+}
+
+/**
+ * A declarative predicate tree over {@see FactRef}s and scalar literals — the
+ * KERNEL representation of a guard condition (R-1). Pure data: inspectable by
+ * the compiler (closure) and serializable; it does no I/O and is never a
+ * closure. Operands are `FactRef | Cond | scalar | array` (the latter for
+ * `in`).
+ */
+final readonly class Cond {
+    /** @param list<mixed> $args */
+    public function __construct(
+        public string $op,
+        public array $args,
+    ) {}
+
+    public static function eq(mixed $a, mixed $b): self  { return new self('eq',  [$a, $b]); }
+    public static function ne(mixed $a, mixed $b): self  { return new self('ne',  [$a, $b]); }
+    public static function lte(mixed $a, mixed $b): self { return new self('lte', [$a, $b]); }
+    public static function lt(mixed $a, mixed $b): self  { return new self('lt',  [$a, $b]); }
+    public static function gte(mixed $a, mixed $b): self { return new self('gte', [$a, $b]); }
+    public static function gt(mixed $a, mixed $b): self  { return new self('gt',  [$a, $b]); }
+    /** @param list<int|string|float|bool|null> $literals */
+    public static function in(mixed $a, array $literals): self { return new self('in', [$a, $literals]); }
+    public static function mul(mixed $a, float $k): self { return new self('mul', [$a, $k]); }
+    public static function not(Cond $c): self            { return new self('not', [$c]); }
+    public static function and(Cond ...$c): self         { return new self('and', $c); }
+    public static function or(Cond ...$c): self          { return new self('or',  $c); }
+
+    /**
+     * Recursively collect the declared fact references (closure surface). Used
+     * by the compiler's static validation and the runtime FactResolver in a
+     * later phase.
+     *
+     * @return list<FactRef>
+     */
+    public function factRefs(): array {
+        $refs = [];
+        foreach ($this->args as $a) {
+            if ($a instanceof FactRef) {
+                $refs[] = $a;
+            } elseif ($a instanceof Cond) {
+                $refs = array_merge($refs, $a->factRefs());
+            } elseif (is_array($a)) {
+                foreach ($a as $x) {
+                    if ($x instanceof FactRef)      { $refs[] = $x; }
+                    elseif ($x instanceof Cond)     { $refs = array_merge($refs, $x->factRefs()); }
+                }
+            }
+        }
+        return $refs;
+    }
+}
+
+/** A pure predicate bound to an operation over declared facts → a Decision. */
+interface Guard {
+    /** @return list<FactRef> declared reads — closure surface */
+    public function reads(): array;
+    public function decide(FactSet $facts): Decision;
 }
 
 final readonly class Version {
@@ -71,6 +208,8 @@ interface Actor {
     public function roleHash(): string;
     /** @return string[] */ public function roles(): array;
     /** @return string[] */ public function permissions(): array;
+    /** RFC-018 (R-2) — server-resolved actor attribute, or null when absent. */
+    public function attribute(string $key): int|string|float|bool|null;
 }
 
 final class StubActor implements Actor {
@@ -78,10 +217,19 @@ final class StubActor implements Actor {
         private readonly ActorRef $ref,
         /** @var string[] */ private readonly array $roles,
         /** @var string[] */ private readonly array $permissions = [],
+        /**
+         * RFC-018 (R-2) — server-resolved actor attributes. Final, defaulted —
+         * every existing `new StubActor($ref, $roles[, $permissions])` keeps
+         * compiling unchanged. Deliberately EXCLUDED from {@see roleHash()} so
+         * attributes never influence the role-decision cache key.
+         * @var array<string,int|string|float|bool|null>
+         */
+        private readonly array $attributes = [],
     ) {}
     public function ref(): ActorRef { return $this->ref; }
     public function roles(): array { return $this->roles; }
     public function permissions(): array { return $this->permissions; }
+    public function attribute(string $key): int|string|float|bool|null { return $this->attributes[$key] ?? null; }
     public function roleHash(): string {
         // RFC-014 §3 canonical hash
         $payload = json_encode([
@@ -378,6 +526,8 @@ final readonly class AuditEntry {
         public ?string $traceId,
         public string $invocationClass,   // 'Standard' | 'Maintenance'
         public string $emitterVersion,
+        /** @var list<Fact> RFC-018 captured decision basis (Phase 1: carried, default empty) */
+        public array $decisionBasis = [],
     ) {}
 }
 
@@ -465,15 +615,29 @@ final readonly class ActionNode {
         public array $effectConfig,
         public array $inputs,
         public string $kind,
+        /** @var list<Cond> RFC-018 data-aware guards (Phase 1: carried, not yet evaluated) */
+        public array $guards = [],
     ) {}
 }
 
 final readonly class ProjectionNode {
+    /**
+     * @param string[] $fields
+     * @param string[] $actionFqns
+     * @param array<string,string> $expand  RFC-015 relation expansion. Maps a
+     *        `reference` field name declared on the owner entity to the display
+     *        field of the *target* entity to fold into each rendered row as
+     *        `{refField}_label`. Empty by default — additive and
+     *        backward-compatible for every existing positional/named caller.
+     */
     public function __construct(
         public string $fqn,
         public string $ownerEntityFqn,
-        /** @var string[] */ public array $fields,
-        /** @var string[] */ public array $actionFqns,
+        public array $fields,
+        public array $actionFqns,
+        public array $expand = [],
+        /** Declared read-role; null = unrestricted. Enforced at the read path. */
+        public ?string $role = null,
     ) {}
 }
 
@@ -501,6 +665,8 @@ final readonly class MetadataGraph {
         /** @var array<string,PolicyNode> */ public array $policies,
         /** @var array<string,WorkflowNode> */ public array $workflows,
         /** @var array<string,ProjectionNode> */ public array $projections,
+        /** @var array<string,FieldNode> RFC-018 declared actor-attribute schema (Phase 1: carried, default empty) */
+        public array $actorAttributes = [],
     ) {}
 }
 
@@ -522,7 +688,7 @@ interface Plugin {
 final class Compiler {
     /** @param Plugin[] $plugins */
     public function compile(array $plugins, string $kernelVersion = '1.0.0'): MetadataGraph {
-        $entities = []; $actions = []; $policies = []; $workflows = []; $projections = [];
+        $entities = []; $actions = []; $policies = []; $workflows = []; $projections = []; $actorAttributes = [];
         foreach ($plugins as $plugin) {
             $desc = $plugin->describe();
             foreach ($desc['entities'] ?? [] as $e) {
@@ -543,8 +709,36 @@ final class Compiler {
             foreach ($desc['projections'] ?? [] as $pr) {
                 $projections[$pr->fqn] = $pr;
             }
+            // RFC-018 (Phase 3) — collect the declared actor-attribute schema.
+            foreach ($desc['actorAttributes'] ?? [] as $k => $v) {
+                $actorAttributes[(string) $k] = $v;
+            }
         }
         // Validate references
+        // RFC-015 — relation (reference) fields MUST target a declared entity.
+        // This rejects dangling relation *definitions* at compile time, before
+        // any data is written; the persistence layer enforces the per-row
+        // referential integrity at write time.
+        foreach ($entities as $entity) {
+            foreach ($entity->fields as $f) {
+                if ($f->type !== 'reference') {
+                    continue;
+                }
+                $target = $f->typeOptions['targetEntityFqn'] ?? null;
+                if ($target === null || $target === '') {
+                    throw new \RuntimeException(
+                        "RelationTargetMissing: entity {$entity->fqn} field '{$f->name}' is a reference "
+                        . "with no target entity FQN (use Field::reference('<plugin>.<entity>'))."
+                    );
+                }
+                if (!isset($entities[$target])) {
+                    throw new \RuntimeException(
+                        "DanglingRelation: entity {$entity->fqn} field '{$f->name}' references entity "
+                        . "'{$target}', which is not registered."
+                    );
+                }
+            }
+        }
         foreach ($actions as $a) {
             if (!isset($policies[$a->policyFqn])) {
                 throw new \RuntimeException("DanglingReference: action {$a->fqn} → policy {$a->policyFqn} (not registered)");
@@ -576,6 +770,10 @@ final class Compiler {
                 }
             }
         }
+        // RFC-018 (Phase 3) — static guard-closure validation (NO runtime eval).
+        // Runs after entities + actions are collected, before the graph is built.
+        $this->validateGuardClosure($actions, $entities, $actorAttributes);
+
         // Canonicalize + hash
         $sortByKey = function(array $a) { ksort($a); return $a; };
         $entities    = $sortByKey($entities);
@@ -594,7 +792,51 @@ final class Compiler {
         ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
         $hash = hash('sha256', $canonical);
 
-        return new MetadataGraph($hash, $kernelVersion, $entities, $actions, $policies, $workflows, $projections);
+        return new MetadataGraph($hash, $kernelVersion, $entities, $actions, $policies, $workflows, $projections, $actorAttributes);
+    }
+
+    /**
+     * RFC-018 (Phase 3) — STATIC closure check (no runtime evaluation).
+     *
+     * Every {@see FactRef} referenced by every {@see Cond} carried on an action
+     * must be resolvable from declared metadata, else {@see DanglingFactReference}
+     * is thrown at compile time:
+     *   - SubjectField    → must be a field of the action's entity;
+     *   - OperationInput  → must be one of the action's declared inputs;
+     *   - Actor           → reserved {id, roles, permissions} OR a declared actor attribute;
+     *   - Context         → reserved {now, tenant, actor};
+     *   - SubjectIdentity → reserved {id, type, tenant}.
+     *
+     * @param array<string,ActionNode> $actions
+     * @param array<string,EntityNode> $entities
+     * @param array<string,mixed>      $actorAttributes
+     */
+    private function validateGuardClosure(array $actions, array $entities, array $actorAttributes): void {
+        $reservedActor     = ['id', 'roles', 'permissions'];
+        $reservedContext   = ['now', 'tenant', 'actor'];
+        $reservedSubjectId = ['id', 'type', 'tenant'];
+        $attrKeys          = array_keys($actorAttributes);
+        foreach ($actions as $a) {
+            if ($a->guards === []) { continue; }
+            $entity       = $entities[$a->entityFqn] ?? null;
+            $entityFields = $entity !== null ? array_map(static fn($f) => $f->name, $entity->fields) : [];
+            $inputNames   = array_map(static fn($f) => $f->name, $a->inputs);
+            foreach ($a->guards as $cond) {
+                if (!$cond instanceof Cond) { continue; }
+                foreach ($cond->factRefs() as $ref) {
+                    $ok = match ($ref->provenance) {
+                        Provenance::SubjectField    => in_array($ref->key, $entityFields, true),
+                        Provenance::OperationInput  => in_array($ref->key, $inputNames, true),
+                        Provenance::Actor           => in_array($ref->key, $reservedActor, true) || in_array($ref->key, $attrKeys, true),
+                        Provenance::Context         => in_array($ref->key, $reservedContext, true),
+                        Provenance::SubjectIdentity => in_array($ref->key, $reservedSubjectId, true),
+                    };
+                    if (!$ok) {
+                        throw new DanglingFactReference($a->fqn, $ref->provenance->value, $ref->key);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -675,6 +917,8 @@ class AususError extends \RuntimeException {}
 
 class UnknownAction extends AususError implements Errors\NotFoundError {}
 class PolicySubjectRequired extends AususError implements Errors\BadRequestError {}
+/** Raised when an action invocation carries an input the action did not declare. */
+class UndeclaredActionInput extends AususError implements Errors\BadRequestError {}
 /**
  * @internal Reserved exception class — not raised by any v0.1.x runtime path.
  *           Declared so future Invoker code paths (notably the policy
@@ -707,6 +951,48 @@ class ConcurrencyConflict extends AususError implements Errors\ConflictError {
 class NotFound extends AususError implements Errors\NotFoundError {
     public function __construct(public readonly Reference $ref) {
         parent::__construct("NotFound: {$ref->entityFqn}/{$ref->identityHandle} in tenant {$ref->tenantId}");
+    }
+}
+/**
+ * RFC-015 — raised by the persistence driver when a `reference` field is written
+ * with an identity that does not resolve to an existing row of the target entity
+ * in the active tenant. A dangling foreign reference is a client error
+ * (BadRequest), not a server fault: the caller supplied an id that does not
+ * exist, or that belongs to another tenant. This is the runtime half of the
+ * "ghost references are impossible" guarantee; the compile-time half is the
+ * `DanglingRelation` check in {@see Compiler::compile()}.
+ */
+class ReferentialIntegrityViolation extends AususError implements Errors\BadRequestError {
+    public function __construct(
+        public readonly string $entityFqn,
+        public readonly string $field,
+        public readonly string $targetEntityFqn,
+        public readonly string $missingId,
+        public readonly string $tenantId,
+    ) {
+        parent::__construct(
+            "ReferentialIntegrityViolation: {$entityFqn}.{$field} → {$targetEntityFqn} "
+            . "'{$missingId}' does not exist in tenant {$tenantId}."
+        );
+    }
+}
+/**
+ * RFC-018 (Phase 3) — raised at compile time by {@see Compiler::validateGuardClosure()}
+ * when a guard's {@see Cond} references a {@see FactRef} that does not resolve to
+ * declared metadata (an unknown subject field, operation input, actor attribute,
+ * or reserved key). A build-time closure error — the static half of "no guard
+ * reads an undeclared fact"; no runtime evaluation is involved.
+ */
+class DanglingFactReference extends AususError implements Errors\BadRequestError {
+    public function __construct(
+        public readonly string $actionFqn,
+        public readonly string $provenance,
+        public readonly string $key,
+    ) {
+        parent::__construct(
+            "DanglingFactReference: action {$actionFqn} guard references {$provenance} "
+            . "'{$key}', which is not declared/resolvable."
+        );
     }
 }
 class AuditEmissionFailed extends AususError implements Errors\InternalError {}

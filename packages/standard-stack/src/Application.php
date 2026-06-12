@@ -48,7 +48,7 @@ final class Application
 {
     /** Config keys accepted by {@see create()}. */
     private const KNOWN_CONFIG = [
-        'tenant', 'actor', 'actorId', 'roles', 'permissions',
+        'tenant', 'actor', 'actorId', 'roles', 'permissions', 'actorAttributes',
         'database', 'kernelVersion', 'migrate', 'driver', 'auditSink',
         'apiPrefix', 'responseFactory', 'streamFactory',
     ];
@@ -144,6 +144,7 @@ final class Application
                 new ActorRef('user', (string) ($config['actorId'] ?? 'app'), $tenant->value()),
                 array_values((array) ($config['roles'] ?? [])),
                 array_values((array) ($config['permissions'] ?? [])),
+                (array) ($config['actorAttributes'] ?? []),   // RFC-018 (R-2)
             );
         }
 

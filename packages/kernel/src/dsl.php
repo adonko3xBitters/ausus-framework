@@ -61,6 +61,7 @@ final class Dsl
     /** @var array<string, PolicyNode> */     private array $policies    = [];
     /** @var array<string, WorkflowNode> */   private array $workflows   = [];
     /** @var array<string, ProjectionNode> */ private array $projections = [];
+    /** @var array<string, mixed> RFC-018 declared actor-attribute schema */ private array $actorAttributes = [];
 
     public function __construct(private readonly Plugin $plugin) {}
 
@@ -72,6 +73,22 @@ final class Dsl
         $builder = new EntityBuilder($this, $fqn);
         $this->entityBuilders[] = $builder;
         return $builder;
+    }
+
+    /**
+     * RFC-018 (Phase 3) — declare the actor-attribute schema. Behaves like the
+     * other plugin-level declarations: it accumulates into the descriptor the
+     * Compiler consumes (and folds into MetadataGraph.actorAttributes). No
+     * advanced business validation here.
+     *
+     * @param array<string, mixed> $schema  attribute name → declared type
+     */
+    public function actorAttributes(array $schema): self
+    {
+        foreach ($schema as $k => $v) {
+            $this->actorAttributes[(string) $k] = $v;
+        }
+        return $this;
     }
 
     // Internal registration (called by builders during finalize).
@@ -113,6 +130,7 @@ final class Dsl
             'policies'    => array_values($this->policies),
             'workflows'   => array_values($this->workflows),
             'projections' => array_values($this->projections),
+            'actorAttributes' => $this->actorAttributes,
         ];
     }
 }
@@ -142,6 +160,20 @@ final class FieldBuilder
     public function currency(string $c): self        { $this->typeOptions['currency'] = $c; return $this; }
     /** enum options */
     public function options(array $opts): self      { $this->typeOptions['options']  = array_values($opts); return $this; }
+
+    /**
+     * @internal RFC-015 — records the target entity FQN for a `reference` field
+     *           into typeOptions. Called only by {@see Field::reference()}; the
+     *           value flows into `FieldNode.typeOptions['targetEntityFqn']`,
+     *           which the Compiler validates, the persistence driver enforces,
+     *           and the renderer consumes. Consumers MUST use
+     *           {@see Field::reference()}, never this method directly.
+     */
+    public function _referenceTarget(string $targetEntityFqn): self
+    {
+        $this->typeOptions['targetEntityFqn'] = $targetEntityFqn;
+        return $this;
+    }
 
     /**
      * Explicit human-friendly label for this field.
@@ -192,6 +224,8 @@ final class ActionBuilder
     /** @var string[] */ public array $stamps = [];
     /** @var string[] */ public array $updateFieldNames = [];
     public ?string $requiredRole = null;
+    /** @var list<Cond> RFC-018 data-aware guards (Phase 3: declared & compiled, not yet evaluated) */
+    public array $guards = [];
 
     public static function create(string ...$inputs): self
     {
@@ -267,6 +301,14 @@ final class ActionBuilder
     public function requireRole(string $role): self  { $this->requiredRole = $role; return $this; }
 
     /**
+     * RFC-018 (Phase 3) — attach a data-aware guard (a {@see Cond} predicate
+     * over declared facts) to this action. The condition is carried into the
+     * ActionNode and statically validated by {@see Compiler::validateGuardClosure()};
+     * NO runtime evaluation happens in this phase.
+     */
+    public function requireThat(Cond $cond): self    { $this->guards[] = $cond; return $this; }
+
+    /**
      * Compile this ActionBuilder into an {@see ActionNode} and its policy.
      *
      * @internal Called from {@see EntityBuilder::finalize()}. The signature
@@ -326,6 +368,7 @@ final class ActionBuilder
                 ],
                 inputs: $inputs,
                 kind: 'standard',
+                guards: $this->guards,
             ), [$policy]];
         }
 
@@ -369,6 +412,7 @@ final class ActionBuilder
                 ],
                 inputs: $inputs,
                 kind: 'standard',
+                guards: $this->guards,
             ), [$policy]];
         }
 
@@ -388,6 +432,7 @@ final class ActionBuilder
                 ],
                 inputs: [],
                 kind: 'standard',
+                guards: $this->guards,
             ), [$policy]];
         }
 
@@ -408,7 +453,7 @@ final class EntityBuilder
     private ?string $workflowField   = null;
     private ?string $workflowInitial = null;
     private bool    $workflowDeclared = false;
-    /** @var array<string, array{fields:array, actions:array, role:?string, policyFqn:?string}> */
+    /** @var array<string, array{fields:array, actions:array, role:?string, policyFqn:?string, expand:array<string,string>}> */
     private array $projectionsConfig = [];
     private bool $finalized = false;
 
@@ -457,10 +502,16 @@ final class EntityBuilder
     /**
      * @param string[] $fields  field names (no '*' wildcard in V0)
      * @param string[] $actions local action names (defaults to all entity actions if empty)
+     * @param array<string,string> $expand  RFC-015 relation expansion: maps a
+     *        `reference` field on this entity to the display field of the target
+     *        entity to fold into each rendered row as `{refField}_label`. The
+     *        referenced field must be declared on this entity and be of type
+     *        `reference`; the display field must exist on the target entity —
+     *        both are validated by the renderer. Empty by default.
      */
-    public function projection(string $localName, array $fields, array $actions = [], ?string $role = null, ?string $policyFqn = null): self
+    public function projection(string $localName, array $fields, array $actions = [], ?string $role = null, ?string $policyFqn = null, array $expand = []): self
     {
-        $this->projectionsConfig[$localName] = compact('fields', 'actions', 'role', 'policyFqn');
+        $this->projectionsConfig[$localName] = compact('fields', 'actions', 'role', 'policyFqn', 'expand');
         return $this;
     }
 
@@ -571,6 +622,8 @@ final class EntityBuilder
                 ownerEntityFqn: $this->fqn,
                 fields: $cfg['fields'],
                 actionFqns: $projActionFqns,
+                expand: $cfg['expand'] ?? [],
+                role: $cfg['role'] ?? null,
             ));
             $projectionFqns[] = $projFqn;
         }
@@ -707,6 +760,40 @@ final class Field
     public static function enum(string ...$options): FieldBuilder
     {
         return (new FieldBuilder('enum'))->options($options);
+    }
+
+    /**
+     * RFC-015 — a typed foreign reference to an instance of another entity.
+     *
+     * Stored as a `reference` field whose value is the target entity's 26-char
+     * identity handle (ULID). The target FQN is recorded in
+     * `typeOptions['targetEntityFqn']` and is:
+     *   - validated at compile time (the Compiler rejects a reference to an
+     *     entity that is not registered — no dangling relation definitions);
+     *   - enforced at write time (the persistence driver rejects an id that does
+     *     not resolve to an existing row of the target entity *in the active
+     *     tenant* — no ghost references);
+     *   - exposed on the ViewSchema FieldDescriptor (via `typeOptions`) and
+     *     foldable into projection rows via `->projection(..., expand: [...])`.
+     *
+     * References never cross tenant boundaries.
+     *
+     * ```php
+     * $dsl->entity('issue')->fields([
+     *     'title'      => Field::string()->max(120),
+     *     'project_id' => Field::reference('tracker.project'),
+     * ]);
+     * ```
+     */
+    public static function reference(string $targetEntityFqn): FieldBuilder
+    {
+        if ($targetEntityFqn === '' || !str_contains($targetEntityFqn, '.')) {
+            throw new \InvalidArgumentException(
+                "Field::reference() requires a fully-qualified target entity FQN "
+                . "(e.g. 'billing.invoice'); got '{$targetEntityFqn}'."
+            );
+        }
+        return (new FieldBuilder('reference'))->_referenceTarget($targetEntityFqn);
     }
 }
 

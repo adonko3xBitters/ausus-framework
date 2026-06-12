@@ -106,6 +106,16 @@ final class Router implements RequestHandlerInterface
             return $this->errorJson(404, 'ProjectionNotFound', "projection $fqn not found");
         }
 
+        // Enforce the declared read-role. getProjection previously rendered any
+        // projection regardless of its `role`, letting an actor read role-gated
+        // data. The role is carried on the compiled ProjectionNode.
+        if ($projection->role !== null) {
+            $actor = $this->resolveActor($request, $tenantId);
+            if (!in_array($projection->role, $actor->roles(), true)) {
+                return $this->errorJson(403, 'Forbidden', "projection {$fqn} requires role '{$projection->role}'");
+            }
+        }
+
         $params           = $request->getQueryParams();
         $subjectIdentity  = $params['subject'] ?? null;
         $subjectRef       = null;
@@ -306,7 +316,26 @@ final class Router implements RequestHandlerInterface
         $roles    = $rolesRaw === ''
             ? []
             : array_values(array_filter(array_map('trim', explode(',', $rolesRaw))));
-        return new StubActor(new ActorRef('user', $id, $tenantId), $roles);
+
+        // RFC-018 (R-2) — optional server-resolved actor attributes carried on
+        // the `X-Actor-Attributes` header as a flat JSON object (typically set
+        // by the authenticated gateway). Fail-safe by design: a missing header,
+        // invalid JSON, or a non-object payload yields [] — never an exception.
+        // Only scalar/null values are kept (RFC-018 facts are scalar).
+        $attrsRaw = $request->getHeaderLine('X-Actor-Attributes');
+        $attributes = [];
+        if ($attrsRaw !== '') {
+            $decoded = json_decode($attrsRaw, true);
+            if (is_array($decoded)) {
+                foreach ($decoded as $k => $v) {
+                    if ($v === null || is_int($v) || is_string($v) || is_float($v) || is_bool($v)) {
+                        $attributes[(string) $k] = $v;
+                    }
+                }
+            }
+        }
+
+        return new StubActor(new ActorRef('user', $id, $tenantId), $roles, [], $attributes);
     }
 
     // ─── response helpers ────────────────────────────────────────────────────

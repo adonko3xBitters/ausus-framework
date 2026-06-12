@@ -90,9 +90,25 @@ five system fields per entity automatically.
 ## Field {#field}
 
 A column on an entity. Declared with `Field::string()` / `::integer()`
-/ `::datetime()` / `::money()` / `::enum(...)`, optionally tagged
-`nullable`, `default`, `unique`, `max`, `currency`, `options`, `label`.
-Type list in [DSL reference](reference/dsl.md).
+/ `::datetime()` / `::money()` / `::enum(...)` /
+`::reference(targetEntityFqn)`, optionally tagged `nullable`, `default`,
+`unique`, `max`, `currency`, `options`, `label`. Type list in
+[DSL reference](reference/dsl.md).
+
+## Field reference (relation) {#field-reference}
+
+A typed foreign reference declared with
+`Field::reference('plugin.entity')` (RFC-015). Stored as a `reference`
+column whose value is the target instance's 26-char identity handle.
+The target is **validated at compile time** (a reference to an
+unregistered entity is a `DanglingRelation` compile error) and
+**enforced at write time** (the persistence driver rejects an id that
+does not resolve to an existing target row in the active tenant with
+`ReferentialIntegrityViolation` — there are no ghost references).
+References never cross tenant boundaries. A projection can fold the
+parent's display field into each row via
+`->projection(..., expand: ['ref_field' => 'target_field'])`, which adds
+a `{ref_field}_label` column to the rendered ViewSchema.
 
 ## FQN — Fully-Qualified Name {#fqn}
 
@@ -148,9 +164,9 @@ JSON document. Two shapes — list (`data.items`) and detail
 
 The value-object identity of an entity instance:
 `{ tenantId, entityFqn, identityHandle }`. The HTTP wire uses
-`Reference` as the `subject` field on action POSTs. The
-`Subject` value object has the same shape but a different semantic
-role (Policy evaluation); both currently coexist.
+`Reference` as the `subject` field on action POSTs. As of RFC-015 it is
+the **single canonical** instance-identity value object; `Subject` is now
+an alias of it (see [Subject](#subject)).
 
 ## Renderer {#renderer}
 
@@ -174,8 +190,11 @@ by the Router for HTTP requests (resolved from `X-Actor-*` headers).
 ## Subject {#subject}
 
 The entity-instance identity passed to `Policy::evaluate()` during the
-Invoker chain. Same data shape as `Reference`; the distinction is
-semantic (policies receive `Subject`, everything else uses `Reference`).
+Invoker chain. As of RFC-015, `Ausus\Subject` is a **`class_alias` of
+`Ausus\Reference`** — one canonical value object. Existing code keeps
+working unchanged (`new Subject(...)`, `Subject::fromReference(...)`,
+`?Subject` type hints, `instanceof Subject`); new code should use
+`Reference`.
 
 ## System field {#system-field}
 

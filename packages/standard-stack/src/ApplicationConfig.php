@@ -44,6 +44,8 @@ final class ApplicationConfig
         public readonly string $actorId = 'app',
         public readonly array $roles = [],
         public readonly array $permissions = [],
+        /** RFC-018 (R-2) — default actor attributes for the built-in StubActor. @var array<string,int|string|float|bool|null> */
+        public readonly array $actorAttributes = [],
         public readonly ?\PDO $pdo = null,
         public readonly ?string $sqlitePath = null,
         public readonly bool $migrate = true,
@@ -115,6 +117,25 @@ final class ApplicationConfig
     public function permissions(array $permissions): self
     {
         return $this->with(['permissions' => $this->validateStringList($permissions, 'permissions')]);
+    }
+
+    /**
+     * RFC-018 (R-2) — default attributes for the built-in `StubActor`. Replaces
+     * any previous value. Values must be scalar or null (RFC-018 facts are
+     * scalar); non-scalar entries are dropped. NOT yet wired to RFC-018 runtime
+     * authorization — this only seeds the default actor.
+     *
+     * @param array<string,mixed> $attributes
+     */
+    public function actorAttributes(array $attributes): self
+    {
+        $clean = [];
+        foreach ($attributes as $k => $v) {
+            if ($v === null || is_int($v) || is_string($v) || is_float($v) || is_bool($v)) {
+                $clean[(string) $k] = $v;
+            }
+        }
+        return $this->with(['actorAttributes' => $clean]);
     }
 
     // ─── persistence ─────────────────────────────────────────────────────────
@@ -251,6 +272,7 @@ final class ApplicationConfig
         if ($this->actorId !== 'app')    $out['actorId']     = $this->actorId;
         if ($this->roles !== [])         $out['roles']       = $this->roles;
         if ($this->permissions !== [])   $out['permissions'] = $this->permissions;
+        if ($this->actorAttributes !== []) $out['actorAttributes'] = $this->actorAttributes;
 
         if ($this->pdo !== null) {
             $out['database'] = $this->pdo;
@@ -287,6 +309,7 @@ final class ApplicationConfig
             actorId:         $c['actorId']         ?? $this->actorId,
             roles:           $c['roles']           ?? $this->roles,
             permissions:     $c['permissions']     ?? $this->permissions,
+            actorAttributes: $c['actorAttributes'] ?? $this->actorAttributes,
             pdo:             $c['pdo']             ?? $this->pdo,
             sqlitePath:      $c['sqlitePath']      ?? $this->sqlitePath,
             migrate:         $c['migrate']         ?? $this->migrate,
