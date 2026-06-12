@@ -64,6 +64,13 @@ jobs:
       - name: PHP playground smoke (36 assertions)
         run: php apps/playground/run.php
 
+      - name: RFC-015 + RFC-018 validation suites
+        run: |
+          php apps/playground/relations-test.php
+          php packages/kernel/tests/phase2-actor-attributes.php
+          php packages/kernel/tests/phase3-guard-closure.php
+          php packages/runtime-default/tests/phase4-guard-runtime.php
+
       - name: Starter boot
         run: composer --working-dir=packages/starter boot
 
