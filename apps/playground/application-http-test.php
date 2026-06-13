@@ -103,7 +103,8 @@ $app->invoke('billing.invoice.create', null, [
     'amount' => ['amount' => '11.00', 'currency' => 'USD'],
 ]);
 $projReq = $factory->createServerRequest('GET', '/api/projections/billing.invoice.summary')
-    ->withHeader('X-Tenant-ID', 'acme');
+    ->withHeader('X-Tenant-ID', 'acme')
+    ->withHeader('X-Actor-Roles', 'invoice.viewer');
 $projRes = $app->http($projReq);
 $schema  = bodyJson($projRes);
 _assert('projection → 200',                   $projRes->getStatusCode() === 200);

@@ -209,8 +209,8 @@ _assert('empty patch is a no-op (only _version returned)',
 $caught = null;
 try { $app->invoke('todo.item.rename', $ref, ['priority' => 'HIGH']); }
 catch (\Throwable $e) { $caught = $e; }
-_assert('payload key outside updatableFields raises an EffectFailed',
-        $caught !== null && str_contains($caught->getMessage(), "'priority' is not patchable"));
+_assert('payload key outside updatableFields raises UndeclaredActionInput (BadRequest)',
+        $caught instanceof \Ausus\UndeclaredActionInput);
 
 // 3d: non-nullable + null → rejected.
 $caught = null;
@@ -374,9 +374,9 @@ $badReq = $factory->createServerRequest('POST', '/api/actions/todo.item.rename')
     ])));
 $badRes = $httpApp->http($badReq);
 $badBody = json_decode((string) $badRes->getBody(), true);
-_assert('HTTP closed-list violation → 500 EffectFailed (see ADR-0002 §13)',
-        $badRes->getStatusCode() === 500
-        && ($badBody['error']['kind'] ?? null) === 'EffectFailed');
+_assert('HTTP closed-list violation → 400 UndeclaredActionInput (ADR-0002 §6.1)',
+        $badRes->getStatusCode() === 400
+        && ($badBody['error']['kind'] ?? null) === 'UndeclaredActionInput');
 
 echo "\n══════════════════════════════════════════════════════════════\n";
 echo "RESULT: passed={$passed} failed={$failed}\n";
