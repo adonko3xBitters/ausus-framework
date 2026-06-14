@@ -218,13 +218,15 @@ curl -fsS https://repo.packagist.org/packages.json   >/dev/null && echo "✓ Pac
 curl -fsS https://registry.npmjs.org/-/ping          >/dev/null && echo "✓ npm reachable"
 ```
 
-### 2.9 Monorepo tag — created LOCALLY only (not pushed)
+### 2.9 Monorepo tag — NOT created here (created + pushed in Phase 7)
 
-```bash
-git tag v0.1.0           # local tag only
-git tag -l v0.1.0        # confirm it exists locally
-# DO NOT push it yet — the monorepo tag is pushed last, in Phase 7.
-```
+Do **not** create the monorepo tag during pre-flight. `scripts/release-publish.sh`
+is the authoritative publish mechanism (see §3.1); while publishing the package
+tags it **deletes any local `vX.Y.Z` tag** (that name is reserved for the
+monorepo release tag) and leaves **no** local `vX.Y.Z` tag after a successful
+run. A tag created here would be destroyed by the publish run. The monorepo tag
+is **created and pushed in Phase 7**, after package publication, on the release
+commit (`HEAD`, which must equal `origin/main`).
 
 ---
 
@@ -241,11 +243,22 @@ PHASE 3  Publish api-http
 PHASE 4  Publish standard-stack, starter
 PHASE 5  Publish @ausus/renderer-react (npm)
 PHASE 6  Post-publish smoke (real public registries)
-PHASE 7  Push monorepo tag + GitHub release
+PHASE 7  Create + push monorepo tag + GitHub release
 PHASE 8  72-hour monitoring window
 ```
 
 ### 3.1 The per-package publish function (P0-safe, idempotent)
+
+> **Authoritative mechanism.** `scripts/release-publish.sh` is the authoritative
+> publication tool. It performs the coordinated subtree-split, tag, push and
+> per-tag verification over all 10 packages in topological order, and is
+> idempotent (skip-if-exists at the verified SHA). It pushes **package tags
+> only** — never `split:main`, never the monorepo tag — and deletes the local
+> `vX.Y.Z` tag after each verified push. **Run `scripts/release-publish.sh
+> vX.Y.Z`.** The inline function below documents the equivalent per-package
+> mechanics and is **superseded** by that script; it must not be run in its place.
+>
+> The monorepo tag is created + pushed separately, in Phase 7 (§3.6).
 
 Use this exact function for every Composer package. It implements P0-D
 (tag pre-check), P0-E (`/tmp` cleanup), and the no-`--tags` rule.
@@ -429,6 +442,13 @@ node -e "console.log(Object.keys(require('@ausus/renderer-react')))"
 Only after Phase 6 is fully green:
 
 ```bash
+# Create the monorepo tag on the release commit, then push only that tag.
+# Pre-conditions: HEAD == origin/main, and NO local vX.Y.Z tag remains
+# (release-publish.sh deletes it after publishing the package tags).
+git rev-parse HEAD                              # = the release commit
+git rev-parse origin/main                       # MUST equal HEAD
+git tag -l v0.1.0                               # MUST print nothing (no residue)
+git tag -a v0.1.0 -m "AUSUS v0.1.0"             # create on HEAD (release commit)
 git push origin v0.1.0          # single tag — NEVER git push --tags
 gh release create v0.1.0 --title "v0.1.0" --notes-file RELEASE-NOTES-v0.1.0.md
 ```
@@ -513,11 +533,16 @@ cd renderer/react && npm version patch --no-git-tag-version && cd -
 bash scripts/ci.sh                 # must end "all 10 steps passed"
 bash scripts/clean-room.sh         # must end "ALL STEPS PASSED"
 
-# 4. Commit, tag locally.
+# 4. Commit. Do NOT tag the monorepo here — per §2.9 the monorepo tag is
+#    created only in Phase 7; release-publish.sh deletes any local v0.1.1 tag
+#    while publishing the package tags, so one created here would be lost.
 git commit -am "release: v0.1.1 (fix: <reason>)"
-git tag v0.1.1
 
-# 5. Re-run Phases 1–7 of §3 with VERSION=v0.1.1 for the affected packages.
+# 5. Re-run §3 Phases 1–7 with VERSION=v0.1.1. release-publish.sh runs
+#    lock-step over ALL 10 packages; any already published at v0.1.1 (e.g. on
+#    a re-run after interruption) are skipped by its idempotent skip-if-exists.
+#    Do NOT restrict to a subset. Phase 7 then creates + pushes the monorepo
+#    v0.1.1 tag on HEAD.
 #    Consumers pinned to "^0.1.0" float forward to 0.1.1 automatically.
 ```
 

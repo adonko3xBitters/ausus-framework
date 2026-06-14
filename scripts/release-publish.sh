@@ -81,10 +81,11 @@ cleanup() {
     for pkg in "${ALL[@]:-}"; do
         git branch -D "split/$pkg" 2>/dev/null || true
     done
-    if [ "$rc" -ne 0 ]; then
-        # Drop local tag only on failure — successful run leaves it as a marker
-        git tag -d "$VERSION" 2>/dev/null || true
-    fi
+    # Defensive backstop — the clone must NEVER retain a local $VERSION tag
+    # (that name is reserved for the monorepo release tag). Tags are pushed to
+    # each rel-* repo then deleted in-loop; this unconditional cleanup covers
+    # DRY_RUN and every failure path.
+    git tag -d "$VERSION" 2>/dev/null || true
     return "$rc"
 }
 trap cleanup EXIT
@@ -176,6 +177,9 @@ push_level() {
                 exit 1
             fi
             echo "  ✓ pushed rel-$pkg $VERSION ($LOCAL_SPLIT_SHA)"
+            # Remove the local tag immediately after a verified push: the clone
+            # must not retain a local $VERSION tag (reserved for the monorepo tag).
+            git tag -d "$VERSION" 2>/dev/null || true
         fi
     done
     git checkout "$ORIGINAL_BRANCH" > /dev/null 2>&1
