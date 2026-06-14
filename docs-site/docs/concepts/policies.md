@@ -47,8 +47,8 @@ If the decision is anything other than `Permit`, the runtime throws
 
 ## The built-in policy: `RoleRequired` {#the-built-in-policy-rolerequired}
 
-v0.1.0 ships one policy implementation: `RoleRequired`. It permits the action
-if the actor holds a named role.
+AUSUS ships `RoleRequired` for **role-based** authorization. It permits the
+action if the actor holds a named role.
 
 You attach it through the DSL with `->requireRole()`:
 
@@ -61,12 +61,48 @@ The compiler creates a `PolicyNode` for the action that constructs a
 `RoleRequired` policy with `role: 'invoice.issuer'`. At invocation time the
 engine checks the role against the actor's role list.
 
+## Data-dependent authorization (RFC-018) {#data-dependent-authorization}
+
+Role-based policies decide on identity alone. **RFC-018** adds *guards* that read
+the **subject record** and **structured actor attributes** at authorization time
+— so a rule like "an adjuster may approve a claim only up to their authority
+limit" is expressed as configuration, not application code.
+
+A guard is attached to an action with `->requireThat(Cond)`, alongside (not
+instead of) `->requireRole()`:
+
+```php
+$dsl->actorAttributes(['authority_limit' => Field::integer()]);
+
+'approve' => Action::transition('status', from: 'ASSESSING', to: 'APPROVED')
+    ->requireRole('claims.adjuster')
+    ->requireThat(Cond::lte(Fact::subject('claim_amount'), Fact::actor('authority_limit'))),
+```
+
+- **Facts.** `Fact::subject(field)` reads a field of the loaded subject entity;
+  `Fact::actor(attribute)` reads a structured actor attribute (declared with
+  `Dsl::actorAttributes(...)`); `Fact::input(key)` reads an action input.
+- **Conditions.** `Cond::eq / ne / lt / lte / gt / gte / in`, composed with
+  `Cond::and / or / not`.
+- **Compile-time closure.** A guard referencing an unknown subject field, actor
+  attribute, or input is rejected when the graph compiles
+  (`DanglingFactReference`).
+- **Fail-closed, in-transaction.** The subject is loaded before authorization and
+  the guard runs **inside the action's transaction**, before any effect. A
+  failing guard raises `PolicyDenied` (HTTP `403`) and rolls the transaction
+  back.
+
+Guards do not change the `Policy` contract above — they are an additional
+authorization mechanism on the same action. Actor attributes are seeded through
+`ApplicationConfig::actorAttributes(...)` and, over HTTP, an `X-Actor-Attributes`
+header parsed fail-safe.
+
 ## Actors {#actors}
 
 An **actor** is who is performing the action. The `Actor` contract exposes a
 ref, a role list, a permission list, and a canonical `roleHash()`.
 
-v0.1.0 ships `StubActor` — a fixed in-memory actor:
+AUSUS ships `StubActor` — a fixed in-memory actor:
 
 ```php
 use Ausus\{StubActor, ActorRef};
@@ -80,17 +116,17 @@ $actor = new StubActor(
 The HTTP API builds a `StubActor` from request headers (`X-Actor-Id`,
 `X-Actor-Roles`) — see [The HTTP API](../backend/http-api.md).
 
-## Current v0.1.0 limitations {#current-v010-limitations}
+## Current limitations {#current-v010-limitations}
 
-- `RoleRequired` is the **only** policy implementation. There is no
-  attribute-based policy, no permission-based policy, and no policy combination
-  (all-of / any-of) in v0.1.0.
+- Authorization is **role-based** (`RoleRequired`) and, since RFC-018,
+  **data-dependent** (`requireThat` guards, above). There is no separate
+  permission-based policy class.
 - There is **no authentication**. `StubActor` is a trusted, caller-supplied
   identity. Anything exposing the runtime — including the HTTP API — must put a
   real authentication layer in front of it. The reserved `ausus/auth-bridge`
-  package is the planned home for that and ships no code in v0.1.0.
+  package is the planned home for that and ships no code.
 - Field-level and projection-level visibility policies are designed but not
-  enforced in v0.1.0.
+  enforced.
 
 ## Related {#related}
 

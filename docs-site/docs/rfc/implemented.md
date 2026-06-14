@@ -1,13 +1,13 @@
 ---
 id: implemented
 title: Implemented RFCs
-sidebar_label: Implemented in v0.1.0
-description: RFCs realised by the AUSUS v0.1.0 code.
+sidebar_label: Implemented
+description: RFCs realised by the AUSUS v1.1.0 code.
 ---
 
 # Implemented RFCs
 
-These RFCs are realised by v0.1.0 — in most cases as a deliberate subset. Each
+These RFCs are realised by v1.1.0 — in most cases as a deliberate subset. Each
 entry notes what shipped and links to the documentation for it.
 
 ## RFC-001 — Kernel {#rfc-001--kernel}
@@ -27,29 +27,33 @@ v0.1.0.
 ## RFC-002 — Persistence driver {#rfc-002--persistence-driver}
 
 The `PersistenceDriver` / `Repository` contracts and a concrete driver.
-v0.1.0 ships the **SQLite** driver with `find` / `create` / `update`,
-schema derivation, optimistic concurrency, and tenant scoping.
+AUSUS ships **two** drivers behind the contract — `persistence-sql` (SQLite,
+reference) and `persistence-postgres` (PostgreSQL, production) — with `find` /
+`create` / `update` / `findAll` / `findPaged`, schema derivation, optimistic
+concurrency, tenant scoping, and referential integrity.
 
-**Subset note:** SQLite only; no `findMany`, query API, or `delete`.
+**Subset note:** no `delete`. Behavioural parity between the two drivers is
+enforced by a cross-driver compatibility gate.
 
 → [SQL Persistence](../backend/sql-persistence.md)
 
 ## RFC-004 — ViewSchema {#rfc-004--viewschema}
 
-The JSON wire format between backend and renderer. v0.1.0 ships
-`schemaVersion 1.0.0`, the `react.web.v1` profile, and list/detail data shapes.
+The JSON wire format between backend and renderer. AUSUS ships
+`schemaVersion 1.2.0`, the `react.web.v1` profile, and list/detail data shapes
+with pagination, filtering, and sorting.
 
-**Subset note:** empty `filters`, no real pagination, fixed locale.
+**Subset note:** fixed locale.
 
 → [ViewSchema](../frontend/viewschema.md)
 
 ## RFC-005 — Policy engine {#rfc-005--policy-engine}
 
-Action authorization. v0.1.0 ships the `PolicyEngine` with deny-by-default and
-fail-closed semantics, and the `RoleRequired` policy.
+Action authorization. AUSUS ships the `PolicyEngine` with deny-by-default and
+fail-closed semantics, the `RoleRequired` policy, and — via RFC-018 —
+data-dependent guards.
 
-**Subset note:** `RoleRequired` is the only policy implementation; no
-attribute-based or combined policies.
+**Subset note:** no separate permission-based policy class.
 
 → [Policies](../concepts/policies.md)
 
@@ -103,7 +107,27 @@ the v0.1.0 sample domain.
 
 → [The Runtime](../backend/runtime.md) · [Entities, Fields & Actions](../concepts/entities-fields-actions.md)
 
+## RFC-015 — Relations & referential integrity {#rfc-015--relations--referential-integrity}
+
+Typed foreign references between entities. AUSUS ships `Field::reference(...)`,
+compile-time rejection of dangling references (`DanglingRelation`), write-time
+enforcement (`ReferentialIntegrityViolation`), and projection `expand` to fold a
+referenced row's display field. The `Subject` identity value object is unified
+into `Reference`.
+
+→ [SQL Persistence](../backend/sql-persistence.md) · [Glossary: Field reference](../glossary.md#field-reference)
+
+## RFC-018 — Data-dependent authorization {#rfc-018--data-dependent-authorization}
+
+Authorization that reads subject field values and structured actor attributes.
+AUSUS ships `Action::…->requireThat(Cond)`, the `Fact` / `Cond` surface,
+plugin-level `actorAttributes(...)`, compile-time closure
+(`DanglingFactReference`), and in-transaction, fail-closed evaluation
+(`PolicyDenied`).
+
+→ [Policies](../concepts/policies.md#data-dependent-authorization)
+
 ## Related {#related}
 
 - [Planned RFCs](planned.md) — what is not yet implemented.
-- [Release Notes v0.1.0](../releases/v0.1.0.md)
+- [Release Notes v1.1.0](../releases/v1.1.0.md)
