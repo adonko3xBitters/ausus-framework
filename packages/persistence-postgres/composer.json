@@ -1,0 +1,28 @@
+{
+    "name": "ausus/persistence-postgres",
+    "type": "library",
+    "description": "L3 PersistenceDriver — PostgreSQL implementation of the AUSUS persistence contract. Behaviour-compatible with ausus/persistence-sql.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "persistence", "postgres", "postgresql", "pdo"],
+    "homepage": "https://github.com/adonko3xBitters/persistence-postgres",
+    "require": {
+        "php": ">=8.3",
+        "ext-pdo": "*",
+        "ext-pdo_pgsql": "*",
+        "ausus/kernel": "^1.0"
+    },
+    "require-dev": {
+        "ausus/persistence-sql": "^1.0"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L3",
+            "role": "driver"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
