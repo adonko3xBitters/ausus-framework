@@ -44,7 +44,7 @@ jobs:
           VERSION="${VERSION#v}"
           echo "Polling Packagist for ausus/* @ v$VERSION (180s budget per package)"
 
-          PACKAGES=(kernel runtime-default persistence-sql api-http standard-stack starter tenancy-row audit-database auth-bridge presentation-default)
+          PACKAGES=(kernel runtime-default persistence-sql persistence-postgres api-http standard-stack starter tenancy-row audit-database auth-bridge presentation-default)
 
           for pkg in "${PACKAGES[@]}"; do
             DEADLINE=$(( $(date +%s) + 180 ))

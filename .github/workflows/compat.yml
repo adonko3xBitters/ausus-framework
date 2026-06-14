@@ -1,0 +1,58 @@
+name: Compat (persistence-postgres)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: compat-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  compat:
+    name: cross-driver compat
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: ausus_compat
+          POSTGRES_USER: ausus
+          POSTGRES_PASSWORD: ausus
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ausus -d ausus_compat"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      AUSUS_PG_DSN: pgsql:host=127.0.0.1;port=5432;dbname=ausus_compat
+      AUSUS_PG_USER: ausus
+      AUSUS_PG_PASS: ausus
+      # Refuse a green run that silently fell back to SQLite-only: the suite
+      # exits non-zero unless the PostgreSQL driver actually participated.
+      AUSUS_PG_REQUIRED: '1'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo, pdo_sqlite, pdo_pgsql
+          coverage: none
+          tools: composer:v2
+
+      - name: Composer install
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Cross-driver compat suite
+        run: php packages/persistence-postgres/tests/compat.php
