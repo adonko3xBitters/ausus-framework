@@ -51,7 +51,7 @@ l'invocation s'arrête avant l'ouverture de la transaction.
 
 ## La politique intégrée : `RoleRequired` {#the-built-in-policy-rolerequired}
 
-La v0.1.0 livre une seule implémentation de politique : `RoleRequired`. Elle
+AUSUS livre `RoleRequired` pour l'autorisation **basée sur les rôles**. Elle
 autorise l'action si l'acteur détient un rôle nommé.
 
 Vous l'attachez via le DSL avec `->requireRole()` :
@@ -65,13 +65,50 @@ Le compilateur crée un `PolicyNode` pour l'action qui construit une politique
 `RoleRequired` avec `role: 'invoice.issuer'`. Au moment de l'invocation, le
 moteur vérifie le rôle par rapport à la liste de rôles de l'acteur.
 
+## Autorisation dépendante des données (RFC-018) {#data-dependent-authorization}
+
+Les politiques basées sur les rôles décident sur la seule identité. **RFC-018**
+ajoute des *gardes* qui lisent le **sujet** (l'enregistrement) et des **attributs
+d'acteur structurés** au moment de l'autorisation — une règle comme « un
+gestionnaire ne peut approuver un sinistre que jusqu'à sa limite d'autorité »
+s'exprime alors en configuration, et non en code applicatif.
+
+Un garde s'attache à une action avec `->requireThat(Cond)`, en complément (et non
+à la place) de `->requireRole()` :
+
+```php
+$dsl->actorAttributes(['authority_limit' => Field::integer()]);
+
+'approve' => Action::transition('status', from: 'ASSESSING', to: 'APPROVED')
+    ->requireRole('claims.adjuster')
+    ->requireThat(Cond::lte(Fact::subject('claim_amount'), Fact::actor('authority_limit'))),
+```
+
+- **Facts.** `Fact::subject(field)` lit un champ de l'entité sujet chargée ;
+  `Fact::actor(attribute)` lit un attribut d'acteur structuré (déclaré avec
+  `Dsl::actorAttributes(...)`) ; `Fact::input(key)` lit une entrée d'action.
+- **Conditions.** `Cond::eq / ne / lt / lte / gt / gte / in`, composées avec
+  `Cond::and / or / not`.
+- **Fermeture à la compilation.** Un garde référençant un champ sujet, un attribut
+  d'acteur ou une entrée inconnus est rejeté à la compilation du graphe
+  (`DanglingFactReference`).
+- **Mode fermé, dans la transaction.** Le sujet est chargé avant l'autorisation
+  et le garde est évalué **à l'intérieur de la transaction de l'action**, avant
+  tout effet. Un garde en échec lève `PolicyDenied` (HTTP `403`) et annule la
+  transaction.
+
+Les gardes ne modifient pas le contrat `Policy` ci-dessus — ils constituent un
+mécanisme d'autorisation additionnel sur la même action. Les attributs d'acteur
+sont injectés via `ApplicationConfig::actorAttributes(...)` et, en HTTP, un
+en-tête `X-Actor-Attributes` analysé en mode sûr.
+
 ## Acteurs {#actors}
 
 Un **acteur** est celui qui réalise l'action. Le contrat `Actor` expose une
 référence, une liste de rôles, une liste de permissions et un `roleHash()`
 canonique.
 
-La v0.1.0 livre `StubActor` — un acteur fixe en mémoire :
+AUSUS livre `StubActor` — un acteur fixe en mémoire :
 
 ```php
 use Ausus\{StubActor, ActorRef};
@@ -85,18 +122,18 @@ $actor = new StubActor(
 L'API HTTP construit un `StubActor` à partir des en-têtes de la requête
 (`X-Actor-Id`, `X-Actor-Roles`) — voir [L'API HTTP](../backend/http-api.md).
 
-## Limites actuelles de la v0.1.0 {#current-v010-limitations}
+## Limites actuelles {#current-v010-limitations}
 
-- `RoleRequired` est la **seule** implémentation de politique. Il n'existe ni
-  politique basée sur les attributs, ni politique basée sur les permissions, ni
-  combinaison de politiques (all-of / any-of) en v0.1.0.
+- L'autorisation est **basée sur les rôles** (`RoleRequired`) et, depuis RFC-018,
+  **dépendante des données** (gardes `requireThat`, ci-dessus). Il n'existe pas de
+  classe de politique distincte basée sur les permissions.
 - Il n'y a **aucune authentification**. `StubActor` est une identité de
   confiance, fournie par l'appelant. Tout ce qui expose le runtime — y compris
   l'API HTTP — doit placer une véritable couche d'authentification devant lui.
   Le paquet réservé `ausus/auth-bridge` est l'emplacement prévu pour cela et ne
-  livre aucun code en v0.1.0.
+  livre aucun code.
 - Les politiques de visibilité au niveau du champ et de la projection sont
-  conçues mais ne sont pas appliquées en v0.1.0.
+  conçues mais ne sont pas appliquées.
 
 ## Voir aussi {#related}
 

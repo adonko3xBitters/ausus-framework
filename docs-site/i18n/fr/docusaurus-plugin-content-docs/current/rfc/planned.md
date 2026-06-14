@@ -2,12 +2,12 @@
 id: planned
 title: RFC prévus
 sidebar_label: Prévus / Reportés
-description: Les RFC pas encore réalisés, ou réalisés seulement en partie, par la v0.1.0.
+description: Les RFC pas encore réalisés, ou réalisés seulement en partie, par la v1.1.0.
 ---
 
 # RFC prévus / reportés
 
-Ces RFC ne sont **pas** réalisés par la v0.1.0, ou ne le sont qu'en partie. Ils
+Ces RFC ne sont **pas** réalisés par la v1.1.0, ou ne le sont qu'en partie. Ils
 décrivent la direction visée du framework.
 
 :::caution Conception, pas engagement
@@ -22,7 +22,7 @@ l'architecture », et non comme « ce qui sera livré et quand ».
 Conçoit un driver de **multi-tenant au niveau ligne** (row-level tenancy)
 dédié et un modèle de résolution de tenant.
 
-**État v0.1.0 — partiel.** Le scoping par tenant *existe* — chaque entité est
+**État actuel — partiel.** Le scoping par tenant *existe* — chaque entité est
 scopée par tenant et le driver SQLite applique les frontières de tenant (voir
 [Persistance SQL](../backend/sql-persistence.md)). Ce qui n'est **pas** dans la
 v0.1.0, c'est le paquet de driver dédié `ausus/tenancy-row` ; ce nom est
@@ -41,7 +41,7 @@ la piste d'audit fonctionne. Ce qui est reporté, c'est le **paquet dédié
 Conçoit un sous-système de reporting/requête et des opérations de classe
 maintenance (`ReportingDriver`, invocations de classe maintenance).
 
-**État v0.1.0 — non implémenté.** Il n'y a pas de driver de reporting. Le
+**État actuel — non implémenté.** Il n'y a pas de driver de reporting. Le
 kernel distingue une classe d'invocation `Maintenance` dans l'enregistrement
 d'audit, mais aucun sous-système de reporting ou de maintenance n'est livré.
 
@@ -50,7 +50,7 @@ d'audit, mais aucun sous-système de reporting ou de maintenance n'est livré.
 Conçoit le modèle d'autorisation complet — résolution d'acteur, un pont
 d'authentification, et une composition de politiques plus riche.
 
-**État v0.1.0 — partiel.** Les contrats `Actor` / `ActorRef` existent dans le
+**État actuel — partiel.** Les contrats `Actor` / `ActorRef` existent dans le
 kernel, et `StubActor` fournit un acteur fixe en mémoire. Ce qui n'est **pas**
 dans la v0.1.0 : toute authentification, la résolution d'acteur à partir
 d'identifiants, ou le paquet `ausus/auth-bridge` (réservé, sans code). Tout ce
@@ -59,7 +59,7 @@ qui expose le runtime doit fournir sa propre authentification — voir
 
 ## Récapitulatif des paquets réservés {#reserved-packages-summary}
 
-Quatre noms de paquets sont réservés dans la v0.1.0 et liés aux RFC ci-dessus :
+Quatre noms de paquets sont réservés et liés aux RFC ci-dessus :
 
 | Paquet | RFC | Statut |
 |---|---|---|
@@ -72,10 +72,10 @@ Voir [Paquets](../packages/index.md) pour le catalogue complet.
 
 ## Autres éléments reportés {#other-deferred-items}
 
-Non liés à un RFC unique, mais documentés comme reportés depuis la v0.1.0 :
+Non liés à un RFC unique, mais documentés comme reportés :
 
-- **Drivers de persistance MySQL / PostgreSQL** — la conception SQL les
-  permet ; seul SQLite est implémenté et validé.
+- **Driver de persistance MySQL** — la conception SQL le permet ; SQLite et
+  PostgreSQL sont tous deux implémentés aujourd'hui.
 - **Attestation de la chaîne d'approvisionnement** — la provenance npm, les
   tags signés GPG et un SBOM sont reportés à la v0.2.0 (voir
   [Intégrité des paquets](../operations/package-integrity.md)).
@@ -86,4 +86,4 @@ Non liés à un RFC unique, mais documentés comme reportés depuis la v0.1.0 :
 ## Voir aussi {#related}
 
 - [RFC implémentés](implemented.md)
-- [Notes de version v0.1.0](../releases/v0.1.0.md) — limites connues.
+- [Notes de version v1.1.0](../releases/v1.1.0.md) — la version courante.
