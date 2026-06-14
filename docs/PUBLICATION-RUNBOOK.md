@@ -491,7 +491,7 @@ A "broken release" = a published version that breaks consumers.
 
 > **Honest effort estimate.** Rolling back is **not** a one-line operation.
 > A `0.1.1` re-cut requires bumping every affected manifest, re-running the
-> entire phased publication for the affected packages, and re-polling
+> entire phased publication (lock-step over all 10 packages), and re-polling
 > Packagist. Budget ~30 minutes.
 
 ### 5.1 Within 72 hours of `npm publish`

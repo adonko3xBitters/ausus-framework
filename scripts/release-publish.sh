@@ -74,7 +74,7 @@ fi
 
 echo "[publish] pre-flight: HEAD=main, clean tree, synced with origin/main"
 
-# ─── Cleanup trap: restore branch, drop local split + (on failure) local tag ─
+# ─── Cleanup trap: restore branch, drop local split branches + local tag ─────
 cleanup() {
     rc=$?
     git checkout "$ORIGINAL_BRANCH" 2>/dev/null || true
