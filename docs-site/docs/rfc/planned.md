@@ -2,12 +2,12 @@
 id: planned
 title: Planned RFCs
 sidebar_label: Planned / Deferred
-description: RFCs not yet realised, or realised only in part, by v0.1.0.
+description: RFCs not yet realised, or realised only in part, by v1.1.0.
 ---
 
 # Planned / Deferred RFCs
 
-These RFCs are **not** realised by v0.1.0, or are realised only in part. They
+These RFCs are **not** realised by v1.1.0, or are realised only in part. They
 describe the intended direction of the framework.
 
 :::caution Design, not commitment
@@ -20,7 +20,7 @@ architecture points", not "what will ship when".
 
 Designs a dedicated **row-level tenancy** driver and tenant-resolution model.
 
-**v0.1.0 state — partial.** Tenant scoping *exists* — every entity is
+**Current state — partial.** Tenant scoping *exists* — every entity is
 tenant-scoped and the SQLite driver enforces tenant boundaries (see
 [SQL Persistence](../backend/sql-persistence.md)). What is **not** in v0.1.0 is
 the dedicated `ausus/tenancy-row` driver package; that name is reserved and
@@ -39,7 +39,7 @@ is reserved and ships no code in v0.1.0.
 Designs a reporting/query subsystem and maintenance-class operations
 (`ReportingDriver`, maintenance-class invocations).
 
-**v0.1.0 state — not implemented.** There is no reporting driver. The kernel
+**Current state — not implemented.** There is no reporting driver. The kernel
 distinguishes a `Maintenance` invocation class in the audit record, but no
 reporting or maintenance subsystem ships.
 
@@ -48,7 +48,7 @@ reporting or maintenance subsystem ships.
 Designs the full authorization model — actor resolution, an authentication
 bridge, and richer policy composition.
 
-**v0.1.0 state — partial.** The `Actor` / `ActorRef` contracts exist in the
+**Current state — partial.** The `Actor` / `ActorRef` contracts exist in the
 kernel, and `StubActor` provides a fixed in-memory actor. What is **not** in
 v0.1.0: any authentication, actor resolution from credentials, or the
 `ausus/auth-bridge` package (reserved, no code). Anything exposing the runtime
@@ -57,7 +57,7 @@ must supply its own authentication — see
 
 ## Reserved packages summary {#reserved-packages-summary}
 
-Four package names are reserved in v0.1.0 and tied to the RFCs above:
+Four package names are reserved and tied to the RFCs above:
 
 | Package | RFC | Status |
 |---|---|---|
@@ -70,10 +70,10 @@ See [Packages](../packages/index.md) for the full catalogue.
 
 ## Other deferred items {#other-deferred-items}
 
-Not tied to a single RFC, but documented as deferred from v0.1.0:
+Not tied to a single RFC, but documented as deferred:
 
-- **MySQL / PostgreSQL persistence drivers** — the SQL design allows for them;
-  only SQLite is implemented and validated.
+- **MySQL persistence driver** — the SQL design allows for it; SQLite and
+  PostgreSQL are both implemented today.
 - **Supply-chain attestation** — npm provenance, GPG-signed tags, and an SBOM
   are deferred to v0.2.0 (see [Package Integrity](../operations/package-integrity.md)).
 - **DSL enrichments** — convention-resolved policy/effect classes, field-level
@@ -82,4 +82,4 @@ Not tied to a single RFC, but documented as deferred from v0.1.0:
 ## Related {#related}
 
 - [Implemented RFCs](implemented.md)
-- [Release Notes v0.1.0](../releases/v0.1.0.md) — known limitations.
+- [Release Notes v1.1.0](../releases/v1.1.0.md) — the current release.
