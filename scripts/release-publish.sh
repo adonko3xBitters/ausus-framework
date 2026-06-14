@@ -37,7 +37,7 @@ cd "$ROOT"
 # Topological order: leaves first, dependents later.
 # Within each level, alphabetical for determinism.
 LEVEL_1=(audit-database auth-bridge kernel presentation-default tenancy-row)  # no ausus/* deps
-LEVEL_2=(persistence-sql runtime-default)                                      # deps: kernel
+LEVEL_2=(persistence-postgres persistence-sql runtime-default)                 # deps: kernel
 LEVEL_3=(api-http)                                                              # deps: kernel + runtime-default
 LEVEL_4=(standard-stack)                                                        # deps: 4 above
 LEVEL_5=(starter)                                                               # deps: 4 above

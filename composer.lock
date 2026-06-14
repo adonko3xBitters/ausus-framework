@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b38f1216f452e81c3ef6e256545bd59e",
+    "content-hash": "10a3fd47d1d582160f42f5fed7f6863f",
     "packages": [
         {
             "name": "ausus/api-http",
@@ -91,6 +91,53 @@
                 "framework",
                 "kernel",
                 "metadata"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/persistence-postgres",
+            "version": "1.0.999",
+            "dist": {
+                "type": "path",
+                "url": "packages/persistence-postgres",
+                "reference": "f5107fd8c79a144cf84a2269930a17feb5577629"
+            },
+            "require": {
+                "ausus/kernel": "^1.0",
+                "ext-pdo": "*",
+                "ext-pdo_pgsql": "*",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "ausus/persistence-sql": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L3",
+                    "role": "driver"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "L3 PersistenceDriver — PostgreSQL implementation of the AUSUS persistence contract. Behaviour-compatible with ausus/persistence-sql.",
+            "homepage": "https://github.com/adonko3xBitters/persistence-postgres",
+            "keywords": [
+                "ausus",
+                "framework",
+                "pdo",
+                "persistence",
+                "postgres",
+                "postgresql"
             ],
             "transport-options": {
                 "symlink": true,
