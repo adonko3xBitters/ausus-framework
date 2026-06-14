@@ -1,13 +1,13 @@
 ---
 id: implemented
 title: RFC implémentés
-sidebar_label: Implémentés dans la v0.1.0
-description: Les RFC réalisés par le code d'AUSUS v0.1.0.
+sidebar_label: Implémentés
+description: Les RFC réalisés par le code d'AUSUS v1.1.0.
 ---
 
 # RFC implémentés
 
-Ces RFC sont réalisés par la v0.1.0 — dans la plupart des cas comme un
+Ces RFC sont réalisés par la v1.1.0 — dans la plupart des cas comme un
 sous-ensemble délibéré. Chaque entrée note ce qui a été livré et renvoie à la
 documentation correspondante.
 
@@ -29,33 +29,34 @@ v0.1.0.
 ## RFC-002 — Driver de persistance {#rfc-002--persistence-driver}
 
 Les contrats `PersistenceDriver` / `Repository` et un driver concret. La
-v0.1.0 livre le driver **SQLite** avec `find` / `create` / `update`, la
-dérivation de schéma, la concurrence optimiste et le scoping par tenant.
+AUSUS livre **deux** drivers derrière le contrat — `persistence-sql` (SQLite,
+référence) et `persistence-postgres` (PostgreSQL, production) — avec `find` /
+`create` / `update` / `findAll` / `findPaged`, la dérivation de schéma, la
+concurrence optimiste, le scoping par tenant et l'intégrité référentielle.
 
-**Note sur le sous-ensemble :** SQLite uniquement ; pas de `findMany`, d'API de
-requête, ni de `delete`.
+**Note sur le sous-ensemble :** pas de `delete`. La parité comportementale entre
+les deux drivers est assurée par un gate de compatibilité inter-drivers.
 
 → [Persistance SQL](../backend/sql-persistence.md)
 
 ## RFC-004 — ViewSchema {#rfc-004--viewschema}
 
-Le format JSON sur le fil entre le backend et le moteur de rendu. La v0.1.0
-livre `schemaVersion 1.0.0`, le profil `react.web.v1`, et les formes de données
-liste/détail.
+Le format JSON sur le fil entre le backend et le moteur de rendu. AUSUS livre
+`schemaVersion 1.2.0`, le profil `react.web.v1`, et les formes de données
+liste/détail avec pagination, filtrage et tri.
 
-**Note sur le sous-ensemble :** `filters` vide, pas de vraie pagination, locale
-fixe.
+**Note sur le sous-ensemble :** locale fixe.
 
 → [ViewSchema](../frontend/viewschema.md)
 
 ## RFC-005 — Moteur de politiques {#rfc-005--policy-engine}
 
-Autorisation des actions. La v0.1.0 livre le `PolicyEngine` avec une sémantique
-de refus par défaut et de fermeture en cas d'échec (fail-closed), et la
-politique `RoleRequired`.
+Autorisation des actions. AUSUS livre le `PolicyEngine` avec une sémantique de
+refus par défaut et de fermeture en cas d'échec (fail-closed), la politique
+`RoleRequired`, et — via RFC-018 — des gardes dépendants des données.
 
-**Note sur le sous-ensemble :** `RoleRequired` est la seule implémentation de
-politique ; pas de politiques basées sur les attributs ni combinées.
+**Note sur le sous-ensemble :** pas de classe de politique distincte basée sur
+les permissions.
 
 → [Politiques](../concepts/policies.md)
 
@@ -114,7 +115,27 @@ dispatchables mais ne sont pas exercées par le domaine d'exemple de la v0.1.0.
 
 → [Le runtime](../backend/runtime.md) · [Entités, champs et actions](../concepts/entities-fields-actions.md)
 
+## RFC-015 — Relations et intégrité référentielle {#rfc-015--relations--referential-integrity}
+
+Des références étrangères typées entre entités. AUSUS livre
+`Field::reference(...)`, le rejet à la compilation des références orphelines
+(`DanglingRelation`), l'application à l'écriture (`ReferentialIntegrityViolation`),
+et le `expand` de projection pour replier le champ d'affichage d'une ligne
+référencée. L'objet-valeur d'identité `Subject` est unifié dans `Reference`.
+
+→ [Persistance SQL](../backend/sql-persistence.md)
+
+## RFC-018 — Autorisation dépendante des données {#rfc-018--data-dependent-authorization}
+
+Une autorisation qui lit les valeurs de champs du sujet et des attributs d'acteur
+structurés. AUSUS livre `Action::…->requireThat(Cond)`, la surface `Fact` /
+`Cond`, les `actorAttributes(...)` au niveau du plugin, la fermeture à la
+compilation (`DanglingFactReference`), et l'évaluation dans la transaction, en
+mode fermé (`PolicyDenied`).
+
+→ [Politiques](../concepts/policies.md#data-dependent-authorization)
+
 ## Voir aussi {#related}
 
 - [RFC prévus](planned.md) — ce qui n'est pas encore implémenté.
-- [Notes de version v0.1.0](../releases/v0.1.0.md)
+- [Notes de version v1.1.0](../releases/v1.1.0.md)
