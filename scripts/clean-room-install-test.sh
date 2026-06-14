@@ -21,11 +21,11 @@
 # Standalone or driven from scripts/release-gate.sh (Step 9).
 #
 # Usage:   bash scripts/clean-room-install-test.sh
-# Env:     EXPECTED_VERSION   target version of ausus/* (default v1.0.1)
+# Env:     EXPECTED_VERSION   target version of ausus/* (default v1.1.0)
 
 set -euo pipefail
 
-EXPECTED_VERSION="${EXPECTED_VERSION:-v1.0.1}"
+EXPECTED_VERSION="${EXPECTED_VERSION:-v1.1.0}"
 TMP="$(mktemp -d -t ausus-clean-room-XXXXXX)"
 
 cleanup() {
