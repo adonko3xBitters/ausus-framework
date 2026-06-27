@@ -1,0 +1,28 @@
+{
+    "name": "ausus/view-system",
+    "type": "library",
+    "description": "AUSUS L5 — View System. ViewDefinition / PageDefinition / SectionDefinition: pure presentation metadata assembled for the React Renderer. No compile, no hash, no repository.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "view", "presentation"],
+    "require": {
+        "php": ">=8.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\View\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ausus\\View\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L5",
+            "role": "view-system"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
