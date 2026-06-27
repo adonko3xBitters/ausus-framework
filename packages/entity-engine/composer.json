@@ -1,0 +1,29 @@
+{
+    "name": "ausus/entity-engine",
+    "type": "library",
+    "description": "AUSUS Entity Engine (L1) — compile pipeline. Phase 2: Canonicalizer (RFC-012 Q7 semantic normal form). RFC-011.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "entity-engine", "compile"],
+    "require": {
+        "php": ">=8.3",
+        "ausus/kernel": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\Engine\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ausus\\Engine\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L1",
+            "role": "entity-engine"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
