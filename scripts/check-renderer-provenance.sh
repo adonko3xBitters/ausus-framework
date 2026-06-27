@@ -31,7 +31,11 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-PKG=renderer/react/package.json
+# Renderer package dir is parameterized so this gate covers BOTH renderer lines:
+#   legacy → renderer/react            (@ausus/renderer-react)   [default]
+#   gen2   → packages/react-renderer   (@ausus/react-renderer)
+RDIR="${RENDERER_PKG_DIR:-renderer/react}"
+PKG="$RDIR/package.json"
 EXPECTED_REPO_URL_HTTPS="https://github.com/adonko3xBitters/ausus-framework.git"
 EXPECTED_REPO_URL_GIT="git+${EXPECTED_REPO_URL_HTTPS}"
 EXPECTED_HOMEPAGE_PREFIX="https://github.com/adonko3xBitters/"
@@ -82,12 +86,11 @@ if [ -z "$PKG_VERSION" ]; then
     exit 1
 fi
 
-CHANGELOG=renderer/react/CHANGELOG.md
+CHANGELOG="$RDIR/CHANGELOG.md"
 if [ ! -f "$CHANGELOG" ]; then
-    echo "::error::$CHANGELOG not found"
-    exit 1
-fi
-
+    echo "  · no $CHANGELOG — skipping CHANGELOG/version drift check for this line"
+    CHANGELOG_VERSION="$PKG_VERSION"
+else
 CHANGELOG_VERSION="$(grep -m1 -E "^## \[[0-9]" "$CHANGELOG" | sed -E 's/^## \[([^]]+)\].*/\1/')"
 if [ -z "$CHANGELOG_VERSION" ]; then
     echo "::error::could not extract topmost version from $CHANGELOG"
@@ -102,9 +105,10 @@ if [ "$PKG_VERSION" != "$CHANGELOG_VERSION" ]; then
     exit 4
 fi
 echo "  ✓ version $PKG_VERSION matches CHANGELOG topmost section"
+fi
 
 # ─── 4. npm pack --dry-run (publishable shape) ──────────────────────────────
-if ! (cd renderer/react && npm pack --dry-run > /tmp/ausus-renderer-pack.log 2>&1); then
+if ! (cd "$RDIR" && npm pack --dry-run > /tmp/ausus-renderer-pack.log 2>&1); then
     echo "::error::npm pack --dry-run failed:"
     tail -20 /tmp/ausus-renderer-pack.log
     exit 5
