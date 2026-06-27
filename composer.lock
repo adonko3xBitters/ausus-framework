@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "10a3fd47d1d582160f42f5fed7f6863f",
+    "content-hash": "d32e6fd3ea70a057d0ee3a2f1eb47ee7",
     "packages": [
         {
             "name": "ausus/api-http",
@@ -54,6 +54,233 @@
             }
         },
         {
+            "name": "ausus/api-runtime",
+            "version": "1.0.999",
+            "dist": {
+                "type": "path",
+                "url": "packages/api-runtime",
+                "reference": "9baa010ede4b639f8d7f6d50be01bc7d9523934d"
+            },
+            "require": {
+                "ausus/entity-engine": "^1.0",
+                "ausus/kernel": "^1.0",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L4",
+                    "role": "api-runtime"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Api\\Runtime\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Api\\Runtime\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS L4 — HTTP API Runtime. Consumes SchemaRepository / EntityEngine / RuntimeEntity only: resolve → bind → invoke/read. Never compiles, canonicalises, hashes, or loads DSL.",
+            "keywords": [
+                "api",
+                "ausus",
+                "framework",
+                "http",
+                "runtime"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/authoring",
+            "version": "1.0.999",
+            "dist": {
+                "type": "path",
+                "url": "packages/authoring",
+                "reference": "9d883cb0004419699b370c120390d0da64f7328a"
+            },
+            "require": {
+                "ausus/kernel": "^1.0",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L1",
+                    "role": "authoring"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Authoring\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Authoring\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS Authoring (L1) — closed PHP DSL producing RFC-012 EntityDefinition. RFC-CLI-002/003.",
+            "keywords": [
+                "ausus",
+                "authoring",
+                "dsl",
+                "framework"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/cli",
+            "version": "1.0.999",
+            "dist": {
+                "type": "path",
+                "url": "packages/cli",
+                "reference": "723d2caf0dc15e4dc57474d9a9815020f94cf24f"
+            },
+            "require": {
+                "ausus/authoring": "^1.0",
+                "ausus/entity-engine": "^1.0",
+                "ausus/kernel": "^1.0",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L6",
+                    "role": "cli",
+                    "implementation-rfc": "RFC-IMPL-ApplicationProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Cli\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Cli\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS — CLI L6: generic tooling commands consuming Ausus\\ApplicationProvider. PHP-native, no container, no auto-discovery.",
+            "keywords": [
+                "ausus",
+                "cli",
+                "framework",
+                "tooling"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/cli-legacy",
+            "version": "1.0.999",
+            "dist": {
+                "type": "path",
+                "url": "packages/cli-legacy",
+                "reference": "a59195711f32a18cc0ae0289a81c2ec65817ab32"
+            },
+            "require": {
+                "ausus/kernel": "^1.0",
+                "ausus/standard-stack": "^1.0",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L6",
+                    "role": "cli-legacy",
+                    "implementation-rfc": "RFC-IMPL-ApplicationProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Cli\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Cli\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS — Legacy CLI commands (compile/doctor) consuming Ausus\\ApplicationProvider over the MetadataGraph stack. Relocated verbatim from ausus/cli during the Entity Engine decoupling; behaviour unchanged.",
+            "keywords": [
+                "ausus",
+                "cli",
+                "framework",
+                "legacy"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/entity-engine",
+            "version": "1.0.999",
+            "dist": {
+                "type": "path",
+                "url": "packages/entity-engine",
+                "reference": "f3d7e197901e32ad50b0319d77e1136c87f1af35"
+            },
+            "require": {
+                "ausus/kernel": "^1.0",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L1",
+                    "role": "entity-engine"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Engine\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Engine\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS Entity Engine (L1) — compile pipeline. Phase 2: Canonicalizer (RFC-012 Q7 semantic normal form). RFC-011.",
+            "keywords": [
+                "ausus",
+                "compile",
+                "entity-engine",
+                "framework"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "ausus/kernel",
             "version": "1.0.999",
             "dist": {
@@ -91,6 +318,51 @@
                 "framework",
                 "kernel",
                 "metadata"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/persistence-memory",
+            "version": "1.0.999",
+            "dist": {
+                "type": "path",
+                "url": "packages/persistence-memory",
+                "reference": "55167773ae3747cddb4403cd90edef745573f14a"
+            },
+            "require": {
+                "ausus/kernel": "^1.0",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L3",
+                    "role": "persistence-driver"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Persistence\\Memory\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Persistence\\Memory\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS — in-memory PersistenceDriver (L3). Reference conformance driver for tests and the vertical slice. RFC-002.",
+            "keywords": [
+                "ausus",
+                "driver",
+                "framework",
+                "memory",
+                "persistence"
             ],
             "transport-options": {
                 "symlink": true,
@@ -348,6 +620,49 @@
                 "framework",
                 "scaffold",
                 "starter"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/view-system",
+            "version": "1.0.999",
+            "dist": {
+                "type": "path",
+                "url": "packages/view-system",
+                "reference": "b462e53e988a7ac410c8f8266532691265ee0d51"
+            },
+            "require": {
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L5",
+                    "role": "view-system"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\View\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\View\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS L5 — View System. ViewDefinition / PageDefinition / SectionDefinition: pure presentation metadata assembled for the React Renderer. No compile, no hash, no repository.",
+            "keywords": [
+                "ausus",
+                "framework",
+                "presentation",
+                "view"
             ],
             "transport-options": {
                 "symlink": true,
