@@ -16,6 +16,8 @@
 
 ## Table of contents
 
+- [**Quick Start**](QUICKSTART.md) — from `composer require` to a rendered UI, outside the monorepo.
+
 1. [Introduction](01-introduction.md) — what AUSUS is, why it exists, principles.
 2. [Architecture](02-architecture.md) — the L0 → L6 layering with a diagram.
 3. [Pipeline](03-pipeline.md) — DSL → … → React Renderer, step by step.
