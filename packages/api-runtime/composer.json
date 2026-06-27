@@ -1,0 +1,30 @@
+{
+    "name": "ausus/api-runtime",
+    "type": "library",
+    "description": "AUSUS L4 — HTTP API Runtime. Consumes SchemaRepository / EntityEngine / RuntimeEntity only: resolve → bind → invoke/read. Never compiles, canonicalises, hashes, or loads DSL.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "api", "runtime", "http"],
+    "require": {
+        "php": ">=8.3",
+        "ausus/kernel": "^1.0",
+        "ausus/entity-engine": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\Api\\Runtime\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ausus\\Api\\Runtime\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L4",
+            "role": "api-runtime"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
