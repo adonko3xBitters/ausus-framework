@@ -1,0 +1,32 @@
+{
+    "name": "ausus/cli",
+    "type": "library",
+    "description": "AUSUS — CLI L6: generic tooling commands consuming Ausus\\ApplicationProvider. PHP-native, no container, no auto-discovery.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "cli", "tooling"],
+    "require": {
+        "php": ">=8.3",
+        "ausus/kernel": "^1.0",
+        "ausus/authoring": "^1.0",
+        "ausus/entity-engine": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\Cli\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ausus\\Cli\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L6",
+            "role": "cli",
+            "implementation-rfc": "RFC-IMPL-ApplicationProvider"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
