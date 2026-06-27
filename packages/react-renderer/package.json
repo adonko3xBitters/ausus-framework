@@ -6,9 +6,10 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/adonko3xBitters/ausus.git",
+    "url": "git+https://github.com/adonko3xBitters/ausus-framework.git",
     "directory": "packages/react-renderer"
   },
+  "homepage": "https://github.com/adonko3xBitters/ausus-framework",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",

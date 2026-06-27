@@ -4,6 +4,7 @@
     "description": "AUSUS L4 — HTTP API Runtime. Consumes SchemaRepository / EntityEngine / RuntimeEntity only: resolve → bind → invoke/read. Never compiles, canonicalises, hashes, or loads DSL.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "api", "runtime", "http"],
+    "homepage": "https://github.com/adonko3xBitters/api-runtime",
     "require": {
         "php": ">=8.3",
         "ausus/kernel": "^2.0",

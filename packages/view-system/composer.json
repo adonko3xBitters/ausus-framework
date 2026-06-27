@@ -4,6 +4,7 @@
     "description": "AUSUS L5 — View System. ViewDefinition / PageDefinition / SectionDefinition: pure presentation metadata assembled for the React Renderer. No compile, no hash, no repository.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "view", "presentation"],
+    "homepage": "https://github.com/adonko3xBitters/view-system",
     "require": {
         "php": ">=8.3"
     },
