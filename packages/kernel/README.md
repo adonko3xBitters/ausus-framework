@@ -1,39 +1,46 @@
 # ausus/kernel
 
-L0 — contracts only. No implementation logic. No dependencies on any other AUSUS package.
+AUSUS **2.0** — Kernel (L0). Contracts and value objects only; **zero runtime
+side effects, zero external dependencies**. It is the frozen foundation of the
+Entity Engine and is shared by every higher layer.
 
-## Owned RFC surfaces
+## Installation
 
-- **RFC-001 (Kernel)** — full, including Amendments-01 and -02.
-- **RFC-005 §2 (Policy contract)** — interface, Decision enum, Subject, Context value objects.
-- **RFC-013 §2 (Effect contract)** — interface, EffectContext.
-- **RFC-014 §2 (Actor contracts)** — Actor, ActorRef, ActorResolver interfaces.
+```bash
+composer require ausus/kernel:^2.0
+```
+
+## Dependencies
+
+- PHP 8.3+
+- none
 
 ## Public surface
 
+- **Entity Engine model** (`Ausus\Definition\*`) — `EntityDefinition`,
+  `FieldDefinition`, `ActionDefinition`, `ProjectionDefinition`, the `Expression`
+  sub-language, and the `Enum\*` families (EE-RFC-012).
+- **Compiled form** (`Ausus\Compiled\*`) — `EntitySchema`, `SchemaIndex`,
+  `SchemaVersion`: the content-addressed output of compilation.
+- **Runtime contracts** (`Ausus\Contracts\*`) — `EntityEngine` (bind),
+  `RuntimeEntity` (invoke/read), `SchemaRepository`, `AuthorizationEvaluator`,
+  `Context` (EE-RFC-011).
+- **Shared value objects** (`Ausus\*`) — `Reference`, `Tenant`, `TenantId`,
+  `ActorRef`, `Entity`, `Decision`, and the `PersistenceDriver` / `Repository`
+  storage contracts.
+
+## Minimal example
+
+```php
+<?php
+use Ausus\Definition\Enum\FieldType;
+use Ausus\Contracts\EntityEngine;   // implemented by ausus/entity-engine
+
+// The kernel declares the contracts; concrete engines/drivers live in their
+// own packages and are bound at runtime:  $engine->bind($schema, $driver).
 ```
-Ausus\                                 (facade root — DSL entry points)
-  Plugin                               (base class plugins extend)
-  Dsl                                  (DSL builder)
-  Field                                (Field type fluent builder)
-  Action                               (Action fluent builder)
-  Policy / Decision / Subject          (re-exported from Ausus\Kernel\Contracts\Policy)
-  Effect / EffectContext / Reference   (re-exported from Ausus\Kernel\Contracts\Persistence + Effect)
 
-Ausus\Kernel\Contracts\                (internal contract namespace)
-  Persistence\PersistenceDriver, PersistenceContext, Repository, ...
-  Policy\Policy, PolicyDescriptor, ...
-  Audit\Auditor, AuditEntry, AuditSink, ...
-  Authorization\Actor, ActorRef, ActorResolver
-  Tenancy\Tenant, TenantId, TenantResolver, TenantIsolationStrategy
-  Reporting\ReportingDriver, ReportingQuery
-  Workflow\WorkflowDescriptor, TransitionDescriptor
-  Effect\Effect, EffectContext
-```
+## Documentation
 
-## Constraints
-
-- ZERO runtime side effects in any class here.
-- ZERO dependencies on `illuminate/database`, `illuminate/http`, etc. — only `illuminate/contracts` is permitted.
-- No abstract base classes that subclass-and-override behavior. Value objects and contracts only.
-- Every public symbol corresponds to a clause in a frozen RFC.
+See the canonical reference [`docs/v2/`](../../docs/v2/README.md) and the
+[Quick Start](../../docs/v2/QUICKSTART.md).
