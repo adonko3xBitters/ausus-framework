@@ -71,34 +71,40 @@ ausus_release_line "$RELEASE_LINE"
 
 log "mode=$([ "$LIVE" = "1" ] && echo LIVE || echo LOCAL)  line=$RELEASE_LINE_NAME  version=${VERSION:-<n/a>}  tmp=$TMP_ROOT"
 
-# ─── Step 1: composer.json structural validation ─────────────────────────────
-log "step 1 — composer.json structural validation"
+# ─── Step 1: composer.json structural validation (this line's packages) ──────
+log "step 1 — composer.json structural validation ($RELEASE_LINE_NAME line)"
 fail_count=0
 
-for f in composer.json packages/*/composer.json; do
+# Validate the root manifest + only the packages belonging to the release line.
+# (Packages in neither line — e.g. cli-legacy, a migration artifact — are not
+# part of any release and are not gated here.)
+LINE_MANIFESTS=(composer.json)
+for pkg in "${RELEASE_ALL[@]}"; do
+    LINE_MANIFESTS+=("packages/$pkg/composer.json")
+done
+
+for f in "${LINE_MANIFESTS[@]}"; do
     if ! composer validate --no-check-publish --no-check-lock --strict "$f" >/dev/null 2>&1; then
         fail "$f failed composer validate --strict"
         fail_count=$((fail_count + 1))
     fi
 done
 
-# starter's minimum-stability must be one of the documented values. During
-# the v0.2 pre-release cycle it was pinned to 'alpha' so the scaffolded
-# project inherited the pre-release resolution chain. At v1.0 stable it
-# drops to 'stable' (the Composer default). Accepting either keeps the
-# gate green across both worlds; anything else (e.g. an accidental
-# 'minimum-stability: dev') still fails loud.
-STARTER_STAB=$(jq -r '."minimum-stability" // "stable"' packages/starter/composer.json)
-case "$STARTER_STAB" in
-    alpha|beta|rc|stable) ;;
-    *)
-        fail "packages/starter/composer.json minimum-stability='$STARTER_STAB' (expected alpha|beta|rc|stable)"
-        fail_count=$((fail_count + 1))
-        ;;
-esac
+# legacy-only: starter's minimum-stability must be a documented value.
+if [ "$RELEASE_LINE_NAME" = "legacy" ]; then
+    STARTER_STAB=$(jq -r '."minimum-stability" // "stable"' packages/starter/composer.json)
+    case "$STARTER_STAB" in
+        alpha|beta|rc|stable) ;;
+        *)
+            fail "packages/starter/composer.json minimum-stability='$STARTER_STAB' (expected alpha|beta|rc|stable)"
+            fail_count=$((fail_count + 1))
+            ;;
+    esac
+fi
 
-# all packages MUST have a homepage field
-for f in packages/*/composer.json; do
+# every package in the line MUST have a homepage field (publishing source)
+for pkg in "${RELEASE_ALL[@]}"; do
+    f="packages/$pkg/composer.json"
     if [ "$(jq -r '.homepage // ""' "$f")" = "" ]; then
         fail "$f missing homepage field"
         fail_count=$((fail_count + 1))
@@ -109,7 +115,7 @@ if [ "$fail_count" -ne 0 ]; then
     fail "structural validation: $fail_count error(s)"
     exit 1
 fi
-ok "all composer.json structurally valid"
+ok "all $RELEASE_LINE_NAME composer.json structurally valid"
 
 # ─── Step 2: build (line-aware) ──────────────────────────────────────────────
 if [ "$RELEASE_LINE_NAME" = "gen2" ]; then
