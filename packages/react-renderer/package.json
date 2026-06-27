@@ -1,13 +1,24 @@
 {
   "name": "@ausus/react-renderer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "AUSUS L5 React Renderer — renders entities, projections and actions discovered from the api-runtime HTTP contract only. No knowledge of kernel/engine/compiler/repository.",
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adonko3xBitters/ausus.git",
+    "directory": "packages/react-renderer"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "src", "README.md"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "src"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "node --test --experimental-strip-types tests/*.test.ts"
