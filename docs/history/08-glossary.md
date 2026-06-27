@@ -38,7 +38,7 @@ recompilation**. File-backed (`.ausus/`) or in-memory.
 
 ### EntityEngine / bind **(Gen 2)**
 `EntityEngine::bind(EntitySchema, PersistenceDriver) → RuntimeEntity`. The "bind"
-half of RFC-011 (compilation is the other half).
+half of EE-RFC-011 (compilation is the other half).
 
 ### Runtime / RuntimeEntity **(both, different shapes)**
 The execution layer. **(Gen 1)** `Invoker`/`WorkflowRuntime`/`EffectDispatcher`/

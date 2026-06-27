@@ -1,6 +1,6 @@
 # 1. Introduction
 
-## What is AUSUS v1.0 (Entity Engine)?
+## What is AUSUS 2.0 (Entity Engine)?
 
 AUSUS is a **metadata-first application engine**. You describe an application as
 declarative metadata — entities, fields, actions, projections, and authorization
@@ -9,12 +9,12 @@ executes it: it persists data, enforces data-aware authorization, exposes an
 HTTP API, and renders a generic React UI. You write **what** the application is;
 the engine runs it.
 
-The v1.0 *Entity Engine* is the realization of two frozen RFCs:
+The 2.0 *Entity Engine* is the realization of two frozen RFCs:
 
-- **RFC-012 — Entity Definition:** the declarative model (`EntityDefinition` =
+- **EE-RFC-012 — Entity Definition:** the declarative model (`EntityDefinition` =
   identity + tenant flag + `Field[]` + `Action[]` + `Projection[]`, with an
   embedded authorization `Expression`).
-- **RFC-011 — Entity Engine:** the execution contract (`compile` →
+- **EE-RFC-011 — Entity Engine:** the execution contract (`compile` →
   `EntitySchema`; `bind(EntitySchema, Driver)` → `RuntimeEntity` with
   `invoke`/`read`).
 
@@ -27,7 +27,7 @@ expressed once, declaratively, and the cross-cutting concerns (tenancy,
 authorization, transactions) are properties of the engine rather than code each
 team must get right.
 
-## Principles (as implemented in v1.0)
+## Principles (as implemented in 2.0)
 
 - **Metadata-first.** The application is data (`EntityDefinition`), not code. The
   authored PHP DSL is a closed notation whose only product is an
@@ -42,7 +42,7 @@ team must get right.
 - **Single rendering contract.** The React renderer consumes **only** the HTTP
   API — it has no knowledge of the kernel, the compiler, or the repository.
 
-## What v1.0 is not
+## What 2.0 is not
 
 It is not (in this slice) an ORM, a UI framework, a workflow engine, or a query
 language. Expand is single-hop; projections do not aggregate; `read()` selection

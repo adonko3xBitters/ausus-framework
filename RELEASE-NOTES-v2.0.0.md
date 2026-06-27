@@ -1,12 +1,12 @@
-# AUSUS v1.0.0 — Entity Engine
+# AUSUS 2.0.0 — Entity Engine
 
 > Release notes for the metadata-first **Entity Engine** vertical slice
-> (RFC-011 Entity Engine / RFC-012 Entity Definition). Canonical documentation:
-> [`docs/v1/`](docs/v1/README.md).
+> (EE-RFC-011 Entity Engine / EE-RFC-012 Entity Definition). Canonical documentation:
+> [`docs/v2/`](docs/v2/README.md).
 >
 > **Lineage note.** This is a new, self-contained line that coexists with the
 > earlier `standard-stack` lineage (`RELEASE-NOTES-v0.1.x.md`, README below the
-> v1.0 banner). The two use distinct package sets and namespaces. The historical
+> 2.0 banner). The two use distinct package sets and namespaces. The historical
 > RFCs and release artifacts are unchanged.
 
 ## What it is
@@ -58,7 +58,7 @@ validations.
 
 ## Known limitations
 
-Documented in [`docs/v1/07-known-limits.md`](docs/v1/07-known-limits.md):
+Documented in [`docs/v2/07-known-limits.md`](docs/v2/07-known-limits.md):
 expand depth = 1, no cross-entity invariants, single-field transitions, no
 aggregation/computed fields, deferred `read()` selection parameters, limited
 runtime integrity validation, and actor attributes limited to

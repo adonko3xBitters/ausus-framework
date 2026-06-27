@@ -1,7 +1,7 @@
-# AUSUS v1.0 — Entity Engine (canonical documentation)
+# AUSUS 2.0 — Entity Engine (canonical documentation)
 
-> This is the **official reference for AUSUS v1.0**, the metadata-first *Entity
-> Engine* vertical slice (RFC-011 Entity Engine / RFC-012 Entity Definition).
+> This is the **official reference for AUSUS 2.0**, the metadata-first *Entity
+> Engine* vertical slice (EE-RFC-011 Entity Engine / EE-RFC-012 Entity Definition).
 > It is a self-contained line of packages — `ausus/kernel` (Definition/Contracts/
 > Compiled), `ausus/entity-engine`, `ausus/authoring`, `ausus/cli`,
 > `ausus/persistence-memory`, `ausus/api-runtime`, `ausus/view-system`, and
@@ -11,7 +11,7 @@
 > The repository also contains an earlier `standard-stack` lineage
 > (`ausus/standard-stack`, `ausus/api-http`, `ausus/runtime-default`,
 > `@ausus/renderer-react`, RFC-001…018) documented by the root `README.md` and
-> the historical `RELEASE-NOTES-v0.1.x.md`. **This v1.0 documentation describes
+> the historical `RELEASE-NOTES-v0.1.x.md`. **This 2.0 documentation describes
 > only the Entity Engine slice** and does not modify the historical material.
 
 ## Table of contents
@@ -22,13 +22,13 @@
 4. [Your first project](04-first-project.md) — define an entity, compile, run, add a view, render.
 5. [Reference applications](05-reference-apps.md) — CRM, Teranga PMS, SGH.
 6. [Capabilities](06-capabilities.md) — actions, guards, expand, views, runtime, API, React, repository.
-7. [Known limits of v1.0](07-known-limits.md) — documented honestly, no proposed fixes.
+7. [Known limits of 2.0](07-known-limits.md) — documented honestly, no proposed fixes.
 
 ## At a glance
 
 ```
 DSL (entities/*.php)
-  → EntityDefinition        (RFC-012 declarative model)
+  → EntityDefinition        (EE-RFC-012 declarative model)
   → Compiler                (global closure + canonicalise + content-hash)
   → EntitySchema            (frozen, content-addressed)
   → FileSchemaRepository    (.ausus/schemas/<hash>.json + index.json)

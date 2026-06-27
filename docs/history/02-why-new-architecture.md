@@ -40,7 +40,7 @@ semantics ⇒ same hash. This gives a stable on-disk cache (`.ausus/schemas/<has
 ## Driver 3 — A runtime independent of storage and presentation (`RuntimeEntity`)
 
 The Legacy runtime is wired to its effect/workflow/policy machinery. The Entity
-Engine separates the two halves of RFC-011 cleanly: **the Compiler** produces an
+Engine separates the two halves of EE-RFC-011 cleanly: **the Compiler** produces an
 `EntitySchema`; **`EntityEngine::bind(EntitySchema, PersistenceDriver)`** returns
 a **`RuntimeEntity`** that depends *only* on the `PersistenceDriver` contract (the
 concrete driver is injected). The runtime imports no DSL, no compiler, and no

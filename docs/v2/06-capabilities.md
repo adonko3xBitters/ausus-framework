@@ -1,4 +1,4 @@
-# 6. Capabilities (v1.0)
+# 6. Capabilities (2.0)
 
 Exactly what the Entity Engine slice does today. Everything here is exercised by
 the test suites and the reference apps.
@@ -25,8 +25,8 @@ An action may carry an optional **guard** (`Expression`).
 ## Guards (authorization)
 
 A guard is an `Expression` evaluated **fail-closed** by
-`DefaultAuthorizationEvaluator`. Operators (all evaluated as of v1.0, via the same
-RFC-012 §Q5 reductions used for hashing):
+`DefaultAuthorizationEvaluator`. Operators (all evaluated as of 2.0, via the same
+EE-RFC-012 §Q5 reductions used for hashing):
 
 - Primitives: `eq`, `lt`, `not`, `and`.
 - Sugar (now fully supported): `ne`, `lte`, `gt`, `gte`, `in`, `or`.

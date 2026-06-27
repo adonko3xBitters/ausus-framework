@@ -1,6 +1,6 @@
 # 5. Reference applications
 
-Three independent applications are the official demonstrators of v1.0. Each is
+Three independent applications are the official demonstrators of 2.0. Each is
 built **only** from the DSL + ViewDefinition — no framework code was modified —
 and each ships a full validation test (PHP + a React/View test). They exist to
 prove the model on real domains and to establish, reproducibly, where it holds

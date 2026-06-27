@@ -1,4 +1,4 @@
-# 7. Known limits of v1.0
+# 7. Known limits of 2.0
 
 These are documented honestly and **without proposed solutions**. Each was
 reproduced by a concrete scenario in the CRM, PMS, or SGH reference apps. They
@@ -74,7 +74,7 @@ guards; richer role/attribute-based rules are approximated through `actor.type`.
 
 ---
 
-These limits mark the boundary of v1.0: AUSUS reasons about **one entity and its
+These limits mark the boundary of 2.0: AUSUS reasons about **one entity and its
 raw foreign keys**, not the entity graph, and it does not compute derived data.
 Within that boundary the model holds, as demonstrated by three independent
 applications.

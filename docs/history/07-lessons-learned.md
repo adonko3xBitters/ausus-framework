@@ -50,7 +50,7 @@ The three validations surfaced exactly **one implementation bug** (as opposed to
 a model limit): expression **sugar operators** (`gt/gte/lte/ne/in/or`) in guards
 were silently denied at runtime because the evaluator only handled the primitives,
 while the canonical (hashed) form used the full set. **RELEASE-001** fixed it by
-making the runtime evaluate the same RFC-012 §Q5 reductions used for the hash. No
+making the runtime evaluate the same EE-RFC-012 §Q5 reductions used for the hash. No
 contract, RFC, or API changed.
 
 ## Takeaway

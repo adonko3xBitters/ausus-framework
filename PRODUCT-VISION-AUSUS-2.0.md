@@ -162,5 +162,5 @@ enforces and on which a consumer can rely:
 
 *This vision is timeless by intent: it describes what AUSUS is, not what it might
 become. It is grounded exclusively in decisions already taken — the founding
-principles, the frozen RFC-011/RFC-012 kernel, the closed-DSL RFCs, and the CRM,
+principles, the frozen EE-RFC-011/EE-RFC-012 kernel, the closed-DSL RFCs, and the CRM,
 Teranga PMS, and SGH validations.*

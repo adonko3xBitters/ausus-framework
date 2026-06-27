@@ -1,6 +1,6 @@
 # 4. Your first project
 
-This walkthrough uses the exact APIs shipped in v1.0. It mirrors the reference
+This walkthrough uses the exact APIs shipped in 2.0. It mirrors the reference
 applications under `apps/`.
 
 ## 0. Prerequisites

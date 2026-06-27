@@ -1,6 +1,6 @@
 # 3. The pipeline
 
-Every AUSUS v1.0 application flows through one pipeline, from authored DSL to a
+Every AUSUS 2.0 application flows through one pipeline, from authored DSL to a
 rendered UI.
 
 ```
@@ -11,7 +11,7 @@ DSL → EntityDefinition → Compiler → EntitySchema → Repository
 ### 1. DSL → EntityDefinition  (`ausus/authoring`, L1)
 
 An author writes `entities/*.php`. The closed DSL (`Definition`, `Expr`) produces
-exactly one `EntityDefinition` (RFC-012) — no side effects, no external
+exactly one `EntityDefinition` (EE-RFC-012) — no side effects, no external
 dependencies. The DSL frontend (`ausus/cli`) discovers the files, statically
 **scans them for forbidden symbols** (e.g. `eval`, `getenv`, IO, reflection),
 then evaluates each once.
@@ -21,7 +21,7 @@ then evaluates each once.
 `Compiler::compile(EntityDefinition[])` runs in three steps, atomically (any
 error aborts with `CompilationError` and produces nothing):
 
-1. **ClosureValidator** — the 16 RFC-012 §Q6 invariants over the whole set
+1. **ClosureValidator** — the 16 EE-RFC-012 §Q6 invariants over the whole set
    (reference targets exist, enums coherent, transitions valid, writeProtected
    respected, expand depth ≤ 1, unique names, …).
 2. **Canonicalizer** — reduces the definition to a semantic normal form

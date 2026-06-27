@@ -1,6 +1,6 @@
 # 2. Architecture
 
-AUSUS v1.0 is a layered monorepo. Each layer depends only on layers below it;
+AUSUS 2.0 is a layered monorepo. Each layer depends only on layers below it;
 there are no upward or sideways dependencies between peers. Layer numbers come
 from each package's `composer.json` (`extra.ausus.layer`).
 
@@ -50,7 +50,7 @@ from each package's `composer.json` (`extra.ausus.layer`).
                       └─────────────────────────────────────────────────────────┘
 ```
 
-## Boundary rules enforced by v1.0
+## Boundary rules enforced by 2.0
 
 - The **kernel** (L0) has zero dependencies and knows no source format, no
   storage, no HTTP.
