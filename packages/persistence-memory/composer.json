@@ -1,0 +1,29 @@
+{
+    "name": "ausus/persistence-memory",
+    "type": "library",
+    "description": "AUSUS — in-memory PersistenceDriver (L3). Reference conformance driver for tests and the vertical slice. RFC-002.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "persistence", "driver", "memory"],
+    "require": {
+        "php": ">=8.3",
+        "ausus/kernel": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\Persistence\\Memory\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ausus\\Persistence\\Memory\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L3",
+            "role": "persistence-driver"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
