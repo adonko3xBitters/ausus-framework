@@ -13,6 +13,63 @@ package-local fix releases; this file covers the shared release lines
 across `ausus/kernel`, `ausus/persistence-sql`, `ausus/runtime-default`,
 `ausus/api-http`, `ausus/standard-stack`, and `@ausus/renderer-react`.
 
+## [Entity Engine v1.0] — metadata-first vertical slice (RFC-011 / RFC-012)
+
+> **Lineage note.** This entry documents the **Entity Engine** line — a new,
+> self-contained metadata-first stack (`ausus/kernel` Definition/Contracts/
+> Compiled, `ausus/entity-engine`, `ausus/authoring`, `ausus/cli`,
+> `ausus/persistence-memory`, `ausus/api-runtime`, `ausus/view-system`,
+> `@ausus/react-renderer`). It **coexists** with the earlier `standard-stack`
+> lineage whose releases (0.1.x → 1.1.0) are recorded below; the two use distinct
+> package sets and namespaces. Final tag numbering for this line is deferred to
+> the release phase. Canonical docs: `docs/v1/`.
+
+### Added
+
+- **RFC-012 Entity Definition + RFC-011 Entity Engine** — kernel DTOs
+  (`EntityDefinition`, `FieldDefinition`, `ActionDefinition`,
+  `ProjectionDefinition`, `Expression`, `EntitySchema`, …) and contracts
+  (`EntityEngine`, `RuntimeEntity`, `SchemaRepository`, `AuthorizationEvaluator`,
+  `Context`).
+- **Compiler pipeline** — Canonicalizer (semantic normal form), Hasher
+  (SHA-256 content hash), ClosureValidator (16 invariants); `Compiler` →
+  `EntitySchema` + `SchemaIndex`.
+- **Authoring DSL** (`Definition`, `Expr`) and **CLI** (`ausus compile`,
+  forbidden-symbol scan, `FileSchemaRepository` → `.ausus/schemas/<hash>.json` +
+  `index.json`).
+- **Runtime** — reference `MemoryDriver` (in-memory `PersistenceDriver`),
+  `EntityEngine::bind`, `RuntimeEntity` (invoke/read, transactions with
+  rollback, data-aware fail-closed authorization, single-hop expand).
+- **HTTP API Runtime** (L4): `GET /api/entities/{e}`, `GET …/projections/{p}`,
+  `POST …/actions/{a}`.
+- **React Renderer** (`@ausus/react-renderer`, L5) — discovery, auto
+  tables/forms, navigation; HTTP-only.
+- **View System** (`ausus/view-system`, L5) — `ViewDefinition` /
+  `PageDefinition` / `SectionDefinition` + registry.
+- **Reference applications** — CRM, Teranga PMS, SGH (`apps/`).
+
+### Fixed
+
+- Authorization **sugar operators** (`ne/lte/gt/gte/in/or`) now evaluate at
+  runtime with the same RFC-012 §Q5 reductions used for the content hash.
+  Previously they fail-closed to *deny*, so the runtime and the canonical
+  (hashed) form disagreed (RELEASE-001 stabilization). No contract, RFC, or API
+  changed.
+
+### Known limitations
+
+See `docs/v1/07-known-limits.md`: single-hop expand, no cross-entity invariants,
+single-field transitions, no aggregation/computed fields, deferred `read()`
+selection parameters, limited runtime integrity validation, limited actor
+attributes.
+
+### Chore
+
+- `.gitignore`: ignore generated `.ausus/` compile output, app test
+  `.fixtures/`, and `packages/react-renderer/dist/`.
+
+---
+
 ## [0.1.1] — 2026-05-26 — v0.1.x stabilisation
 
 The v0.1.x stabilisation series. Headlines: a complete
