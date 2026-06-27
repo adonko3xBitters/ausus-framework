@@ -1,59 +1,31 @@
 {
     "name": "ausus/monorepo",
     "type": "project",
-    "description": "AUSUS monorepo — V0 publication-ready workspace. Resolves ausus/* packages from local path repositories; mirrors what Packagist will see post-publication.",
+    "description": "AUSUS 2.0 — official Entity Engine workspace. Resolves the Gen2 ausus/* packages from local path repositories at 2.0.0. The Legacy 1.x packages remain present in the repository but are no longer built or resolved by this workspace.",
     "license": "MIT",
     "repositories": [
-        {
-            "name": "persistence-postgres",
-            "type": "path",
-            "url": "packages/persistence-postgres",
-            "options": {
-                "symlink": true,
-                "versions": {
-                    "ausus/persistence-postgres": "1.0.999"
-                }
-            }
-        },
-        { "type": "path", "url": "packages/kernel",                "options": { "symlink": true, "versions": { "ausus/kernel":               "1.0.999" } } },
-        { "type": "path", "url": "packages/entity-engine",         "options": { "symlink": true, "versions": { "ausus/entity-engine":        "1.0.999" } } },
-        { "type": "path", "url": "packages/authoring",             "options": { "symlink": true, "versions": { "ausus/authoring":            "1.0.999" } } },
-        { "type": "path", "url": "packages/persistence-memory",    "options": { "symlink": true, "versions": { "ausus/persistence-memory":   "1.0.999" } } },
-        { "type": "path", "url": "packages/api-runtime",           "options": { "symlink": true, "versions": { "ausus/api-runtime":          "1.0.999" } } },
-        { "type": "path", "url": "packages/view-system",           "options": { "symlink": true, "versions": { "ausus/view-system":          "1.0.999" } } },
-        { "type": "path", "url": "packages/persistence-sql",       "options": { "symlink": true, "versions": { "ausus/persistence-sql":      "1.0.999" } } },
-        { "type": "path", "url": "packages/runtime-default",       "options": { "symlink": true, "versions": { "ausus/runtime-default":      "1.0.999" } } },
-        { "type": "path", "url": "packages/api-http",              "options": { "symlink": true, "versions": { "ausus/api-http":             "1.0.999" } } },
-        { "type": "path", "url": "packages/tenancy-row",           "options": { "symlink": true, "versions": { "ausus/tenancy-row":          "1.0.999" } } },
-        { "type": "path", "url": "packages/audit-database",        "options": { "symlink": true, "versions": { "ausus/audit-database":       "1.0.999" } } },
-        { "type": "path", "url": "packages/auth-bridge",           "options": { "symlink": true, "versions": { "ausus/auth-bridge":          "1.0.999" } } },
-        { "type": "path", "url": "packages/presentation-default",  "options": { "symlink": true, "versions": { "ausus/presentation-default": "1.0.999" } } },
-        { "type": "path", "url": "packages/standard-stack",        "options": { "symlink": true, "versions": { "ausus/standard-stack":       "1.0.999" } } },
-        { "type": "path", "url": "packages/starter",               "options": { "symlink": true, "versions": { "ausus/starter":              "1.0.999" } } },
-        { "type": "path", "url": "packages/cli",                   "options": { "symlink": true, "versions": { "ausus/cli":                  "1.0.999" } } },
-        { "type": "path", "url": "packages/cli-legacy",            "options": { "symlink": true, "versions": { "ausus/cli-legacy":           "1.0.999" } } }
+        { "type": "path", "url": "packages/kernel",                "options": { "symlink": true, "versions": { "ausus/kernel":               "2.0.0" } } },
+        { "type": "path", "url": "packages/entity-engine",         "options": { "symlink": true, "versions": { "ausus/entity-engine":        "2.0.0" } } },
+        { "type": "path", "url": "packages/authoring",             "options": { "symlink": true, "versions": { "ausus/authoring":            "2.0.0" } } },
+        { "type": "path", "url": "packages/persistence-memory",    "options": { "symlink": true, "versions": { "ausus/persistence-memory":   "2.0.0" } } },
+        { "type": "path", "url": "packages/api-runtime",           "options": { "symlink": true, "versions": { "ausus/api-runtime":          "2.0.0" } } },
+        { "type": "path", "url": "packages/view-system",           "options": { "symlink": true, "versions": { "ausus/view-system":          "2.0.0" } } },
+        { "type": "path", "url": "packages/cli",                   "options": { "symlink": true, "versions": { "ausus/cli":                  "2.0.0" } } }
     ],
     "require": {
         "php": ">=8.3",
-        "ausus/api-http": "^1.0",
-        "ausus/api-runtime": "^1.0",
-        "ausus/authoring": "^1.0",
-        "ausus/cli": "^1.0",
-        "ausus/cli-legacy": "^1.0",
-        "ausus/entity-engine": "^1.0",
-        "ausus/kernel": "^1.0",
-        "ausus/persistence-memory": "^1.0",
-        "ausus/persistence-postgres": "^1.0",
-        "ausus/persistence-sql": "^1.0",
-        "ausus/runtime-default": "^1.0",
-        "ausus/standard-stack": "^1.0",
-        "ausus/starter": "^1.0",
-        "ausus/view-system": "^1.0",
+        "ausus/api-runtime": "^2.0",
+        "ausus/authoring": "^2.0",
+        "ausus/cli": "^2.0",
+        "ausus/entity-engine": "^2.0",
+        "ausus/kernel": "^2.0",
+        "ausus/persistence-memory": "^2.0",
+        "ausus/view-system": "^2.0",
         "nyholm/psr7": "^1.8",
         "nyholm/psr7-server": "^1.1"
     },
     "autoload": {
-        "classmap": ["apps/playground", "apps/issue-tracker/src"]
+        "classmap": []
     },
     "config": {
         "preferred-install": "dist",
