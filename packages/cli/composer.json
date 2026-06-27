@@ -1,14 +1,14 @@
 {
     "name": "ausus/cli",
     "type": "library",
-    "description": "AUSUS — CLI L6: generic tooling commands consuming Ausus\\ApplicationProvider. PHP-native, no container, no auto-discovery.",
+    "description": "AUSUS — CLI (L6): DSL frontend and the `ausus compile` command. Discovers closed-DSL definition files, scans them for forbidden symbols, compiles them to content-addressed EntitySchema via the Entity Engine, and persists through FileSchemaRepository. PHP-native, no container, no auto-discovery.",
     "license": "MIT",
     "keywords": ["ausus", "framework", "cli", "tooling"],
     "require": {
         "php": ">=8.3",
-        "ausus/kernel": "^1.0",
-        "ausus/authoring": "^1.0",
-        "ausus/entity-engine": "^1.0"
+        "ausus/kernel": "^2.0",
+        "ausus/authoring": "^2.0",
+        "ausus/entity-engine": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -24,7 +24,7 @@
         "ausus": {
             "layer": "L6",
             "role": "cli",
-            "implementation-rfc": "RFC-IMPL-ApplicationProvider"
+            "spec": "EE-RFC-CLI-002/003"
         }
     },
     "minimum-stability": "stable",
