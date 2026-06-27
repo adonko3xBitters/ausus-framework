@@ -1,0 +1,33 @@
+{
+  "name": "@ausus/react-renderer",
+  "version": "1.0.0",
+  "description": "AUSUS L5 React Renderer — renders entities, projections and actions discovered from the api-runtime HTTP contract only. No knowledge of kernel/engine/compiler/repository.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "src", "README.md"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test --experimental-strip-types tests/*.test.ts"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.3"
+  },
+  "keywords": ["ausus", "react", "renderer", "api-runtime"],
+  "engines": {
+    "node": ">=18"
+  },
+  "ausus": {
+    "layer": "L5",
+    "role": "renderer",
+    "consumes": "api-runtime (HTTP contract only)"
+  }
+}
