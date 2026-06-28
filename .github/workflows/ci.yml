@@ -90,6 +90,9 @@ jobs:
           node --version
           npm --version
 
+      - name: Install renderer devDeps (typescript for the npm pack/prepare build)
+        run: npm install --prefix packages/react-renderer --no-audit --no-fund
+
       - name: Gen2 CI (scripts/ci-gen2.sh)
         run: bash scripts/ci-gen2.sh
 
