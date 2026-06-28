@@ -6,14 +6,50 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      line:
+        description: 'Force line (auto|gen2|legacy)'
+        required: false
+        default: 'auto'
 
 concurrency:
   group: compat-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # Same release-line resolution as the rest of the chain. The cross-driver
+  # PostgreSQL compatibility suite validates the Legacy ausus/persistence-postgres
+  # driver, which does not belong to the Gen2 line (Gen2 ships only
+  # ausus/persistence-memory). On the Gen2 line there is no relevant cross-driver
+  # validation, so the compat job is skipped cleanly.
+  resolve-line:
+    name: resolve release line
+    runs-on: ubuntu-latest
+    outputs:
+      line: ${{ steps.line.outputs.line }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - id: line
+        name: Resolve line
+        run: |
+          LINE="${{ github.event.inputs.line }}"
+          if [ -z "$LINE" ] || [ "$LINE" = "auto" ]; then
+            if jq -e '.require["ausus/entity-engine"]' composer.json >/dev/null 2>&1; then
+              LINE=gen2
+            else
+              LINE=legacy
+            fi
+          fi
+          . scripts/release-packages.sh
+          ausus_release_line "$LINE" >/dev/null
+          echo "Resolved release line: $LINE"
+          echo "line=$LINE" >> "$GITHUB_OUTPUT"
+
   compat:
     name: cross-driver compat
+    needs: resolve-line
+    if: needs.resolve-line.outputs.line == 'legacy'
     runs-on: ubuntu-latest
 
     services:
