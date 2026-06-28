@@ -9,14 +9,90 @@ on:
       - 'v*'
 
   workflow_dispatch:
+    inputs:
+      line:
+        description: 'Force line (auto|gen2|legacy)'
+        required: false
+        default: 'auto'
 
 concurrency:
   group: release-gate-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  gate:
+  # Same release-line resolution as ci.yml / release-publish.sh /
+  # release-gate.sh / packagist-validation: explicit input wins, else the
+  # active Composer workspace decides (ausus/entity-engine → gen2).
+  resolve-line:
+    name: resolve release line
+    runs-on: ubuntu-latest
+    outputs:
+      line: ${{ steps.line.outputs.line }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - id: line
+        name: Resolve line
+        run: |
+          LINE="${{ github.event.inputs.line }}"
+          if [ -z "$LINE" ] || [ "$LINE" = "auto" ]; then
+            if jq -e '.require["ausus/entity-engine"]' composer.json >/dev/null 2>&1; then
+              LINE=gen2
+            else
+              LINE=legacy
+            fi
+          fi
+          . scripts/release-packages.sh
+          ausus_release_line "$LINE" >/dev/null
+          echo "Resolved release line: $LINE"
+          echo "line=$LINE" >> "$GITHUB_OUTPUT"
+
+  # Gen2 (AUSUS 2.0) — runs ONLY scripts/release-gate.sh with RELEASE_LINE=gen2
+  # (which internally runs ci-gen2.sh + the renderer provenance check). It never
+  # invokes scripts/ci.sh or scripts/clean-room.sh, and runs no Legacy demonstrator.
+  gate-gen2:
+    name: gate gen2 (PHP ${{ matrix.php }})
+    needs: resolve-line
+    if: needs.resolve-line.outputs.line == 'gen2'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo, pdo_sqlite, mbstring, intl
+          tools: composer:v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Composer install (Gen2 workspace)
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Install renderer devDeps (typescript for the npm pack/prepare build)
+        run: npm install --prefix packages/react-renderer --no-audit --no-fund
+
+      - name: Run scripts/release-gate.sh (gen2, local mode)
+        run: bash scripts/release-gate.sh
+        env:
+          RELEASE_LINE: gen2
+          RELEASE_GATE_LIVE: '0'
+
+  # Legacy (standard-stack) — strictly unchanged historical behaviour.
+  gate-legacy:
     name: release-gate (PHP ${{ matrix.php }})
+    needs: resolve-line
+    if: needs.resolve-line.outputs.line == 'legacy'
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     strategy:

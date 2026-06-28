@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      line:
+        description: 'Force CI line (auto|gen2|legacy)'
+        required: false
+        default: 'auto'
 
 # Cancel in-flight runs on the same ref
 concurrency:
@@ -14,12 +19,99 @@ concurrency:
 
 jobs:
   # ─────────────────────────────────────────────────────────────────────
-  # Main matrix — exercises PHP 8.3/8.4 × Node 18/20/22 against the
-  # default React 18 peer. The clean-room step only fires on the tip
-  # slot (8.4 + 22) to keep total CI minutes reasonable.
+  # Release-line resolution — same source of truth as the publish chain
+  # (scripts/release-packages.sh). On a PR/push there is no tag, so the
+  # active Composer workspace decides: the Gen2 workspace requires
+  # ausus/entity-engine; the Legacy workspace requires ausus/standard-stack.
+  # `workflow_dispatch` can force a line. Only the resolved line's CI runs.
   # ─────────────────────────────────────────────────────────────────────
-  ci:
-    name: ${{ matrix.php-version }} · node${{ matrix.node-version }}
+  resolve-line:
+    name: resolve release line
+    runs-on: ubuntu-latest
+    outputs:
+      line: ${{ steps.line.outputs.line }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - id: line
+        name: Resolve line
+        run: |
+          LINE="${{ github.event.inputs.line }}"
+          if [ -z "$LINE" ] || [ "$LINE" = "auto" ]; then
+            if jq -e '.require["ausus/entity-engine"]' composer.json >/dev/null 2>&1; then
+              LINE=gen2
+            else
+              LINE=legacy
+            fi
+          fi
+          # Validate against the canonical line registry used by release-publish,
+          # release-gate, packagist-validation and npm-publish.
+          . scripts/release-packages.sh
+          ausus_release_line "$LINE" >/dev/null
+          echo "Resolved release line: $LINE"
+          echo "line=$LINE" >> "$GITHUB_OUTPUT"
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Gen2 (AUSUS 2.0 Entity Engine) — runs ONLY scripts/ci-gen2.sh, the
+  # official Gen2 CI reference. No Legacy demonstrator is ever executed.
+  #
+  # Node is pinned to 22 (not the 18/20/22 matrix used by the Legacy job):
+  # scripts/ci-gen2.sh runs its TypeScript test suites with
+  # `node --test --experimental-strip-types`, a flag introduced in Node 22.6.0
+  # and absent on 18/20 (where it fails with `bad option`). The other ci-gen2
+  # steps (composer + PHP suites, and the npm pack build) are 18/20-compatible,
+  # but ci-gen2.sh is a single script that always runs the strip-types TS step,
+  # so the whole job must run on a Node that supports it. The PHP matrix
+  # (8.3/8.4) is preserved; the Legacy job keeps the full 18/20/22 Node matrix.
+  # ─────────────────────────────────────────────────────────────────────
+  ci-gen2:
+    name: gen2 · ${{ matrix.php-version }} · node${{ matrix.node-version }}
+    needs: resolve-line
+    if: needs.resolve-line.outputs.line == 'gen2'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:  ['8.3', '8.4']
+        node-version: ['22']   # ci-gen2.sh TS suites need Node >=22.6 (--experimental-strip-types)
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: pdo, pdo_sqlite
+          coverage: none
+          tools: composer:v2
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Show toolchain
+        run: |
+          php --version | head -1
+          composer --version
+          node --version
+          npm --version
+
+      - name: Install renderer devDeps (typescript for the npm pack/prepare build)
+        run: npm install --prefix packages/react-renderer --no-audit --no-fund
+
+      - name: Gen2 CI (scripts/ci-gen2.sh)
+        run: bash scripts/ci-gen2.sh
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Legacy (standard-stack) — unchanged. Runs only on the Legacy line.
+  # PHP 8.3/8.4 × Node 18/20/22. Clean-room/integration on the tip slot.
+  # ─────────────────────────────────────────────────────────────────────
+  ci-legacy:
+    name: legacy · ${{ matrix.php-version }} · node${{ matrix.node-version }}
+    needs: resolve-line
+    if: needs.resolve-line.outputs.line == 'legacy'
     runs-on: ubuntu-latest
 
     strategy:
@@ -96,15 +188,15 @@ jobs:
         run: bash scripts/integration-http.sh
 
   # ─────────────────────────────────────────────────────────────────────
-  # React-version compatibility job — proves @ausus/renderer-react works
-  # under each version it claims to support in peerDependencies (^18 || ^19).
-  # Reuses the renderer build + trace harness; overrides the React version
-  # in the playground workspace before running.
+  # React-version compatibility job — Legacy line only. Proves
+  # @ausus/renderer-react works under each peerDependencies version
+  # (^18 || ^19). Unchanged; gated to the Legacy line.
   # ─────────────────────────────────────────────────────────────────────
   react-compat:
     name: react${{ matrix.react-major }}-compat
     runs-on: ubuntu-latest
-    needs: ci
+    needs: [resolve-line, ci-legacy]
+    if: needs.resolve-line.outputs.line == 'legacy'
 
     strategy:
       fail-fast: false

@@ -14,14 +14,20 @@
 > the historical `RELEASE-NOTES-v0.1.x.md`. **This 2.0 documentation describes
 > only the Entity Engine slice** and does not modify the historical material.
 
-## Table of contents
+## Start here
 
-- [**Quick Start**](QUICKSTART.md) — from `composer require` to a rendered UI, outside the monorepo.
+New to AUSUS 2.0? Follow the **[Quick Start](QUICKSTART.md)** — the single
+recommended path, from `composer require` to a rendered UI, outside the monorepo.
+
+## Reference (read in any order)
 
 1. [Introduction](01-introduction.md) — what AUSUS is, why it exists, principles.
 2. [Architecture](02-architecture.md) — the L0 → L6 layering with a diagram.
 3. [Pipeline](03-pipeline.md) — DSL → … → React Renderer, step by step.
-4. [Your first project](04-first-project.md) — define an entity, compile, run, add a view, render.
+4. [Inside the monorepo — a first project](04-first-project.md) — the same
+   walkthrough resolved via Composer **path repositories**, for contributors
+   working in this repository. External users should follow the
+   [Quick Start](QUICKSTART.md) instead.
 5. [Reference applications](05-reference-apps.md) — CRM, Teranga PMS, SGH.
 6. [Capabilities](06-capabilities.md) — actions, guards, expand, views, runtime, API, React, repository.
 7. [Known limits of 2.0](07-known-limits.md) — documented honestly, no proposed fixes.
