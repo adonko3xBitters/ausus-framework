@@ -54,7 +54,15 @@ jobs:
   # ─────────────────────────────────────────────────────────────────────
   # Gen2 (AUSUS 2.0 Entity Engine) — runs ONLY scripts/ci-gen2.sh, the
   # official Gen2 CI reference. No Legacy demonstrator is ever executed.
-  # PHP/Node matrix preserved.
+  #
+  # Node is pinned to 22 (not the 18/20/22 matrix used by the Legacy job):
+  # scripts/ci-gen2.sh runs its TypeScript test suites with
+  # `node --test --experimental-strip-types`, a flag introduced in Node 22.6.0
+  # and absent on 18/20 (where it fails with `bad option`). The other ci-gen2
+  # steps (composer + PHP suites, and the npm pack build) are 18/20-compatible,
+  # but ci-gen2.sh is a single script that always runs the strip-types TS step,
+  # so the whole job must run on a Node that supports it. The PHP matrix
+  # (8.3/8.4) is preserved; the Legacy job keeps the full 18/20/22 Node matrix.
   # ─────────────────────────────────────────────────────────────────────
   ci-gen2:
     name: gen2 · ${{ matrix.php-version }} · node${{ matrix.node-version }}
@@ -65,7 +73,7 @@ jobs:
       fail-fast: false
       matrix:
         php-version:  ['8.3', '8.4']
-        node-version: ['18', '20', '22']
+        node-version: ['22']   # ci-gen2.sh TS suites need Node >=22.6 (--experimental-strip-types)
     steps:
       - name: Checkout
         uses: actions/checkout@v6
