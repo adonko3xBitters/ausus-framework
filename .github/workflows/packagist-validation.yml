@@ -42,9 +42,15 @@ jobs:
             VERSION="${GITHUB_REF#refs/tags/}"
           fi
           VERSION="${VERSION#v}"
-          echo "Polling Packagist for ausus/* @ v$VERSION (180s budget per package)"
 
-          PACKAGES=(kernel runtime-default persistence-sql persistence-postgres api-http standard-stack starter tenancy-row audit-database auth-bridge presentation-default)
+          # Select the package set for the line this tag belongs to (major>=2 → gen2).
+          # shellcheck source=scripts/release-packages.sh
+          . scripts/release-packages.sh
+          LINE="$(ausus_line_for_version "v$VERSION")"
+          ausus_release_line "$LINE"
+          PACKAGES=("${RELEASE_ALL[@]}")
+          echo "RELEASE_LINE=$LINE" >> "$GITHUB_ENV"
+          echo "Polling Packagist for the $LINE line ausus/* @ v$VERSION: ${PACKAGES[*]}"
 
           for pkg in "${PACKAGES[@]}"; do
             DEADLINE=$(( $(date +%s) + 180 ))
@@ -72,3 +78,4 @@ jobs:
         env:
           RELEASE_GATE_LIVE: '1'
           RELEASE_GATE_VERSION: ${{ env.VERSION }}
+          RELEASE_LINE: ${{ env.RELEASE_LINE }}

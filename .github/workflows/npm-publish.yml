@@ -1,5 +1,14 @@
 name: npm-publish
 
+# Two independent renderer packages coexist in this monorepo:
+#   legacy → renderer/react            → @ausus/renderer-react
+#   gen2   → packages/react-renderer   → @ausus/react-renderer   (AUSUS 2.0)
+#
+# Both jobs run on every release tag but each one PUBLISHES ONLY when its own
+# package.json version equals the tag — otherwise it skips. So a v1.x tag
+# publishes the legacy renderer and skips gen2; a v2.x tag publishes the gen2
+# renderer and skips legacy. Neither line can block the other.
+
 on:
   push:
     tags:
@@ -10,77 +19,110 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to publish from (e.g. v0.2.0-alpha.4)'
+        description: 'Tag to publish from (e.g. v2.0.0)'
         required: true
 
 jobs:
-  publish:
+  publish-legacy:
+    name: publish @ausus/renderer-react (legacy)
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     permissions:
       contents: read
-      id-token: write   # required for npm provenance attestation
+      id-token: write
+    env:
+      PKG_DIR: renderer/react
+      PKG_NAME: '@ausus/renderer-react'
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.tag || github.ref }}
-
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           registry-url: 'https://registry.npmjs.org'
-
-      - name: Verify package.json version matches tag
-        working-directory: renderer/react
+      - name: Resolve tag + decide whether this line matches
+        id: match
         run: |
-          if [ -n "${{ github.event.inputs.tag }}" ]; then
-            INPUT="${{ github.event.inputs.tag }}"
-          else
-            INPUT="${GITHUB_REF#refs/tags/}"
-          fi
+          INPUT="${{ github.event.inputs.tag }}"; [ -n "$INPUT" ] || INPUT="${GITHUB_REF#refs/tags/}"
           TAG_VERSION="${INPUT#v}"
-          PKG_VERSION=$(jq -r '.version' package.json)
-          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
-            echo "::error::package.json version ($PKG_VERSION) ≠ tag ($TAG_VERSION)"
-            exit 1
-          fi
+          PKG_VERSION=$(jq -r '.version' "$PKG_DIR/package.json")
           echo "TAG_VERSION=$TAG_VERSION" >> "$GITHUB_ENV"
-          echo "Resolved TAG_VERSION=$TAG_VERSION"
-
+          if [ "$PKG_VERSION" = "$TAG_VERSION" ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"; echo "legacy renderer matches tag ($PKG_VERSION) — will publish"
+          else
+            echo "go=false" >> "$GITHUB_OUTPUT"; echo "legacy renderer ($PKG_VERSION) ≠ tag ($TAG_VERSION) — skipping"
+          fi
       - name: Install deps
+        if: steps.match.outputs.go == 'true'
         working-directory: renderer/react
         run: npm ci --no-audit --no-fund
-
       - name: Build
+        if: steps.match.outputs.go == 'true'
         working-directory: renderer/react
         run: npm run build
-
       - name: Validate built artifacts
+        if: steps.match.outputs.go == 'true'
         working-directory: renderer/react
         run: |
           [ -f dist/index.js ] || { echo "::error::dist/index.js missing"; exit 1; }
           [ -f dist/index.d.ts ] || { echo "::error::dist/index.d.ts missing"; exit 1; }
-          echo "  ✓ dist/index.js + dist/index.d.ts present"
-
       - name: npm publish
+        if: steps.match.outputs.go == 'true'
         working-directory: renderer/react
         run: |
-          if [[ "$TAG_VERSION" == *-alpha.* || "$TAG_VERSION" == *-beta.* || "$TAG_VERSION" == *-rc.* ]]; then
-            DIST_TAG=next
-          else
-            DIST_TAG=latest
-          fi
-          echo "Publishing with dist-tag: $DIST_TAG"
+          DIST_TAG=latest
+          case "$TAG_VERSION" in *-alpha.*|*-beta.*|*-rc.*) DIST_TAG=next;; esac
           npm publish --tag "$DIST_TAG" --access public --provenance
-          if [ "$DIST_TAG" = "next" ]; then
-            HAS_STABLE=$(npm view @ausus/renderer-react versions --json 2>/dev/null \
-              | jq -r '.[]' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$' | head -1 || echo "")
-            if [ -z "$HAS_STABLE" ]; then
-              echo "No stable v1+ on npm — promoting $TAG_VERSION to @latest"
-              npm dist-tag add "@ausus/renderer-react@$TAG_VERSION" latest
-            else
-              echo "Stable v1+ exists ($HAS_STABLE) — @latest left untouched"
-            fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-gen2:
+    name: publish @ausus/react-renderer (gen2)
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      PKG_DIR: packages/react-renderer
+      PKG_NAME: '@ausus/react-renderer'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Resolve tag + decide whether this line matches
+        id: match
+        run: |
+          INPUT="${{ github.event.inputs.tag }}"; [ -n "$INPUT" ] || INPUT="${GITHUB_REF#refs/tags/}"
+          TAG_VERSION="${INPUT#v}"
+          PKG_VERSION=$(jq -r '.version' "$PKG_DIR/package.json")
+          echo "TAG_VERSION=$TAG_VERSION" >> "$GITHUB_ENV"
+          if [ "$PKG_VERSION" = "$TAG_VERSION" ]; then
+            echo "go=true" >> "$GITHUB_OUTPUT"; echo "gen2 renderer matches tag ($PKG_VERSION) — will publish"
+          else
+            echo "go=false" >> "$GITHUB_OUTPUT"; echo "gen2 renderer ($PKG_VERSION) ≠ tag ($TAG_VERSION) — skipping"
           fi
+      - name: Build (prepare hook builds dist)
+        if: steps.match.outputs.go == 'true'
+        working-directory: packages/react-renderer
+        run: npm ci --no-audit --no-fund && npm run build
+      - name: Validate built artifacts
+        if: steps.match.outputs.go == 'true'
+        working-directory: packages/react-renderer
+        run: |
+          [ -f dist/index.js ] || { echo "::error::dist/index.js missing"; exit 1; }
+          [ -f dist/index.d.ts ] || { echo "::error::dist/index.d.ts missing"; exit 1; }
+      - name: npm publish
+        if: steps.match.outputs.go == 'true'
+        working-directory: packages/react-renderer
+        run: |
+          DIST_TAG=latest
+          case "$TAG_VERSION" in *-alpha.*|*-beta.*|*-rc.*) DIST_TAG=next;; esac
+          npm publish --tag "$DIST_TAG" --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

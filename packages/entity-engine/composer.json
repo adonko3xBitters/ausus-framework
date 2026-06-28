@@ -1,0 +1,30 @@
+{
+    "name": "ausus/entity-engine",
+    "type": "library",
+    "description": "AUSUS Entity Engine (L1) — content-addressed compile pipeline (Canonicalizer semantic normal form, Hasher, ClosureValidator) plus the bind/runtime half. EE-RFC-011 / EE-RFC-012.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "entity-engine", "compile"],
+    "homepage": "https://github.com/adonko3xBitters/entity-engine",
+    "require": {
+        "php": ">=8.3",
+        "ausus/kernel": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\Engine\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ausus\\Engine\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L1",
+            "role": "entity-engine"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

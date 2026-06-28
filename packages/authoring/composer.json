@@ -1,0 +1,30 @@
+{
+    "name": "ausus/authoring",
+    "type": "library",
+    "description": "AUSUS Authoring (L1) — closed PHP DSL producing an EE-RFC-012 EntityDefinition. EE-RFC-CLI-002/003.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "authoring", "dsl"],
+    "homepage": "https://github.com/adonko3xBitters/authoring",
+    "require": {
+        "php": ">=8.3",
+        "ausus/kernel": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\Authoring\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ausus\\Authoring\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L1",
+            "role": "authoring"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

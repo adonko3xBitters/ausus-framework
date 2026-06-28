@@ -1,0 +1,31 @@
+{
+    "name": "ausus/cli-legacy",
+    "type": "library",
+    "description": "AUSUS — Legacy CLI commands (compile/doctor) consuming Ausus\\ApplicationProvider over the MetadataGraph stack. Relocated verbatim from ausus/cli during the Entity Engine decoupling; behaviour unchanged.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "cli", "legacy"],
+    "require": {
+        "php": ">=8.3",
+        "ausus/standard-stack": "^1.0",
+        "ausus/kernel": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\Cli\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ausus\\Cli\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L6",
+            "role": "cli-legacy",
+            "implementation-rfc": "RFC-IMPL-ApplicationProvider"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

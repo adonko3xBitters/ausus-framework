@@ -1,0 +1,33 @@
+{
+    "name": "ausus/cli",
+    "type": "library",
+    "description": "AUSUS — CLI (L6): DSL frontend and the `ausus compile` command. Discovers closed-DSL definition files, scans them for forbidden symbols, compiles them to content-addressed EntitySchema via the Entity Engine, and persists through FileSchemaRepository. PHP-native, no container, no auto-discovery.",
+    "license": "MIT",
+    "keywords": ["ausus", "framework", "cli", "tooling"],
+    "homepage": "https://github.com/adonko3xBitters/cli",
+    "require": {
+        "php": ">=8.3",
+        "ausus/kernel": "^2.0",
+        "ausus/authoring": "^2.0",
+        "ausus/entity-engine": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\Cli\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ausus\\Cli\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "ausus": {
+            "layer": "L6",
+            "role": "cli",
+            "spec": "EE-RFC-CLI-002/003"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

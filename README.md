@@ -5,6 +5,16 @@
 [![PHP](https://img.shields.io/badge/php-8.3%2B-777bb4.svg)](https://www.php.net/)
 [![Packagist](https://img.shields.io/badge/packagist-ausus%2Fstandard--stack-orange.svg)](https://packagist.org/packages/ausus/standard-stack)
 
+> **📘 AUSUS 2.0 — the Entity Engine.** This repository now contains the
+> metadata-first **Entity Engine** vertical slice (EE-RFC-011 / EE-RFC-012): packages
+> `ausus/kernel` (Definition/Contracts/Compiled), `ausus/entity-engine`,
+> `ausus/authoring`, `ausus/cli`, `ausus/persistence-memory`,
+> `ausus/api-runtime`, `ausus/view-system`, and `@ausus/react-renderer`,
+> validated by the CRM, Teranga PMS, and SGH reference apps under `apps/`. Its
+> **canonical documentation is [`docs/v2/`](docs/v2/README.md)** (and
+> [`RELEASE-NOTES-v2.0.0.md`](RELEASE-NOTES-v2.0.0.md)). The sections below
+> describe the earlier `standard-stack` lineage and are unchanged.
+
 **Ship enterprise applications in days, not quarters.** AUSUS is a Laravel-native platform for building CRUD apps, ERP workflows, multi-tenant SaaS, and internal tools — where multi-tenancy, authorization, audit trails, and approval workflows are built in, not bolted on.
 
 ---

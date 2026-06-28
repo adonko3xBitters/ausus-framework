@@ -4,49 +4,183 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "10a3fd47d1d582160f42f5fed7f6863f",
+    "content-hash": "812e3b5b30bc3868fe65e148830087b6",
     "packages": [
         {
-            "name": "ausus/api-http",
-            "version": "1.0.999",
+            "name": "ausus/api-runtime",
+            "version": "2.0.0",
             "dist": {
                 "type": "path",
-                "url": "packages/api-http",
-                "reference": "2037368510250cdaaa2440853e017c3b2d0b8ce2"
+                "url": "packages/api-runtime",
+                "reference": "89ee8f9012e870a14d68bfd8779f35475bdfd39f"
             },
             "require": {
-                "ausus/kernel": "^1.0",
-                "ausus/runtime-default": "^1.0",
-                "php": ">=8.3",
-                "psr/http-factory": "^1.0",
-                "psr/http-message": "^1.1 || ^2.0",
-                "psr/http-server-handler": "^1.0",
-                "psr/http-server-middleware": "^1.0"
+                "ausus/entity-engine": "^2.0",
+                "ausus/kernel": "^2.0",
+                "php": ">=8.3"
             },
             "type": "library",
             "extra": {
                 "ausus": {
                     "layer": "L4",
-                    "role": "api-surface"
+                    "role": "api-runtime"
                 }
             },
             "autoload": {
-                "classmap": [
-                    "src/"
-                ]
+                "psr-4": {
+                    "Ausus\\Api\\Runtime\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Api\\Runtime\\Tests\\": "tests/"
+                }
             },
             "license": [
                 "MIT"
             ],
-            "description": "AUSUS L4 — PSR-7/15 HTTP API surface for the metadata graph. Serves RFC-004 ViewSchema fetches, Action invocation, and the kernel exception taxonomy.",
-            "homepage": "https://github.com/adonko3xBitters/api-http",
+            "description": "AUSUS L4 — HTTP API Runtime. Consumes SchemaRepository / EntityEngine / RuntimeEntity only: resolve → bind → invoke/read. Never compiles, canonicalises, hashes, or loads DSL.",
             "keywords": [
                 "api",
                 "ausus",
                 "framework",
                 "http",
-                "psr-15",
-                "psr-7"
+                "runtime"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/authoring",
+            "version": "2.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/authoring",
+                "reference": "9d4811ddb7d5571ba65e85cad76072178379c96d"
+            },
+            "require": {
+                "ausus/kernel": "^2.0",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L1",
+                    "role": "authoring"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Authoring\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Authoring\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS Authoring (L1) — closed PHP DSL producing an EE-RFC-012 EntityDefinition. EE-RFC-CLI-002/003.",
+            "keywords": [
+                "ausus",
+                "authoring",
+                "dsl",
+                "framework"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/cli",
+            "version": "2.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/cli",
+                "reference": "7c65129967128bafe25f990c77c8e0eb4aea2292"
+            },
+            "require": {
+                "ausus/authoring": "^2.0",
+                "ausus/entity-engine": "^2.0",
+                "ausus/kernel": "^2.0",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L6",
+                    "role": "cli",
+                    "spec": "EE-RFC-CLI-002/003"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Cli\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Cli\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS — CLI (L6): DSL frontend and the `ausus compile` command. Discovers closed-DSL definition files, scans them for forbidden symbols, compiles them to content-addressed EntitySchema via the Entity Engine, and persists through FileSchemaRepository. PHP-native, no container, no auto-discovery.",
+            "keywords": [
+                "ausus",
+                "cli",
+                "framework",
+                "tooling"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "ausus/entity-engine",
+            "version": "2.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/entity-engine",
+                "reference": "570df00cde92ad3213bcd989c1f757be9f120bcc"
+            },
+            "require": {
+                "ausus/kernel": "^2.0",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "extra": {
+                "ausus": {
+                    "layer": "L1",
+                    "role": "entity-engine"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Engine\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\Engine\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS Entity Engine (L1) — content-addressed compile pipeline (Canonicalizer semantic normal form, Hasher, ClosureValidator) plus the bind/runtime half. EE-RFC-011 / EE-RFC-012.",
+            "keywords": [
+                "ausus",
+                "compile",
+                "entity-engine",
+                "framework"
             ],
             "transport-options": {
                 "symlink": true,
@@ -55,11 +189,11 @@
         },
         {
             "name": "ausus/kernel",
-            "version": "1.0.999",
+            "version": "2.0.0",
             "dist": {
                 "type": "path",
                 "url": "packages/kernel",
-                "reference": "165bff0edcd3ccccb2f6370798585cb55bc1efac"
+                "reference": "1ae950abf6dbe7f3030f5d14767de7247e390dc7"
             },
             "require": {
                 "php": ">=8.3"
@@ -84,7 +218,7 @@
             "license": [
                 "MIT"
             ],
-            "description": "AUSUS Kernel — contracts, value objects, DSL facade. RFC-001 + contract surfaces of RFC-005 §2, RFC-013 §2, RFC-014 §2.",
+            "description": "AUSUS Kernel (L0) — contracts, value objects, DSL facade, and the Entity Engine model + runtime contracts (Definition / Contracts / Compiled). RFC-001 + contract surfaces of RFC-005 §2, RFC-013 §2, RFC-014 §2; EE-RFC-011 / EE-RFC-012.",
             "homepage": "https://github.com/adonko3xBitters/kernel",
             "keywords": [
                 "ausus",
@@ -98,98 +232,44 @@
             }
         },
         {
-            "name": "ausus/persistence-postgres",
-            "version": "1.0.999",
+            "name": "ausus/persistence-memory",
+            "version": "2.0.0",
             "dist": {
                 "type": "path",
-                "url": "packages/persistence-postgres",
-                "reference": "f5107fd8c79a144cf84a2269930a17feb5577629"
+                "url": "packages/persistence-memory",
+                "reference": "77d7bf67ab60ad42939061333f80cc376d896fa7"
             },
             "require": {
-                "ausus/kernel": "^1.0",
-                "ext-pdo": "*",
-                "ext-pdo_pgsql": "*",
+                "ausus/kernel": "^2.0",
                 "php": ">=8.3"
-            },
-            "require-dev": {
-                "ausus/persistence-sql": "^1.0"
             },
             "type": "library",
             "extra": {
                 "ausus": {
                     "layer": "L3",
-                    "role": "driver"
+                    "role": "persistence-driver"
                 }
             },
             "autoload": {
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "L3 PersistenceDriver — PostgreSQL implementation of the AUSUS persistence contract. Behaviour-compatible with ausus/persistence-sql.",
-            "homepage": "https://github.com/adonko3xBitters/persistence-postgres",
-            "keywords": [
-                "ausus",
-                "framework",
-                "pdo",
-                "persistence",
-                "postgres",
-                "postgresql"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "ausus/persistence-sql",
-            "version": "1.0.999",
-            "dist": {
-                "type": "path",
-                "url": "packages/persistence-sql",
-                "reference": "c14fb4ee1615f96d64c64aba885d61c08b26205b"
-            },
-            "require": {
-                "ausus/kernel": "^1.0",
-                "ext-pdo": "*",
-                "php": ">=8.3"
-            },
-            "suggest": {
-                "ext-pdo_mysql": "For MySQL deployments",
-                "ext-pdo_pgsql": "For PostgreSQL deployments",
-                "ext-pdo_sqlite": "Default driver for V0 smoke tests"
-            },
-            "type": "library",
-            "extra": {
-                "ausus": {
-                    "layer": "L3",
-                    "role": "driver"
+                "psr-4": {
+                    "Ausus\\Persistence\\Memory\\": "src/"
                 }
-            },
-            "autoload": {
-                "classmap": [
-                    "src/"
-                ]
             },
             "autoload-dev": {
                 "psr-4": {
-                    "Ausus\\Persistence\\Sql\\Tests\\": "tests/"
+                    "Ausus\\Persistence\\Memory\\Tests\\": "tests/"
                 }
             },
             "license": [
                 "MIT"
             ],
-            "description": "L3 PersistenceDriver — SQL implementation of RFC-002 via PDO (SQLite/MySQL/Postgres). Includes SchemaDeriver + DatabaseAuditSink.",
-            "homepage": "https://github.com/adonko3xBitters/persistence-sql",
+            "description": "AUSUS — in-memory PersistenceDriver (L3). Reference conformance driver for tests and the vertical slice. RFC-002.",
             "keywords": [
                 "ausus",
+                "driver",
                 "framework",
-                "pdo",
-                "persistence",
-                "sql"
+                "memory",
+                "persistence"
             ],
             "transport-options": {
                 "symlink": true,
@@ -197,157 +277,42 @@
             }
         },
         {
-            "name": "ausus/runtime-default",
-            "version": "1.0.999",
+            "name": "ausus/view-system",
+            "version": "2.0.0",
             "dist": {
                 "type": "path",
-                "url": "packages/runtime-default",
-                "reference": "5deddf356d99d3905c236cecfd7034b042fc96f8"
+                "url": "packages/view-system",
+                "reference": "9d1f641f5421021684eaacdea4286ee905dc8475"
             },
             "require": {
-                "ausus/kernel": "^1.0",
-                "php": ">=8.3"
-            },
-            "type": "library",
-            "extra": {
-                "ausus": {
-                    "layer": "L2",
-                    "role": "runtime"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Ausus\\Runtime\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "L2 Runtime — Invoker, Policy Engine, Workflow runtime, Effect dispatch. Implements RFC-005 §3–§13, RFC-006, RFC-001 §A-1.4 §8.2.1, and the de facto ActionEffect dispatch of RFC-013.",
-            "homepage": "https://github.com/adonko3xBitters/runtime-default",
-            "keywords": [
-                "ausus",
-                "framework",
-                "invoker",
-                "runtime",
-                "workflow"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "ausus/standard-stack",
-            "version": "1.0.999",
-            "dist": {
-                "type": "path",
-                "url": "packages/standard-stack",
-                "reference": "d548db624e13157c5c7fd35df21b80c40a3b7c72"
-            },
-            "require": {
-                "ausus/api-http": "^1.0",
-                "ausus/kernel": "^1.0",
-                "ausus/persistence-sql": "^1.0",
-                "ausus/runtime-default": "^1.0",
                 "php": ">=8.3"
             },
             "type": "library",
             "extra": {
                 "ausus": {
                     "layer": "L5",
-                    "role": "stack",
-                    "v0-scope": [
-                        "ausus/kernel",
-                        "ausus/runtime-default",
-                        "ausus/persistence-sql",
-                        "ausus/api-http"
-                    ]
+                    "role": "view-system"
                 }
             },
             "autoload": {
-                "classmap": [
-                    "src/"
-                ]
+                "psr-4": {
+                    "Ausus\\View\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Ausus\\View\\Tests\\": "tests/"
+                }
             },
             "license": [
                 "MIT"
             ],
-            "description": "AUSUS — the V0 Standard Stack: bundles kernel + persistence-sql + runtime-default + api-http and ships the high-level Ausus\\Application bootstrap facade. Skeleton packages (tenancy-row, audit-database, auth-bridge, presentation-default) will be added as their RFC-12 §16 implementations land.",
-            "homepage": "https://github.com/adonko3xBitters/standard-stack",
-            "keywords": [
-                "application",
-                "ausus",
-                "bootstrap",
-                "framework",
-                "stack"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "ausus/starter",
-            "version": "1.0.999",
-            "dist": {
-                "type": "path",
-                "url": "packages/starter",
-                "reference": "7f8fbbd1bfdde375e32a818bcb05d29fc01b2e9e"
-            },
-            "require": {
-                "ausus/kernel": "^1.0",
-                "ausus/persistence-sql": "^1.0",
-                "ausus/runtime-default": "^1.0",
-                "ausus/standard-stack": "^1.0",
-                "ext-pdo": "*",
-                "ext-pdo_sqlite": "*",
-                "nyholm/psr7": "^1.8",
-                "nyholm/psr7-server": "^1.1",
-                "php": ">=8.3"
-            },
-            "bin": [
-                "bin/boot.php"
-            ],
-            "type": "project",
-            "extra": {
-                "ausus": {
-                    "layer": "L7",
-                    "role": "template"
-                }
-            },
-            "autoload": {
-                "classmap": [
-                    "src/"
-                ]
-            },
-            "scripts": {
-                "post-create-project-cmd": [
-                    "@php bin/boot.php"
-                ],
-                "boot": [
-                    "@php bin/boot.php"
-                ],
-                "serve": [
-                    "Composer\\Config::disableProcessTimeout",
-                    "@php -S localhost:8000 bin/server.php"
-                ]
-            },
-            "license": [
-                "MIT"
-            ],
-            "description": "AUSUS V0 starter template — boots a working HelloInvoice demo on top of the Standard Stack via Ausus\\Application. Installs via `composer create-project ausus/starter myapp`.",
-            "homepage": "https://github.com/adonko3xBitters/starter",
+            "description": "AUSUS L5 — View System. ViewDefinition / PageDefinition / SectionDefinition: pure presentation metadata assembled for the React Renderer. No compile, no hash, no repository.",
             "keywords": [
                 "ausus",
                 "framework",
-                "scaffold",
-                "starter"
+                "presentation",
+                "view"
             ],
             "transport-options": {
                 "symlink": true,
@@ -605,119 +570,6 @@
                 "source": "https://github.com/php-fig/http-message/tree/2.0"
             },
             "time": "2023-04-04T09:54:51+00:00"
-        },
-        {
-            "name": "psr/http-server-handler",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/http-server-handler.git",
-                "reference": "84c4fb66179be4caaf8e97bd239203245302e7d4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-server-handler/zipball/84c4fb66179be4caaf8e97bd239203245302e7d4",
-                "reference": "84c4fb66179be4caaf8e97bd239203245302e7d4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0",
-                "psr/http-message": "^1.0 || ^2.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Http\\Server\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "https://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for HTTP server-side request handler",
-            "keywords": [
-                "handler",
-                "http",
-                "http-interop",
-                "psr",
-                "psr-15",
-                "psr-7",
-                "request",
-                "response",
-                "server"
-            ],
-            "support": {
-                "source": "https://github.com/php-fig/http-server-handler/tree/1.0.2"
-            },
-            "time": "2023-04-10T20:06:20+00:00"
-        },
-        {
-            "name": "psr/http-server-middleware",
-            "version": "1.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-fig/http-server-middleware.git",
-                "reference": "c1481f747daaa6a0782775cd6a8c26a1bf4a3829"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/http-server-middleware/zipball/c1481f747daaa6a0782775cd6a8c26a1bf4a3829",
-                "reference": "c1481f747daaa6a0782775cd6a8c26a1bf4a3829",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0",
-                "psr/http-message": "^1.0 || ^2.0",
-                "psr/http-server-handler": "^1.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Psr\\Http\\Server\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "PHP-FIG",
-                    "homepage": "https://www.php-fig.org/"
-                }
-            ],
-            "description": "Common interface for HTTP server-side middleware",
-            "keywords": [
-                "http",
-                "http-interop",
-                "middleware",
-                "psr",
-                "psr-15",
-                "psr-7",
-                "request",
-                "response"
-            ],
-            "support": {
-                "issues": "https://github.com/php-fig/http-server-middleware/issues",
-                "source": "https://github.com/php-fig/http-server-middleware/tree/1.0.2"
-            },
-            "time": "2023-04-11T06:14:47+00:00"
         }
     ],
     "packages-dev": [],
