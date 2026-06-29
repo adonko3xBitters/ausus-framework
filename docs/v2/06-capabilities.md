@@ -52,6 +52,10 @@ projection that must itself have no expand** (depth ≤ 1, enforced by the
 compiler). Pattern: give every entity a flat `board` (the expand target) and put
 expands on `detail`.
 
+A projection read also accepts a **Projection Query** — `where` / `orderBy` /
+`limit` / `offset` over the exposed scalar fields (see the *Projection Query
+Language* reference).
+
 ## Runtime
 
 `RuntimeEntity::invoke` (create/transition/update) and `read` (projection

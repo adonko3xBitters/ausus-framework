@@ -37,13 +37,19 @@ derived value — e.g. an invoice `total` cannot be computed from line items, an
 patient `age` cannot be derived from `dob`. **Layer:** projection (the Report /
 aggregation capability is deferred).
 
-## 5. `read()` selection parameters are deferred
+## 5. `read()` selection — basic filter/sort/pagination only (L3)
 
-`read(projection, params, context)` ignores `params`: there is no server-side
-filter, sort, or pagination, so a projection returns **all** rows. Distinct
-boards that should differ only by a filter (e.g. "Arrivals" vs "Departures",
-"today's appointments", "active admissions") cannot be told apart yet.
-**Layer:** runtime read.
+**Resolved in part.** `read(projection, params, context)` now applies a
+server-side **Projection Query** — `where` (filter), `orderBy` (sort), and
+`limit`/`offset` (pagination) over the projection's exposed scalar fields (see
+the *Projection Query Language* reference). Distinct boards that differ only by a
+filter (e.g. "Arrivals" vs "Departures", "today's appointments", "active
+admissions") are now expressible.
+
+Still deferred at this layer: **joins, reverse relations, aggregations,
+computed/derived fields, reporting, availability, and anti-joins**. Filtering
+and sorting are restricted to the projection's own exposed scalar fields (not
+expand targets). **Layer:** runtime read.
 
 ## 6. Limited runtime integrity validation
 

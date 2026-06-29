@@ -33,6 +33,9 @@ final class ReadProjectionHandler
         $schema = $this->schemas->resolve($entity);
         $runtime = $this->engine->bind($schema, $this->driver);
 
-        return ['rows' => $runtime->read($projection, $params, $context)];
+        // L3 — translate the flat HTTP query into the structured read() contract.
+        $query = QueryStringParser::parse($params);
+
+        return ['rows' => $runtime->read($projection, $query, $context)];
     }
 }
