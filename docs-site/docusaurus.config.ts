@@ -8,7 +8,7 @@ const GITHUB_REPO = 'https://github.com/adonko3xBitters/ausus-framework';
 
 const config: Config = {
   title: 'AUSUS',
-  tagline: 'A metadata-first, plugin-first PHP framework for enterprise applications.',
+  tagline: 'Compile immutable metadata into running applications.',
   favicon: 'img/favicon.ico',
 
   future: {
@@ -85,11 +85,9 @@ const config: Config = {
         src: 'img/logo.svg',
       },
       items: [
-        {type: 'doc', docId: 'getting-started/installation', label: 'Getting Started', position: 'left'},
-        {type: 'doc', docId: 'concepts/metadata-graph', label: 'Concepts', position: 'left'},
-        {type: 'doc', docId: 'packages/index', label: 'Packages', position: 'left'},
-        {type: 'doc', docId: 'releases/v0.1.1', label: 'Release Notes', position: 'left'},
-        {type: 'doc', docId: 'operations/publication-runbook', label: 'Operations', position: 'left'},
+        {type: 'doc', docId: 'gen2/QUICKSTART', label: 'Quick Start', position: 'left'},
+        {type: 'doc', docId: 'gen2/introduction', label: 'Concepts', position: 'left'},
+        {type: 'doc', docId: 'gen2/architecture', label: 'Architecture', position: 'left'},
         {type: 'docSidebar', sidebarId: 'docs', label: 'All Docs', position: 'left'},
         {href: GITHUB_REPO, label: 'GitHub', position: 'right'},
         {
@@ -104,11 +102,10 @@ const config: Config = {
         {
           title: 'Docs',
           items: [
-            {label: 'Installation', to: '/getting-started/installation'},
-            {label: 'HelloInvoice tutorial', to: '/getting-started/hello-invoice'},
-            {label: 'Packages', to: '/packages/'},
-            {label: 'Release Notes v0.1.1', to: '/releases/v0.1.1'},
-            {label: 'Release Notes v0.1.0', to: '/releases/v0.1.0'},
+            {label: 'Quick Start', to: '/gen2/QUICKSTART'},
+            {label: 'Architecture', to: '/gen2/architecture'},
+            {label: 'Capabilities', to: '/gen2/capabilities'},
+            {label: 'Known limits', to: '/gen2/known-limits'},
           ],
         },
         {
@@ -116,14 +113,14 @@ const config: Config = {
           items: [
             {label: 'GitHub', href: GITHUB_REPO},
             {label: 'Packagist (ausus/*)', href: 'https://packagist.org/search/?query=ausus'},
-            {label: 'npm (@ausus/renderer-react)', href: 'https://www.npmjs.com/package/@ausus/renderer-react'},
+            {label: 'npm (@ausus/react-renderer)', href: 'https://www.npmjs.com/package/@ausus/react-renderer'},
           ],
         },
         {
           title: 'Project',
           items: [
-            {label: 'RFCs', to: '/rfc/'},
-            {label: 'Publication Runbook', to: '/operations/publication-runbook'},
+            {label: 'Roadmap & limits', to: '/gen2/known-limits'},
+            {label: 'Contributing', href: `${GITHUB_REPO}/blob/main/CONTRIBUTING.md`},
           ],
         },
       ],
