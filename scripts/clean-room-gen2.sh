@@ -88,8 +88,8 @@ echo "  ✓ compile + runtime smoke green"
 # ─── D. installed versions ──────────────────────────────────────────────────
 echo "[clean-room-gen2] D — installed versions"
 for pkg in ausus/kernel ausus/entity-engine ausus/authoring ausus/persistence-memory ausus/api-runtime ausus/cli; do
-    INSTALLED="$(composer show "$pkg" 2>/dev/null | awk '/^versions/ { gsub(/[*,]/,""); print $2; exit }')"
-    [ "$INSTALLED" = "$EXPECTED_VERSION" ] || { echo "::error::$pkg installed=$INSTALLED (expected $EXPECTED_VERSION)"; exit 1; }
+    INSTALLED="$(composer show "$pkg" --format=json 2>/dev/null | jq -r '.versions[0] // ""')"
+    [ "${INSTALLED#v}" = "${EXPECTED_VERSION#v}" ] || { echo "::error::$pkg installed=$INSTALLED (expected $EXPECTED_VERSION)"; exit 1; }
     printf "  ✓ %-28s %s\n" "$pkg" "$INSTALLED"
 done
 
