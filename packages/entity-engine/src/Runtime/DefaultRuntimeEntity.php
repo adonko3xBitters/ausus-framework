@@ -13,6 +13,7 @@ use Ausus\Definition\ActionDefinition;
 use Ausus\Definition\Enum\ActionKind;
 use Ausus\Definition\Enum\FieldType;
 use Ausus\Definition\ProjectionDefinition;
+use Ausus\Engine\Query\ProjectionQuery;
 use Ausus\Entity;
 use Ausus\PersistenceDriver;
 use Ausus\Reference;
@@ -66,11 +67,18 @@ final class DefaultRuntimeEntity implements RuntimeEntity
         $definition = $this->projection($projection)
             ?? throw new RuntimeException("ausus:read: unknown projection '{$projection}'");
 
+        // L3 — parse + validate the projection query (fail-closed) before any I/O.
+        $query = ProjectionQuery::fromParams($params, $definition);
+
         $tx = $this->driver->beginTransaction($context->tenant());
         try {
             $entities = $this->driver->context($context->tenant(), $tx)
                 ->repository($this->schema->identity)
                 ->findAll();
+
+            // L3 — selection: WHERE → ORDER BY → LIMIT/OFFSET, before rendering.
+            $entities = $query->apply($entities);
+
             $rows = [];
             foreach ($entities as $entity) {
                 $rows[] = $this->renderRow($definition, $entity, $context, $tx);

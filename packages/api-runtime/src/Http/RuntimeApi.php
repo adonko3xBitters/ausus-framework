@@ -87,6 +87,9 @@ final class RuntimeApi
     private function statusFor(Throwable $e): int
     {
         $m = strtolower($e->getMessage());
+        if (str_contains($m, 'ausus:query')) {
+            return 400; // malformed projection query (L3)
+        }
         if (str_contains($m, 'denied')) {
             return 403; // authorization deny
         }

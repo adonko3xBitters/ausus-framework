@@ -3,6 +3,13 @@
 
 export { RuntimeClient } from './api/RuntimeClient.ts';
 export type { FetchLike, RuntimeClientOptions } from './api/RuntimeClient.ts';
+export { buildProjectionParams } from './api/projectionQuery.ts';
+export type {
+  FilterCondition,
+  FilterOperator,
+  ProjectionQuerySpec,
+  SortSpec,
+} from './api/projectionQuery.ts';
 export { EntityRegistry } from './discovery/EntityRegistry.ts';
 export type { NavigationEntry } from './discovery/EntityRegistry.ts';
 
