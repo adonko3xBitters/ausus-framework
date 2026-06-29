@@ -1,0 +1,20 @@
+{
+    "name": "ausus/persistence-sqlite",
+    "description": "AUSUS 2.0 — the first public SQL PersistenceDriver: a PDO SQLite implementation of the frozen kernel persistence SPI. Drop-in interchangeable with ausus/persistence-memory.",
+    "license": "MIT",
+    "type": "library",
+    "require": {
+        "php": ">=8.3",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
+        "ext-json": "*",
+        "ausus/kernel": "^2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Ausus\\Persistence\\Sqlite\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

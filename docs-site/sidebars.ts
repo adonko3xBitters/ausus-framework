@@ -42,7 +42,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Reference',
-      items: ['gen2/projection-queries', 'gen2/projection-aggregations', 'gen2/known-limits'],
+      items: ['gen2/projection-queries', 'gen2/projection-aggregations', 'gen2/sql-persistence', 'gen2/known-limits'],
     },
     {
       type: 'category',
