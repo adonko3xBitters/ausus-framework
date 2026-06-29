@@ -26,6 +26,7 @@ echo "[ci-gen2] step 1 — composer validate"
 fail=0
 for f in composer.json packages/kernel/composer.json packages/entity-engine/composer.json \
          packages/authoring/composer.json packages/persistence-memory/composer.json \
+         packages/persistence-sqlite/composer.json \
          packages/api-runtime/composer.json packages/view-system/composer.json \
          packages/cli/composer.json; do
     if composer validate --no-check-publish --no-check-lock --strict "$f" >/dev/null 2>&1; then
@@ -57,6 +58,8 @@ PHP_SUITES=(
     packages/authoring/tests/dsl-expression-test.php
     packages/authoring/tests/dsl-equivalence-test.php
     packages/persistence-memory/tests/driver-conformance-test.php
+    packages/persistence-sqlite/tests/sqlite-conformance-test.php
+    packages/persistence-sqlite/tests/sqlite-integration-test.php
     packages/cli/tests/dsl-frontend-test.php
     packages/cli/tests/file-schema-repository-test.php
     packages/cli/tests/compile-entities-test.php

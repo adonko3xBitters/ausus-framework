@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "812e3b5b30bc3868fe65e148830087b6",
+    "content-hash": "5de43e720c31e76f3490038e1a1627dd",
     "packages": [
         {
             "name": "ausus/api-runtime",
@@ -12,7 +12,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/api-runtime",
-                "reference": "89ee8f9012e870a14d68bfd8779f35475bdfd39f"
+                "reference": "8333b313d3a8a222edea236fc16a87bd2ebcd67d"
             },
             "require": {
                 "ausus/entity-engine": "^2.0",
@@ -40,6 +40,7 @@
                 "MIT"
             ],
             "description": "AUSUS L4 — HTTP API Runtime. Consumes SchemaRepository / EntityEngine / RuntimeEntity only: resolve → bind → invoke/read. Never compiles, canonicalises, hashes, or loads DSL.",
+            "homepage": "https://github.com/adonko3xBitters/api-runtime",
             "keywords": [
                 "api",
                 "ausus",
@@ -58,7 +59,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/authoring",
-                "reference": "9d4811ddb7d5571ba65e85cad76072178379c96d"
+                "reference": "a6502fc9b4974b3287bdbc4deace63af45b3d3ac"
             },
             "require": {
                 "ausus/kernel": "^2.0",
@@ -85,6 +86,7 @@
                 "MIT"
             ],
             "description": "AUSUS Authoring (L1) — closed PHP DSL producing an EE-RFC-012 EntityDefinition. EE-RFC-CLI-002/003.",
+            "homepage": "https://github.com/adonko3xBitters/authoring",
             "keywords": [
                 "ausus",
                 "authoring",
@@ -102,7 +104,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "7c65129967128bafe25f990c77c8e0eb4aea2292"
+                "reference": "55aeda806406de5c4e616aba07f4f5e69689759b"
             },
             "require": {
                 "ausus/authoring": "^2.0",
@@ -132,6 +134,7 @@
                 "MIT"
             ],
             "description": "AUSUS — CLI (L6): DSL frontend and the `ausus compile` command. Discovers closed-DSL definition files, scans them for forbidden symbols, compiles them to content-addressed EntitySchema via the Entity Engine, and persists through FileSchemaRepository. PHP-native, no container, no auto-discovery.",
+            "homepage": "https://github.com/adonko3xBitters/cli",
             "keywords": [
                 "ausus",
                 "cli",
@@ -149,7 +152,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/entity-engine",
-                "reference": "570df00cde92ad3213bcd989c1f757be9f120bcc"
+                "reference": "70022515d56aec8ee37f7538ead49d42031790ac"
             },
             "require": {
                 "ausus/kernel": "^2.0",
@@ -176,6 +179,7 @@
                 "MIT"
             ],
             "description": "AUSUS Entity Engine (L1) — content-addressed compile pipeline (Canonicalizer semantic normal form, Hasher, ClosureValidator) plus the bind/runtime half. EE-RFC-011 / EE-RFC-012.",
+            "homepage": "https://github.com/adonko3xBitters/entity-engine",
             "keywords": [
                 "ausus",
                 "compile",
@@ -237,7 +241,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/persistence-memory",
-                "reference": "77d7bf67ab60ad42939061333f80cc376d896fa7"
+                "reference": "663ab34a85f3a6a160329f893cae0c1122d0fa51"
             },
             "require": {
                 "ausus/kernel": "^2.0",
@@ -264,6 +268,7 @@
                 "MIT"
             ],
             "description": "AUSUS — in-memory PersistenceDriver (L3). Reference conformance driver for tests and the vertical slice. RFC-002.",
+            "homepage": "https://github.com/adonko3xBitters/persistence-memory",
             "keywords": [
                 "ausus",
                 "driver",
@@ -277,12 +282,42 @@
             }
         },
         {
+            "name": "ausus/persistence-sqlite",
+            "version": "2.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/persistence-sqlite",
+                "reference": "508f0acb881744a1d9a3e468e8ee764ea6baea54"
+            },
+            "require": {
+                "ausus/kernel": "^2.0",
+                "ext-json": "*",
+                "ext-pdo": "*",
+                "ext-pdo_sqlite": "*",
+                "php": ">=8.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ausus\\Persistence\\Sqlite\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "AUSUS 2.0 — the first public SQL PersistenceDriver: a PDO SQLite implementation of the frozen kernel persistence SPI. Drop-in interchangeable with ausus/persistence-memory.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "ausus/view-system",
             "version": "2.0.0",
             "dist": {
                 "type": "path",
                 "url": "packages/view-system",
-                "reference": "9d1f641f5421021684eaacdea4286ee905dc8475"
+                "reference": "096364edc5bfd6cb383219a790caf1b66f009da3"
             },
             "require": {
                 "php": ">=8.3"
@@ -308,6 +343,7 @@
                 "MIT"
             ],
             "description": "AUSUS L5 — View System. ViewDefinition / PageDefinition / SectionDefinition: pure presentation metadata assembled for the React Renderer. No compile, no hash, no repository.",
+            "homepage": "https://github.com/adonko3xBitters/view-system",
             "keywords": [
                 "ausus",
                 "framework",

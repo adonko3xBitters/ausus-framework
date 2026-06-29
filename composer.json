@@ -8,6 +8,7 @@
         { "type": "path", "url": "packages/entity-engine",         "options": { "symlink": true, "versions": { "ausus/entity-engine":        "2.0.0" } } },
         { "type": "path", "url": "packages/authoring",             "options": { "symlink": true, "versions": { "ausus/authoring":            "2.0.0" } } },
         { "type": "path", "url": "packages/persistence-memory",    "options": { "symlink": true, "versions": { "ausus/persistence-memory":   "2.0.0" } } },
+        { "type": "path", "url": "packages/persistence-sqlite",    "options": { "symlink": true, "versions": { "ausus/persistence-sqlite":   "2.0.0" } } },
         { "type": "path", "url": "packages/api-runtime",           "options": { "symlink": true, "versions": { "ausus/api-runtime":          "2.0.0" } } },
         { "type": "path", "url": "packages/view-system",           "options": { "symlink": true, "versions": { "ausus/view-system":          "2.0.0" } } },
         { "type": "path", "url": "packages/cli",                   "options": { "symlink": true, "versions": { "ausus/cli":                  "2.0.0" } } }
@@ -20,6 +21,7 @@
         "ausus/entity-engine": "^2.0",
         "ausus/kernel": "^2.0",
         "ausus/persistence-memory": "^2.0",
+        "ausus/persistence-sqlite": "^2.0",
         "ausus/view-system": "^2.0",
         "nyholm/psr7": "^1.8",
         "nyholm/psr7-server": "^1.1"
