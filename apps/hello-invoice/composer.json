@@ -1,0 +1,18 @@
+{
+    "name": "acme/hello-invoice",
+    "description": "AUSUS 2.0 — official Hello Invoice example. Public packages only; the exact project a user downloads from GitHub.",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.3",
+        "ausus/authoring": "^2.0",
+        "ausus/entity-engine": "^2.0",
+        "ausus/persistence-memory": "^2.0",
+        "ausus/api-runtime": "^2.0"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

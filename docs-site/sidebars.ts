@@ -15,7 +15,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Getting Started',
       collapsed: false,
-      items: ['gen2/QUICKSTART', 'gen2/first-project'],
+      items: ['gen2/QUICKSTART', 'gen2/first-project', 'gen2/tutorials/hello-invoice'],
     },
     {
       type: 'category',
@@ -27,6 +27,12 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Architecture',
       items: ['gen2/architecture'],
+    },
+    {
+      type: 'category',
+      label: 'Tutorials',
+      collapsed: false,
+      items: ['gen2/tutorials/hello-invoice'],
     },
     {
       type: 'category',
