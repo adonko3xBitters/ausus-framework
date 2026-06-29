@@ -20,6 +20,7 @@ once, centrally.
 ## Start here
 
 - **[Quick Start](gen2/QUICKSTART.md)** — from `composer require` to a rendered UI, in under five minutes.
+- **[Hello Invoice](gen2/tutorials/hello-invoice.md)** — build your first application end to end, using only public packages.
 - **[Introduction](gen2/01-introduction.md)** — what AUSUS is, why it exists, its principles.
 - **[Architecture](gen2/02-architecture.md)** — the L0 → L6 layering and the compile→run pipeline.
 
