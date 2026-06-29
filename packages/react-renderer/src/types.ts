@@ -45,6 +45,8 @@ export interface EntitySchemaResponse {
 // GET /api/entities/{entity}/projections/{projection}
 export interface ProjectionResponse {
   rows: Array<Record<string, unknown>>;
+  // L4 — present only when the request asked for `aggregate`; never on plain reads.
+  aggregates?: Record<string, number | string | null>;
 }
 
 // POST /api/entities/{entity}/actions/{action}

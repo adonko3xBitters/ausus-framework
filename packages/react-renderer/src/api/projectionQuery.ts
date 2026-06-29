@@ -42,12 +42,25 @@ export interface SortSpec {
   dir?: 'asc' | 'desc';
 }
 
+// L4 — KPI aggregations.
+export type AggregateOp = 'count' | 'sum' | 'avg' | 'min' | 'max';
+
+export interface AggregateSpec {
+  op: AggregateOp;
+  /** Required for sum/avg/min/max; optional for count (omitted ⇒ row count). */
+  field?: string;
+  /** Result alias under `aggregates` in the response. */
+  as: string;
+}
+
 export interface ProjectionQuerySpec {
   /** AND-joined conditions (matches the HTTP shorthand semantics). */
   where?: FilterCondition[];
   orderBy?: SortSpec[];
   limit?: number;
   offset?: number;
+  /** L4 — aggregates computed over the full WHERE-filtered set (ignores limit/offset). */
+  aggregate?: AggregateSpec[];
 }
 
 /**
@@ -76,6 +89,12 @@ export function buildProjectionParams(spec: ProjectionQuerySpec): Record<string,
   }
   if (spec.offset !== undefined) {
     params.offset = String(spec.offset);
+  }
+
+  if (spec.aggregate && spec.aggregate.length > 0) {
+    params.aggregate = spec.aggregate
+      .map((a) => (a.field === undefined ? `${a.op}:${a.as}` : `${a.op}:${a.field}:${a.as}`))
+      .join(',');
   }
 
   return params;

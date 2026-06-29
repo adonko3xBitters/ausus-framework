@@ -6,6 +6,7 @@ namespace Ausus\Api\Runtime\Projection;
 use Ausus\Contracts\Context;
 use Ausus\Contracts\EntityEngine;
 use Ausus\Contracts\SchemaRepository;
+use Ausus\Engine\Runtime\AggregatingRuntimeEntity;
 use Ausus\PersistenceDriver;
 
 /**
@@ -26,7 +27,7 @@ final class ReadProjectionHandler
 
     /**
      * @param array<string,mixed> $params
-     * @return array{rows: list<array<string,mixed>>}
+     * @return array{rows: list<array<string,mixed>>, aggregates?: array<string,mixed>}
      */
     public function handle(string $entity, string $projection, array $params, Context $context): array
     {
@@ -35,6 +36,12 @@ final class ReadProjectionHandler
 
         // L3 — translate the flat HTTP query into the structured read() contract.
         $query = QueryStringParser::parse($params);
+
+        // L4 — when aggregates are requested and the runtime supports them, return
+        // the { rows, aggregates } envelope. Otherwise the unchanged rows-only one.
+        if (array_key_exists('aggregate', $query) && $runtime instanceof AggregatingRuntimeEntity) {
+            return $runtime->readWithAggregates($projection, $query, $context);
+        }
 
         return ['rows' => $runtime->read($projection, $query, $context)];
     }

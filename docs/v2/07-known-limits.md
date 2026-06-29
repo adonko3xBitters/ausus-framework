@@ -30,12 +30,17 @@ cannot stamp other fields at the same time — e.g. `Stay.checkOut` sets
 `status = checked_out` but cannot record `actualCheckOut`; `Consultation.close`
 cannot record `closedAt`. **Layer:** kernel (TransitionSpec) / runtime.
 
-## 4. No aggregation or computed fields
+## 4. Aggregations (count/sum/avg/min/max) only — no grouping or computed fields
 
-Projections expose stored fields only. There is no summation, grouping, count, or
-derived value — e.g. an invoice `total` cannot be computed from line items, and a
-patient `age` cannot be derived from `dob`. **Layer:** projection (the Report /
-aggregation capability is deferred).
+**Resolved in part.** A projection read now applies server-side **aggregations**
+— `count`, `sum`, `avg`, `min`, `max` over the exposed scalar fields, computed on
+the WHERE-filtered, visible set (see the *Projection Aggregations* reference).
+KPI cards and dashboard badges are now expressible.
+
+Still deferred at this layer: **grouping (group-by), computed/derived fields**
+(e.g. an invoice `total` summed from line items, or a patient `age` derived from
+`dob`), and full reporting. `sum`/`avg` operate on stored numeric values only.
+**Layer:** projection / runtime read.
 
 ## 5. `read()` selection — basic filter/sort/pagination only (L3)
 
@@ -46,10 +51,11 @@ the *Projection Query Language* reference). Distinct boards that differ only by 
 filter (e.g. "Arrivals" vs "Departures", "today's appointments", "active
 admissions") are now expressible.
 
-Still deferred at this layer: **joins, reverse relations, aggregations,
-computed/derived fields, reporting, availability, and anti-joins**. Filtering
-and sorting are restricted to the projection's own exposed scalar fields (not
-expand targets). **Layer:** runtime read.
+Aggregations (count/sum/avg/min/max) are also available — see limit #4 and the
+*Projection Aggregations* reference. Still deferred at this layer: **joins,
+reverse relations, grouping, computed/derived fields, reporting, availability,
+and anti-joins**. Filtering and sorting are restricted to the projection's own
+exposed scalar fields (not expand targets). **Layer:** runtime read.
 
 ## 6. Limited runtime integrity validation
 

@@ -54,7 +54,9 @@ expands on `detail`.
 
 A projection read also accepts a **Projection Query** — `where` / `orderBy` /
 `limit` / `offset` over the exposed scalar fields (see the *Projection Query
-Language* reference).
+Language* reference) — and **Projection Aggregations** — `count` / `sum` / `avg`
+/ `min` / `max` for KPI cards and dashboards (see the *Projection Aggregations*
+reference).
 
 ## Runtime
 
