@@ -5,6 +5,8 @@ export { RuntimeClient } from './api/RuntimeClient.ts';
 export type { FetchLike, RuntimeClientOptions } from './api/RuntimeClient.ts';
 export { buildProjectionParams } from './api/projectionQuery.ts';
 export type {
+  AggregateOp,
+  AggregateSpec,
   FilterCondition,
   FilterOperator,
   ProjectionQuerySpec,

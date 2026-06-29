@@ -52,6 +52,7 @@ PHP_SUITES=(
     packages/entity-engine/tests/authorization-evaluator-test.php
     packages/entity-engine/tests/runtime-entity-test.php
     packages/entity-engine/tests/projection-query-test.php
+    packages/entity-engine/tests/projection-aggregation-test.php
     packages/authoring/tests/dsl-definition-test.php
     packages/authoring/tests/dsl-expression-test.php
     packages/authoring/tests/dsl-equivalence-test.php
@@ -61,6 +62,7 @@ PHP_SUITES=(
     packages/cli/tests/compile-entities-test.php
     packages/api-runtime/tests/runtime-api-test.php
     packages/api-runtime/tests/projection-query-http-test.php
+    packages/api-runtime/tests/projection-aggregation-http-test.php
     packages/view-system/tests/view-system-test.php
     apps/crm/tests/crm-validation-test.php
     apps/teranga-pms/tests/pms-validation-test.php
@@ -82,6 +84,7 @@ echo "[ci-gen2] step 4 — JS suites"
 JS_SUITES=(
     packages/react-renderer/tests/renderer.test.ts
     packages/react-renderer/tests/projection-query.test.ts
+    packages/react-renderer/tests/projection-aggregation.test.ts
     packages/view-system/tests/view-renderer.test.ts
     apps/crm/tests/crm-renderer.test.ts
     apps/teranga-pms/tests/pms-renderer.test.ts

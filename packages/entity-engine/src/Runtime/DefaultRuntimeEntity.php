@@ -13,6 +13,7 @@ use Ausus\Definition\ActionDefinition;
 use Ausus\Definition\Enum\ActionKind;
 use Ausus\Definition\Enum\FieldType;
 use Ausus\Definition\ProjectionDefinition;
+use Ausus\Engine\Query\ProjectionAggregation;
 use Ausus\Engine\Query\ProjectionQuery;
 use Ausus\Entity;
 use Ausus\PersistenceDriver;
@@ -35,7 +36,7 @@ use Throwable;
  * The optional {@see SchemaRepository} resolves a target entity's schema for
  * single-hop `expand` (depth ≤ 1 — guaranteed by the closure; no recursion).
  */
-final class DefaultRuntimeEntity implements RuntimeEntity
+final class DefaultRuntimeEntity implements RuntimeEntity, AggregatingRuntimeEntity
 {
     public function __construct(
         private readonly EntitySchema $schema,
@@ -64,11 +65,27 @@ final class DefaultRuntimeEntity implements RuntimeEntity
      */
     public function read(string $projection, array $params, Context $context): array
     {
+        // The kernel contract returns a bare list<row>; L4 lives in the shared
+        // pipeline below and is simply discarded here (aggregates are [] unless
+        // `aggregate` is present). Rows are byte-identical to the L3 behaviour.
+        return $this->readWithAggregates($projection, $params, $context)['rows'];
+    }
+
+    /**
+     * L4 — one read pass producing both the paginated rows and the KPI
+     * aggregates. {@see AggregatingRuntimeEntity}.
+     *
+     * @param array<string,mixed> $params
+     * @return array{rows: list<array<string,mixed>>, aggregates: array<string,mixed>}
+     */
+    public function readWithAggregates(string $projection, array $params, Context $context): array
+    {
         $definition = $this->projection($projection)
             ?? throw new RuntimeException("ausus:read: unknown projection '{$projection}'");
 
-        // L3 — parse + validate the projection query (fail-closed) before any I/O.
+        // L3 + L4 — parse + validate (fail-closed) before any I/O.
         $query = ProjectionQuery::fromParams($params, $definition);
+        $aggregation = ProjectionAggregation::fromParams($params, $definition);
 
         $tx = $this->driver->beginTransaction($context->tenant());
         try {
@@ -76,16 +93,30 @@ final class DefaultRuntimeEntity implements RuntimeEntity
                 ->repository($this->schema->identity)
                 ->findAll();
 
-            // L3 — selection: WHERE → ORDER BY → LIMIT/OFFSET, before rendering.
-            $entities = $query->apply($entities);
+            // L3 — WHERE filter (tenant-scoped). Aggregates run over this full
+            // set; rows are then sorted + paginated from the same set.
+            $filtered = $query->filter($entities);
 
+            // L4 — aggregate over the WHERE-filtered, visibility-applied set,
+            // independent of LIMIT/OFFSET. renderFields() applies per-field
+            // visibility, so hidden values never contribute.
+            $aggregates = [];
+            if (!$aggregation->isEmpty()) {
+                $visible = [];
+                foreach ($filtered as $entity) {
+                    $visible[] = $this->renderFields($definition, $entity, $context);
+                }
+                $aggregates = $aggregation->compute($visible);
+            }
+
+            // L3 — ORDER BY → LIMIT/OFFSET, then render the page (fields + expand).
             $rows = [];
-            foreach ($entities as $entity) {
+            foreach ($query->sortAndSlice($filtered) as $entity) {
                 $rows[] = $this->renderRow($definition, $entity, $context, $tx);
             }
             $this->driver->rollback($tx); // read-only
 
-            return $rows;
+            return ['rows' => $rows, 'aggregates' => $aggregates];
         } catch (Throwable $e) {
             $this->driver->rollback($tx);
             throw $e;

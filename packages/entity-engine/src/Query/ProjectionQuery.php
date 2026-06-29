@@ -78,8 +78,10 @@ final class ProjectionQuery
             $allowed[$exposed->field] = true;
         }
 
+        // `aggregate` is a sibling read parameter owned by L4
+        // ({@see ProjectionAggregation}); L3 accepts and ignores it.
         foreach (array_keys($params) as $key) {
-            if (!in_array($key, ['where', 'orderBy', 'limit', 'offset'], true)) {
+            if (!in_array($key, ['where', 'orderBy', 'limit', 'offset', 'aggregate'], true)) {
                 throw new QueryError("ausus:query: unknown parameter '{$key}'");
             }
         }
@@ -95,18 +97,45 @@ final class ProjectionQuery
     /**
      * Apply WHERE → ORDER BY → LIMIT/OFFSET to a list of entities.
      *
+     * Equivalent to {@see sortAndSlice}({@see filter}($entities)); kept as the
+     * one-shot entry point. L4 uses the two halves separately so aggregates can
+     * be computed over the WHERE-filtered set *before* pagination.
+     *
      * @param list<Entity> $entities
      * @return list<Entity>
      */
     public function apply(array $entities): array
     {
-        if ($this->filter !== null) {
-            $entities = array_values(array_filter(
-                $entities,
-                fn (Entity $e): bool => $this->matches($this->filter, $e),
-            ));
+        return $this->sortAndSlice($this->filter($entities));
+    }
+
+    /**
+     * WHERE only: the tenant-scoped rows that match the filter, unordered and
+     * unpaginated. This is the set L4 aggregates over.
+     *
+     * @param list<Entity> $entities
+     * @return list<Entity>
+     */
+    public function filter(array $entities): array
+    {
+        if ($this->filter === null) {
+            return array_values($entities);
         }
 
+        return array_values(array_filter(
+            $entities,
+            fn (Entity $e): bool => $this->matches($this->filter, $e),
+        ));
+    }
+
+    /**
+     * ORDER BY → LIMIT/OFFSET over an already-filtered list (the page of rows).
+     *
+     * @param list<Entity> $entities
+     * @return list<Entity>
+     */
+    public function sortAndSlice(array $entities): array
+    {
         if ($this->orderBy !== []) {
             usort($entities, fn (Entity $a, Entity $b): int => $this->compareRows($a, $b));
         }
