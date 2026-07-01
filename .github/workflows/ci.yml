@@ -32,7 +32,7 @@ jobs:
       line: ${{ steps.line.outputs.line }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       - id: line
         name: Resolve line
         run: |
@@ -76,7 +76,7 @@ jobs:
         node-version: ['22']   # ci-gen2.sh TS suites need Node >=22.6 (--experimental-strip-types)
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
@@ -122,7 +122,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup PHP ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
@@ -205,7 +205,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Node 22
         uses: actions/setup-node@v6
